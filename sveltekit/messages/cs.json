@@ -1,0 +1,33 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "example_message": "Bry den {username}",
+  "labels": {
+    "choose_country": "Vyberte zemi",
+    "invoice": "Faktura"
+  },
+  "actions": {
+    "add-item": "Přidat položku",
+    "remove-item": "Odstranit položku"
+  },
+  "form": {
+    "receiver": "Odběratel",
+    "general": "Obecné",
+    "company": "Jméno společnosti",
+    "fullname": "Celé jméno",
+    "address": "Adresa",
+    "postal": "PSČ",
+    "city": "Město",
+    "country": "Stát",
+    "ine": "IČO",
+    "vat": "DIČ",
+    "currency": "Měna",
+    "refid": "Číslo faktury",
+    "issued-at": "Vystaveno dne",
+    "paid-at": "Zaplaceno dne",
+    "items": "Položky",
+    "name": "Název",
+    "count": "Počet",
+    "measurement-unit": "Měrná jednotka (MJ)",
+    "single-price": "Cena za MJ"
+  }
+}

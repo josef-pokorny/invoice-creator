@@ -1,0 +1,34 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "example_message": "Hello world {username}",
+  "labels": {
+    "choose_country": "Chooose country",
+    "invoice": "Invoice"
+  },
+  "actions": {
+    "add-item": "Add item",
+    "remove-item": "Remove item"
+  },
+  "form": {
+    "receiver": "Receiver",
+    "general": "General",
+    "company": "Jméno společnosti",
+    "fullname": "Full name",
+    "address": "Address",
+    "postal": "Postal code",
+    "city": "City",
+    "country": "Country",
+    "ine": "INE",
+    "vat": "VAT",
+    "currency": "Currency",
+    "refid": "Invoice ID",
+    "date": "Date",
+    "issued-at": "Issued at",
+    "paid-at": "Paid at",
+    "items": "Items",
+    "name": "Name",
+    "count": "Count",
+    "measurement-unit": "Measurement unit (MU)",
+    "single-price": "Price for MU"
+  }
+}
