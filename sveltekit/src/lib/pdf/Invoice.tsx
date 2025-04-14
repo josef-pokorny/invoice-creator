@@ -8,35 +8,68 @@ import {
     Font,
 } from "@react-pdf/renderer";
 import { EInvoiceType, type IInvoiceProps } from "./invoice-types";
-import { supplier } from "$lib/billing.json";
 import moment from "$lib/moment";
 
 import MontserratRegular from "$lib/fonts/Montserrat-Regular.ttf";
 // import MontserratMedium from "$lib/fonts/Montserrat-Medium.ttf";
 import MontserratBold from "$lib/fonts/Montserrat-Bold.ttf";
-import { fromCents } from "$lib/index";
+import { fromCents, type IBilling } from "$lib/index";
 // import MontserratExtraBold from "$lib/fonts/Montserrat-ExtraBold.ttf";
 // import MontserratSemiBold from "$lib/fonts/Montserrat-SemiBold.ttf";
 // import MontserratLight from "$lib/fonts/Montserrat-Light.ttf";
+
+import RobotoRegular from "$lib/fonts/Roboto-Regular.ttf";
+import RobotoBold from "$lib/fonts/Roboto-Bold.ttf";
+import RobotoItalicRegular from "$lib/fonts/Roboto-Italic.ttf";
+import RobotoItalicBold from "$lib/fonts/Roboto-BoldItalic.ttf";
+import RobotoSemiBold from "$lib/fonts/Roboto-SemiBold.ttf";
+import RobotoItalicSemiBold from "$lib/fonts/Roboto-SemiBoldItalic.ttf";
+import RobotoLight from "$lib/fonts/Roboto-Light.ttf";
+import RobotoItalicLight from "$lib/fonts/Roboto-LightItalic.ttf";
+import _ from "lodash";
 
 Font.register({
     family: "Roboto",
     fonts: [
         {
-            src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf",
+            src: RobotoLight,
             fontWeight: 300,
+            fontStyle: "normal",
         },
         {
-            src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf",
+            src: RobotoItalicLight,
+            fontWeight: 300,
+            fontStyle: "italic",
+        },
+        {
+            src: RobotoRegular,
             fontWeight: 400,
+            fontStyle: "normal",
         },
         {
-            src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
+            src: RobotoItalicRegular,
+            fontWeight: 400,
+            fontStyle: "italic",
+        },
+        {
+            src: RobotoSemiBold,
             fontWeight: 500,
+            fontStyle: "normal",
         },
         {
-            src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf",
+            src: RobotoItalicSemiBold,
+            fontWeight: 500,
+            fontStyle: "italic",
+        },
+        {
+            src: RobotoBold,
             fontWeight: 600,
+            fontStyle: "normal",
+        },
+        {
+            src: RobotoItalicBold,
+            fontWeight: 600,
+            fontStyle: "italic",
         },
     ],
 });
@@ -58,7 +91,7 @@ Font.register({
         // },
         {
             src: MontserratBold,
-            fontWeight: 700,
+            fontWeight: 600,
         },
         // {
         //   src: MontserratExtraBold,
@@ -79,13 +112,23 @@ const styles = StyleSheet.create({
         gap: 4,
         padding: "30 18 0",
     },
+    footer: {
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        justifyContent: "flex-end",
+        padding: "30 18",
+    },
     page: {
-        padding: "15 18 30",
+        display: "flex",
+    },
+    main: {
+        padding: "5 18 30",
     },
     companyName: {
         fontFamily: "Montserrat",
-        fontWeight: 700,
-        fontSize: 20,
+        fontWeight: 600,
+        fontSize: 18,
     },
     refId: {
         fontWeight: 500,
@@ -98,7 +141,7 @@ const styles = StyleSheet.create({
     addresses: {
         display: "flex",
         flexDirection: "row",
-        marginBottom: 50,
+        marginBottom: 30,
     },
     address: {
         flexGrow: 0,
@@ -119,25 +162,39 @@ const styles = StyleSheet.create({
         padding: "2 5",
         fontSize: "10px",
     },
-    itemText0: {
-        width: "9%",
-        flexGrow: 0,
+    itemCount: {
+        width: "6%",
         padding: "0 3",
     },
-    itemText1: {
-        width: "15%",
-        flexGrow: 0,
+    itemMeasurementUnit: {
+        width: "6%",
         padding: "0 3",
     },
-    itemText2: {
-        width: "20%",
-        flexGrow: 0,
+    itemPriceForMU: {
+        width: "12%",
         padding: "0 3",
     },
-    itemText3: {
-        width: "25%",
-        flexGrow: 0,
+    itemTotal: {
+        width: "18%",
         padding: "0 3",
+    },
+    itemVat: {
+        width: "10%",
+        padding: "0 3",
+    },
+    itemVatPercentage: {
+        width: "10%",
+        padding: "0 3",
+    },
+    itemTotalWithVat: {
+        width: "18%",
+        padding: "0 3",
+    },
+    itemName: {
+        padding: "0 3",
+        flex: 1,
+        minWidth: 1,
+        width: "100%",
     },
     line: {
         backgroundColor: "gray",
@@ -151,19 +208,45 @@ const styles = StyleSheet.create({
         textAlign: "right",
         fontWeight: 600,
     },
+    rounded: {
+        textAlign: "right",
+    },
+    textSecondary: {
+        color: "#6e6e6e",
+    },
+    italic: { fontStyle: "italic" },
 });
 
 export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
-    const { billing } = invoiceData || {};
+    const withoutVatText = " bez DPH";
 
-    const totalPrice = invoiceData.items.reduce((prev, current) => {
-        console.log({ prev, ...current });
-        return prev + current.singlePrice * current.count;
-    }, 0);
+    const items = invoiceData.items.map((item) => {
+        const total = _.round(Number(item.count) * Number(item.singlePrice), 0);
+        const vat = _.round((total / 100) * (item.vatPercentage || 0), 0);
+
+        return {
+            ...item,
+            total,
+            vat,
+            totalWithVat: total + vat,
+        };
+    });
+
+    const totalPrice = fromCents(
+        items.reduce((prev, current) => {
+            return (
+                prev + current.total + (invoiceData.countVat ? current.vat : 0)
+            );
+        }, 0),
+    );
+    const roundedTotalPrice = invoiceData.roundTotal
+        ? _.round(totalPrice, 0)
+        : totalPrice;
+    const roundedBy = _.round(roundedTotalPrice - totalPrice, 2);
 
     return (
         <Document>
-            <Page size="A4" style={styles.font}>
+            <Page size="A4" style={{ ...styles.font, ...styles.page }}>
                 <View style={styles.header}>
                     <Text style={styles.companyName}>
                         <Text>{invoiceData?.companyName}</Text>
@@ -175,101 +258,237 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 EInvoiceType.INVOICE_TAX_DOC
                               ? "Faktura - daňový doklad"
                               : "Faktura"}{" "}
-                        {invoiceData?.refId}
+                        - {invoiceData?.refId}
                     </Text>
                 </View>
-                <View style={styles.page}>
+                <View style={styles.main}>
                     <View style={styles.addresses}>
                         <View style={styles.address}>
                             <Text style={styles.h2}>Dodavatel</Text>
+                            <BillingView
+                                supplier
+                                billing={invoiceData.supplierBilling}
+                            />
+
                             <View style={styles.space} />
-                            <Text>{supplier.name}</Text>
-                            <Text>{supplier.line1}</Text>
-                            <Text>{supplier.line2}</Text>
-                            <View style={styles.space} />
-                            <Text>IČO: {supplier.ine}</Text>
-                            <Text>
-                                {supplier.vat
-                                    ? `DIČ: ${supplier.vat}`
-                                    : "Neplátce DPH"}
-                            </Text>
-                            <Text>
-                                Fyzická osoba zapsaná v živnostenském rejstříku
-                            </Text>
-                        </View>
-                        <View style={styles.address}>
-                            <Text style={styles.h2}>Odběratel</Text>
-                            <View style={styles.space} />
-                            <Text>{billing?.fullname}</Text>
-                            <Text>{billing?.line1}</Text>
-                            <Text>
-                                {billing?.postal} {billing?.city}
-                            </Text>
-                            <View style={styles.space} />
-                            {billing?.ine && <Text>IČO: {billing?.ine}</Text>}
-                            {billing?.vat && <Text>DIČ: {billing?.vat}</Text>}
+
+                            {invoiceData.isSupplierSelfEmployed ? (
+                                <Text style={styles.textSecondary}>
+                                    Fyzická osoba zapsaná v živnostenském
+                                    rejstříku
+                                </Text>
+                            ) : (
+                                <Text style={styles.textSecondary}>
+                                    {invoiceData.customTextUnderSupplier}
+                                </Text>
+                            )}
+
                             <View style={styles.space} />
                             <View style={styles.line} />
                             <View style={styles.space} />
-                            {invoiceData?.issuedAt && (
+
+                            {invoiceData.paymentType && (
                                 <Text>
-                                    Vystaveno dne:{" "}
-                                    {moment(invoiceData?.issuedAt)
-                                        .locale("cs")
-                                        .format("l")}
+                                    Způsob platby:{" "}
+                                    {breakText(invoiceData.paymentType)}
                                 </Text>
                             )}
-                            {invoiceData?.paidAt && (
-                                <Text>
-                                    Datum UZP:{" "}
-                                    {moment(invoiceData?.paidAt)
-                                        .locale("cs")
-                                        .format("l")}
-                                </Text>
+                            {invoiceData.paymentInfo && (
+                                <Text>{invoiceData.paymentInfo}</Text>
                             )}
+                        </View>
+                        <View style={styles.address}>
+                            <Text style={styles.h2}>Odběratel</Text>
+                            <BillingView billing={invoiceData.billing} />
+
+                            <View style={styles.space} />
+                            <View style={styles.line} />
+                            <View style={styles.space} />
+
+                            <View style={{ fontSize: 10 }}>
+                                {invoiceData?.issuedAt && (
+                                    <Text>
+                                        <Text style={styles.italic}>
+                                            Datum vystavení:{" "}
+                                        </Text>
+                                        {moment(invoiceData?.issuedAt)
+                                            .locale("cs")
+                                            .format("l")}
+                                    </Text>
+                                )}
+                                {invoiceData?.paidAt && (
+                                    <Text>
+                                        <Text style={styles.italic}>
+                                            Datum uskut. zdaň. plnění:{" "}
+                                        </Text>
+                                        {moment(invoiceData?.paidAt)
+                                            .locale("cs")
+                                            .format("l")}
+                                    </Text>
+                                )}
+                                {invoiceData?.pickedUpAt && (
+                                    <Text>
+                                        <Text style={styles.italic}>
+                                            Datum převzetí:{" "}
+                                        </Text>
+                                        {moment(invoiceData?.pickedUpAt)
+                                            .locale("cs")
+                                            .format("l")}
+                                    </Text>
+                                )}
+                                {invoiceData?.paymentDueDate && (
+                                    <Text>
+                                        <Text style={styles.italic}>
+                                            Datum převzetí:{" "}
+                                        </Text>
+                                        {moment(invoiceData?.paymentDueDate)
+                                            .locale("cs")
+                                            .format("l")}
+                                    </Text>
+                                )}
+                            </View>
                         </View>
                     </View>
                     <View style={styles.itemsTable}>
-                        <View style={styles.item}>
-                            <Text style={styles.itemText0}>Počet</Text>
-                            <Text style={styles.itemText0}>MJ</Text>
-                            <Text style={styles.itemText3}>Název položky</Text>
-                            <Text style={styles.itemText1}>Cena za MJ</Text>
-                            <Text style={styles.itemText2}>Celkem</Text>
+                        <View
+                            style={{
+                                ...styles.item,
+                                ...styles.italic,
+                                fontWeight: 500,
+                            }}
+                        >
+                            <Text style={styles.itemCount}>Počet</Text>
+                            <Text style={styles.itemMeasurementUnit}>MJ</Text>
+                            <Text style={styles.itemName}>Název položky</Text>
+                            <Text style={styles.itemPriceForMU}>
+                                Cena za MJ
+                            </Text>
+                            <Text style={styles.itemTotal}>
+                                Celkem {invoiceData.countVat && withoutVatText}
+                            </Text>
+                            {invoiceData.countVat && (
+                                <>
+                                    <Text style={styles.itemVat}>DPH</Text>
+                                    <Text style={styles.itemVatPercentage}>
+                                        DPH %
+                                    </Text>
+                                    <Text style={styles.itemTotalWithVat}>
+                                        Celkem
+                                    </Text>
+                                </>
+                            )}
                         </View>
-                        {invoiceData?.items.map((item) => (
+                        {items.map((item) => (
                             <View
                                 style={styles.item}
-                                key={item.name + item.count}
+                                key={item.name + item.count + item.id}
                             >
-                                <Text style={styles.itemText0}>
-                                    {item.count}
+                                <Text style={styles.itemCount}>
+                                    {breakText(item.count)}
                                 </Text>
-                                <Text style={styles.itemText0}>
-                                    {item.measurementUnit}
+                                <Text style={styles.itemMeasurementUnit}>
+                                    {breakText(item.measurementUnit)}
                                 </Text>
-                                <Text style={styles.itemText3}>
-                                    {item.name}
-                                </Text>
-                                <Text style={styles.itemText1}>
-                                    {fromCents(Number(item.singlePrice))}{" "}
-                                    {item.currency || invoiceData?.currency}
-                                </Text>
-                                <Text style={styles.itemText2}>
-                                    {fromCents(
-                                        Number(item.count) *
-                                            Number(item.singlePrice) || 0,
+                                <Text style={styles.itemName}>{item.name}</Text>
+                                <Text style={styles.itemPriceForMU}>
+                                    {breakText(
+                                        fromCents(Number(item.singlePrice)),
                                     )}{" "}
-                                    {item.currency || invoiceData?.currency}
+                                    {/* {item.currency || invoiceData?.currency} */}
                                 </Text>
+                                <Text style={styles.itemTotal}>
+                                    {breakText(fromCents(item.total || 0))}{" "}
+                                    {/* {item.currency || invoiceData?.currency} */}
+                                </Text>
+                                {invoiceData.countVat && (
+                                    <>
+                                        <Text style={styles.itemVat}>
+                                            {breakText(fromCents(item.vat))}
+                                        </Text>
+                                        <Text style={styles.itemVatPercentage}>
+                                            {breakText(item.vatPercentage)}
+                                        </Text>
+                                        <Text style={styles.itemTotalWithVat}>
+                                            {breakText(
+                                                fromCents(item.totalWithVat),
+                                            )}
+                                        </Text>
+                                    </>
+                                )}
                             </View>
                         ))}
                     </View>
+                    {invoiceData.roundTotal && (
+                        <Text style={styles.rounded}>
+                            <Text style={{ ...styles.italic }}>
+                                Zaokrouhlení:
+                            </Text>{" "}
+                            {roundedBy} {invoiceData?.currency}
+                        </Text>
+                    )}
                     <Text style={styles.totalPrice}>
-                        Celkem: {fromCents(totalPrice)} {invoiceData?.currency}
+                        <Text style={{ fontWeight: 500, ...styles.italic }}>
+                            Celkem:
+                        </Text>{" "}
+                        {roundedTotalPrice} {invoiceData?.currency}
                     </Text>
+                </View>
+                <View style={styles.footer}>
+                    <Text>{invoiceData.customFooterText}</Text>
                 </View>
             </Page>
         </Document>
     );
 };
+
+const BillingView = ({
+    billing,
+    supplier,
+}: {
+    billing: IBilling;
+    supplier?: boolean;
+}) => {
+    return (
+        <>
+            <View style={styles.space} />
+            <Text style={{ fontWeight: 500 }}>{billing?.fullname}</Text>
+            <Text style={styles.textSecondary}>{billing?.line1}</Text>
+            <Text style={styles.textSecondary}>
+                {billing?.postal} {billing?.city}
+            </Text>
+            <Text style={styles.textSecondary}>{billing?.country}</Text>
+            <View style={styles.space} />
+            {billing?.ine && (
+                <Text>
+                    <Text style={styles.italic}>IČO:</Text> {billing?.ine}
+                </Text>
+            )}
+            {supplier ? (
+                <Text>
+                    {billing.vat ? (
+                        <>
+                            <Text style={styles.italic}>DIČ:</Text>{" "}
+                            {billing.vat}
+                        </>
+                    ) : (
+                        <Text style={styles.italic}>Neplátce DPH</Text>
+                    )}
+                </Text>
+            ) : (
+                billing?.vat && (
+                    <Text>
+                        <Text style={styles.italic}>DIČ:</Text> {billing?.vat}
+                    </Text>
+                )
+            )}
+        </>
+    );
+};
+
+function breakText(text: string | number | undefined) {
+    return String(text)
+        .split("")
+        .map((s, idx) => {
+            return <Text key={String(text) + idx}>{s}</Text>;
+        });
+}

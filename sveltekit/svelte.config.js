@@ -6,6 +6,9 @@ const config = {
     preprocess: vitePreprocess(),
     kit: {
         adapter: adapter(),
+        prerender: {
+            concurrency: 4,
+        },
     },
     alias: {
         $routes: "./src/routes",

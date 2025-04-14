@@ -25,22 +25,30 @@ export function localStorageState<T>({
         const storedValue = localStorage.getItem(key);
         if (storedValue !== null) {
             try {
-                const parsedData = JSON.parse(storedValue, (k, v) =>
+                let parsedData = JSON.parse(storedValue, (k, v) =>
                     v === UndefinedReplacement ? undefined : v,
                 ) as T;
 
-                if (
-                    (!parsedData && defaultValue) ||
-                    (defaultValue &&
-                        parsedData &&
-                        _.difference(
-                            Object.keys(defaultValue),
-                            Object.keys(parsedData),
-                        ).length > 0)
-                ) {
-                    // value stored in localStorage does not meet new interface of object
-                    console.log("aaaaaaaaaaaaaaaaaaa");
+                const differentKeys =
+                    defaultValue && parsedData
+                        ? _.difference(
+                              Object.keys(defaultValue),
+                              Object.keys(parsedData),
+                          )
+                        : [];
+
+                if (!parsedData && defaultValue) {
                     initialValue = defaultValue;
+                } else if (parsedData && differentKeys.length > 0) {
+                    differentKeys.forEach((key) => {
+                        parsedData = _.set(
+                            parsedData as NonNullable<T>,
+                            key,
+                            _.get(defaultValue, key),
+                        );
+                    });
+
+                    initialValue = parsedData;
                 } else {
                     initialValue = parsedData;
                 }

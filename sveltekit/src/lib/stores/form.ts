@@ -4,6 +4,15 @@ import { useLocalStorageContext } from "./sharedStore.svelte";
 // Define default values
 const defaultForm: IInvoiceProps["invoiceData"] = {
     items: [],
+    supplierBilling: {
+        fullname: "",
+        line1: "",
+        postal: "",
+        city: "",
+        country: "",
+        ine: "",
+        vat: "",
+    },
     billing: {
         fullname: "",
         line1: "",
@@ -20,6 +29,15 @@ const defaultForm: IInvoiceProps["invoiceData"] = {
     paidAt: "",
     companyName: "",
     issuedAt: "",
+    paymentDueDate: "",
+    pickedUpAt: "",
+    paymentType: "",
+    paymentInfo: "",
+    isSupplierSelfEmployed: true,
+    customTextUnderSupplier: "",
+    customFooterText: "",
+    countVat: false,
+    roundTotal: false,
 };
 
 export function useFormStore(initialValue?: typeof defaultForm) {

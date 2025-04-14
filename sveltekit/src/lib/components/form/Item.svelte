@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { DefaultItem, type IItem } from "$lib/pdf/invoice-types";
     import { m } from "$lib/paraglide/messages";
     import type { IInvoiceProps } from "$lib/pdf/invoice-types";
     import { useFormStore } from "$lib/stores/form";
@@ -22,6 +23,17 @@
                     return i;
                 }
             });
+        });
+    });
+
+    $effect(() => {
+        const differentKeys =
+            DefaultItem && item
+                ? _.difference(Object.keys(DefaultItem), Object.keys(item))
+                : [];
+
+        differentKeys.forEach((key) => {
+            item = _.set(item, key, _.get(DefaultItem, key));
         });
     });
 </script>
@@ -48,7 +60,7 @@
         type="number"
         min={0}
     />
-    <div class="grid grid-cols-2 items-end gap-1">
+    <div class="grid grid-cols-[2fr_1fr] items-end gap-1">
         <Input
             bind:value={item.singlePrice}
             label={m["form.single-price"]()}
@@ -60,4 +72,14 @@
             label={m["form.measurement-unit"]()}
         />
     </div>
+    {#if !_.isUndefined(item.vatPercentage)}
+        <Input
+            bind:value={item.vatPercentage}
+            label={m["form.vat-percentage"]()}
+            type="number"
+            min={0}
+            max={100}
+            step={0.01}
+        />
+    {/if}
 </div>

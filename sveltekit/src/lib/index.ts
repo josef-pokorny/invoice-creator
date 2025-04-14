@@ -64,7 +64,7 @@ export async function renderInvoice({
         const a = document.createElement("a");
         document.body.appendChild(a);
         a.href = url;
-        a.download = `${invoiceProps.invoiceData.companyName} - ${m["labels.invoice"]()} ${createRefIdForInvoice(invoiceProps.invoiceData.refId)}.pdf`;
+        a.download = `${m["labels.invoice"]()} - ${createRefIdForInvoice(invoiceProps.invoiceData.refId)}.pdf`;
         a.click();
         setTimeout(() => {
             document.body.removeChild(a);
@@ -75,9 +75,9 @@ export async function renderInvoice({
 }
 
 export function toCents(num: number): number {
-    return Math.round(num * 100);
+    return _.round(num * 100, 0);
 }
 
 export function fromCents(num: number): number {
-    return num / 100;
+    return _.round(num / 100, 2);
 }

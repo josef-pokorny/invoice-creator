@@ -7,10 +7,14 @@
   },
   "actions": {
     "add-item": "Přidat položku",
-    "remove-item": "Odstranit položku"
+    "remove-item": "Odstranit položku",
+    "save": "Uložit",
+    "full-preview": "Ukázat",
+    "download": "Stáhnout PDF"
   },
   "form": {
     "receiver": "Odběratel",
+    "supplier": "Dodavatel",
     "general": "Obecné",
     "company": "Jméno společnosti",
     "fullname": "Celé jméno",
@@ -22,12 +26,30 @@
     "vat": "DIČ",
     "currency": "Měna",
     "refid": "Číslo faktury",
-    "issued-at": "Vystaveno dne",
-    "paid-at": "Zaplaceno dne",
+    "issued-at": "Datum vystavení",
+    "paid-at": "Datum UZP",
     "items": "Položky",
     "name": "Název",
     "count": "Počet",
     "measurement-unit": "Měrná jednotka (MJ)",
-    "single-price": "Cena za MJ"
+    "single-price": "Cena za MJ",
+    "custom-text-under-supplier": "Vlastní text pod Dodavatelem",
+    "iam-selfemployed": "Jsem OSVČ",
+    "custom-footer-text": "Vlastní text v zápatí",
+    "INVOICE_TAX_DOC": "Faktura - daňový doklad",
+    "INVOICE": "Faktura",
+    "PRE_INVOICE": "Proforma faktura",
+    "vat-percentage": "% DPH",
+    "count-vat": "Započítat DPH",
+    "round-total": "Zaokrouhlit celkovou cenu",
+    "payment-type": "Způsob platby",
+    "payment-info": "Platební údaje (Bankovní účet, VS, apod.)",
+    "pickup-at": "Datum převzetí",
+    "payment-due": "Datum splatnosti"
+  },
+  "meta": {
+    "title": "Vytvoření Faktury Zdarma",
+    "description": "Vytvořte si fakturu online během pár minut. Zdarma, snadno a bez registrace. Ideální řešení pro OSVČ a malé podnikatele.",
+    "keywords": "faktura, online faktura, faktura zdarma, faktura pro podnikatele, vytvořit fakturu, fakturování, fakturační nástroj"
   }
 }
