@@ -64,7 +64,7 @@ export async function renderInvoice({
         const a = document.createElement("a");
         document.body.appendChild(a);
         a.href = url;
-        a.download = `${m["labels.invoice"]()} - ${createRefIdForInvoice(invoiceProps.invoiceData.refId)}.pdf`;
+        a.download = `${m["labels.invoice"]()} - ${invoiceProps.invoiceData.refId}.pdf`;
         a.click();
         setTimeout(() => {
             document.body.removeChild(a);
