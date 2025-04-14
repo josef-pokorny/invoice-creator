@@ -36,24 +36,37 @@
         });
 
     function renderPDF() {
-        if (url) window.URL.revokeObjectURL(url);
-
         renderInvoiceFunc().then((d) => {
+            if (url) window.URL.revokeObjectURL(url);
             url = d;
         });
     }
 
-    onMount(() => {
-        renderPDF();
+    let isMounted = false;
+    let timeoutId: number;
+    $effect(() => {
+        ({
+            ...invoiceData,
+            ...invoiceData.items,
+            ...invoiceData.billing,
+            ...invoiceData.supplierBilling,
+        });
+
+        if (isMounted) {
+            timeoutId = setTimeout(() => {
+                renderPDF();
+            }, 1000);
+        }
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
     });
 
-    let date = $state(
-        ("0000" + moment(invoiceData.paidAt).year()).slice(-4) +
-            "-" +
-            ("00" + moment(invoiceData.paidAt).date() + 1).slice(-2) +
-            "-" +
-            ("00" + moment(invoiceData.paidAt).month()).slice(-2),
-    );
+    onMount(() => {
+        renderPDF();
+        isMounted = true;
+    });
 
     let issuedAtDate = $derived(
         invoiceData.issuedAt ? new Date(invoiceData.issuedAt) : undefined,
@@ -130,7 +143,6 @@
             e.preventDefault();
             renderPDF();
         }}
-        onchange={() => renderPDF}
     >
         <h2 class="h3 text-center">{m["labels.invoice"]()}</h2>
 

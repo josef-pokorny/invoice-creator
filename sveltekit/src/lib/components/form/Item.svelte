@@ -15,18 +15,6 @@
     let item = $derived(props.item);
 
     $effect(() => {
-        requestAnimationFrame(() => {
-            invoiceData.items.map((i) => {
-                if (i.id === item.id) {
-                    return { ...i, ...item };
-                } else {
-                    return i;
-                }
-            });
-        });
-    });
-
-    $effect(() => {
         const differentKeys =
             DefaultItem && item
                 ? _.difference(Object.keys(DefaultItem), Object.keys(item))
