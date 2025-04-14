@@ -13,7 +13,7 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"machine-translate": "inlang machine translate --project project.inlang",
-		"postbuild": "npx svelte-sitemap --domain https://invoice-creator.josefpokorny.cz/"
+		"postbuild": "npx svelte-sitemap --domain https://invoice-creator.josefpokorny.cz/ -o .vercel/output/static"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.8",
