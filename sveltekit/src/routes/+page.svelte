@@ -83,13 +83,9 @@
 
     let fullPreview = $state(false);
 
-    // $effect(() => {
-    //     const main = document.querySelector("main");
-
-    //     if (main) {
-    //         main.style.overflow = fullPreview ? "hidden" : "";
-    //     }
-    // });
+    $effect(() => {
+        document.body.style.overflow = fullPreview ? "hidden" : "";
+    });
 </script>
 
 <Crawl />
