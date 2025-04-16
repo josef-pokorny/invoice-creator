@@ -20,6 +20,7 @@ You can preview the production build with `pnpm run preview`.
 
 ## TODO
 - [ ] en translation for invoice
-- [ ] rerender invoice on item property change
-- [ ] FIX: date with wrong title in invoice
-- [ ] sum every single column
+- [x] rerender invoice on item property change
+- [x] FIX: date with wrong title in invoice
+- [x] sum every single column
+- [ ] Ares autocomplete

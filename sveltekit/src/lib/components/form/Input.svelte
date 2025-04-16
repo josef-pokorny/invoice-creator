@@ -6,6 +6,9 @@
         HTMLInputAttributes,
         HTMLTextareaAttributes,
     } from "svelte/elements";
+    import Error from "./Error.svelte";
+    import type { IYupError } from "$lib/types/types";
+    import { createId } from "$lib/utils";
 
     type TExdended = HTMLInputAttributes &
         HTMLTextareaAttributes &
@@ -20,6 +23,8 @@
         value?: string | number;
         type?: HTMLInputAttributes["type"] | "textarea";
         date?: string | Date;
+        error?: IYupError;
+        isErrorVisible?: boolean;
     }
 
     let {
@@ -27,7 +32,9 @@
         value = $bindable(""),
         date = $bindable(new Date()),
         onchange: onchangeProp,
-        id = _.uniqueId("input_") + Math.random() + Math.random(),
+        id = $bindable(createId()),
+        error,
+        isErrorVisible = true,
         ...rest
     }: IProps = $props();
 
@@ -59,12 +66,19 @@
 
 <fieldset class="label">
     {#if label}
-        <label for={id} class="label-text text-surface-100 text-[0.9rem]">
+        <label
+            aria-errormessage="{id}-error"
+            aria-invalid={!!error}
+            for={id}
+            class="label-text text-surface-100 text-[0.9rem]"
+        >
             {label}
         </label>
     {/if}
     {#if rest.type === "textarea"}
         <textarea
+            aria-errormessage="{id}-error"
+            aria-invalid={!!error}
             {id}
             bind:value
             {...rest}
@@ -73,6 +87,8 @@
         ></textarea>
     {:else}
         <input
+            aria-errormessage="{id}-error"
+            aria-invalid={!!error}
             {id}
             bind:value
             {...rest}
@@ -80,11 +96,12 @@
             {onchange}
         />
     {/if}
+    {#if isErrorVisible}
+        <Error id={id || ""} {error} />
+    {/if}
 </fieldset>
 
 <style lang="scss">
-    @reference "../../../app.css";
-
     .date-picker {
         :global(input[type="text"]) {
             @apply input;

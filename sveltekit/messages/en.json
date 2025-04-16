@@ -10,7 +10,10 @@
     "remove-item": "Remove item",
     "save": "Save",
     "full-preview": "Preview",
-    "download": "Download PDF"
+    "download": "Download PDF",
+    "fill-in-by-ine": "Fill in information by INE",
+    "close": "Close",
+    "change-language": "Change language"
   },
   "form": {
     "receiver": "Receiver",
@@ -41,11 +44,21 @@
     "PRE_INVOICE": "Proforma Invoice",
     "vat-percentage": "% VAT",
     "count-vat": "Count VAT",
-    "round-total": "Zaokrouhlit celkovou cenu",
+    "round-total": "Round total price",
     "payment-type": "Payment type",
     "payment-info": "Payment information (Bank account, etc.)",
     "pickup-at": "Picked up on",
-    "payment-due": "Payment due date"
+    "payment-due": "Payment due date",
+    "is-selfemployed": "Is self employed"
+  },
+  "errors": {
+    "something-went-wrong-500": "Something went wrong. You request has not been completed.",
+    "invalid-ine": "This INE is invalid",
+    "this-field-is-recommended": "It's recommended to fill this field",
+    "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places"
+  },
+  "text": {
+    "a": ""
   },
   "meta": {
     "title": "Create Invoice for Free",

@@ -6,14 +6,12 @@ const config = {
     preprocess: vitePreprocess(),
     kit: {
         adapter: adapter(),
-        prerender: {
-            concurrency: 4,
-        },
     },
     alias: {
         $routes: "./src/routes",
         $types: ".svelte-kit/types/src/routes/$types",
         $static: "./static",
+        $src: "./src",
     },
     optimizeDeps: {
         exclude: ["skeletonlabs"],

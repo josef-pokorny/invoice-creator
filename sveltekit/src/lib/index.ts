@@ -73,11 +73,3 @@ export async function renderInvoice({
 
     return url;
 }
-
-export function toCents(num: number): number {
-    return _.round(num * 100, 0);
-}
-
-export function fromCents(num: number): number {
-    return _.round(num / 100, 2);
-}

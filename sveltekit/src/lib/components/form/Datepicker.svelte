@@ -1,5 +1,6 @@
 <script lang="ts">
     import { getLocale } from "$lib/paraglide/runtime";
+    import type { IYupError } from "$lib/types/types";
     import { Datepicker } from "flowbite-svelte";
     import _ from "lodash";
     import type { ComponentProps } from "svelte";
@@ -7,28 +8,54 @@
         HTMLInputAttributes,
         HTMLTextareaAttributes,
     } from "svelte/elements";
+    import Error from "./Error.svelte";
+    import { createId } from "$lib/utils";
 
     interface IProps extends Partial<ComponentProps<typeof Datepicker>> {
         label?: string;
         type?: HTMLInputAttributes["type"] | "textarea";
         date?: Date;
+        isoDate?: string;
+        error?: IYupError;
     }
 
     let {
         label,
         value = $bindable(),
+        isoDate = $bindable(),
         onchange: onchangeProp,
+        error,
         ...rest
     }: IProps = $props();
 
-    const id = _.uniqueId("input_") + Math.random();
+    const id = createId();
 
     function onchange(e: Parameters<NonNullable<IProps["onchange"]>>[0]) {
         if (onchangeProp) onchangeProp(e as any);
     }
+
+    $effect(() => {
+        isoDate = value ? value.toISOString() : "";
+    });
+
+    $effect(() => {
+        if (error) {
+            let input = document.querySelector(
+                `#wrapper-${id} .date-picker input`,
+            );
+
+            if (input) {
+                input.ariaInvalid = "true";
+
+                return () => {
+                    input.ariaInvalid = "false";
+                };
+            }
+        }
+    });
 </script>
 
-<fieldset class="label">
+<fieldset class="label" id="wrapper-{id}">
     {#if label}
         <label for={id} class="label-text text-surface-100 text-[0.9rem]">
             {label}
@@ -38,7 +65,8 @@
         <Datepicker
             bind:value
             color="green"
-            title={""}
+            title={String(label)}
+            placeholder={String(label)}
             {id}
             autohide
             range={false}
@@ -46,23 +74,26 @@
             disabled={rest.disabled || false}
             firstDayOfWeek={1}
             dateFormat={{}}
-            placeholder=""
             required={rest.required || false}
-            inputClass=""
+            inputClass="input"
             inline={false}
             showActionButtons
+            aria-invalid={!!error}
             {onchange}
             {...rest}
         />
     </div>
+    <Error id={id || ""} {error} />
 </fieldset>
 
 <style lang="scss">
-    @reference "../../../app.css";
-
     .date-picker {
         :global(input[type="text"]) {
-            @apply input;
+            @apply input placeholder-transparent;
+        }
+
+        :global(input[type="text"][aria-invalid="true"]) {
+            @include errorInput;
         }
 
         :global(#datepicker-dropdown) {

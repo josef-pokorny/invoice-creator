@@ -2,7 +2,7 @@ import { browser } from "$app/environment";
 import { getContext, hasContext, setContext } from "svelte";
 import _ from "lodash";
 
-export interface TLocalStorageState<T> {
+export interface TSharedStorageState<T> {
     value: T;
     reset: () => void;
 }
@@ -17,9 +17,7 @@ export function localStorageState<T>({
     value: T;
     key: string;
     defaultValue?: T;
-}): TLocalStorageState<T> {
-    // Load initial value from localStorage if available
-
+}): TSharedStorageState<T> {
     let initialValue = value;
     if (browser) {
         const storedValue = localStorage.getItem(key);
@@ -61,12 +59,10 @@ export function localStorageState<T>({
         }
     }
 
-    // Create a state container with the initial value
     const store = $state({
         value: initialValue,
     });
 
-    // Set up effect to save to localStorage when the state changes
     $effect(() => {
         if (browser) {
             localStorage.setItem(
@@ -78,7 +74,6 @@ export function localStorageState<T>({
         }
     });
 
-    // Add reset function
     const reset = () => {
         if (defaultValue) {
             store.value = _.cloneDeep(defaultValue);
@@ -89,7 +84,6 @@ export function localStorageState<T>({
         }
     };
 
-    // Return the enhanced state object
     return {
         get value() {
             return store.value;
@@ -101,27 +95,71 @@ export function localStorageState<T>({
     };
 }
 
-export function useLocalStorageContext<T extends Record<string, unknown>>(
+export function useLocalStorageContext<T>(
     key: string,
     defaultValue: T,
     initialValue?: T,
-): TLocalStorageState<T> {
-    // Use provided localStorage key or fall back to context key
+): TSharedStorageState<T> {
     const storageKey = `invoice-app-${key}`;
 
-    // Check if we already have this store in context
     if (hasContext(key)) {
-        return getContext<TLocalStorageState<T>>(key);
+        return getContext<TSharedStorageState<T>>(key);
     }
 
-    // If not in context, create it and set it in context
     const store = localStorageState({
         value: initialValue || defaultValue,
         key: storageKey,
         defaultValue: defaultValue,
     });
 
-    // Save it in context so it can be reused
+    setContext(key, store);
+
+    return store;
+}
+
+export function storeState<T>({
+    defaultValue,
+    initialValue,
+}: {
+    defaultValue: T;
+    initialValue?: T;
+}): TSharedStorageState<T> {
+    const store = $state({
+        value: initialValue || defaultValue,
+    });
+
+    const reset = () => {
+        if (defaultValue) {
+            store.value = _.cloneDeep(defaultValue);
+        } else {
+            console.error(
+                "defaultValue isn't provided, reset() function has not been completed",
+            );
+        }
+    };
+
+    return {
+        get value() {
+            return store.value;
+        },
+        set value(newValue) {
+            store.value = newValue;
+        },
+        reset,
+    };
+}
+
+export function useStoreContext<T>(
+    key: string,
+    defaultValue: T,
+    initialValue?: T,
+): TSharedStorageState<T> {
+    if (hasContext(key)) {
+        return getContext<TSharedStorageState<T>>(key);
+    }
+
+    const store = storeState({ defaultValue, initialValue });
+
     setContext(key, store);
 
     return store;

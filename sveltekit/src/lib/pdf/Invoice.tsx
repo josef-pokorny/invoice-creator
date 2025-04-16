@@ -13,7 +13,7 @@ import moment from "$lib/moment";
 import MontserratRegular from "$lib/fonts/Montserrat-Regular.ttf";
 // import MontserratMedium from "$lib/fonts/Montserrat-Medium.ttf";
 import MontserratBold from "$lib/fonts/Montserrat-Bold.ttf";
-import { fromCents, type IBilling } from "$lib/index";
+import { type IBilling } from "$lib/index";
 // import MontserratExtraBold from "$lib/fonts/Montserrat-ExtraBold.ttf";
 // import MontserratSemiBold from "$lib/fonts/Montserrat-SemiBold.ttf";
 // import MontserratLight from "$lib/fonts/Montserrat-Light.ttf";
@@ -26,7 +26,7 @@ import RobotoSemiBold from "$lib/fonts/Roboto-SemiBold.ttf";
 import RobotoItalicSemiBold from "$lib/fonts/Roboto-SemiBoldItalic.ttf";
 import RobotoLight from "$lib/fonts/Roboto-Light.ttf";
 import RobotoItalicLight from "$lib/fonts/Roboto-LightItalic.ttf";
-import _ from "lodash";
+import { fromCents } from "./utils";
 
 Font.register({
     family: "Roboto",
@@ -215,34 +215,17 @@ const styles = StyleSheet.create({
         color: "#6e6e6e",
     },
     italic: { fontStyle: "italic" },
+    totalRow: {
+        display: "flex",
+        flexDirection: "row",
+        padding: "2 5",
+        fontSize: "10px",
+        marginTop: 10,
+    },
 });
 
 export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
-    const withoutVatText = " bez DPH";
-
-    const items = invoiceData.items.map((item) => {
-        const total = _.round(Number(item.count) * Number(item.singlePrice), 0);
-        const vat = _.round((total / 100) * (item.vatPercentage || 0), 0);
-
-        return {
-            ...item,
-            total,
-            vat,
-            totalWithVat: total + vat,
-        };
-    });
-
-    const totalPrice = fromCents(
-        items.reduce((prev, current) => {
-            return (
-                prev + current.total + (invoiceData.countVat ? current.vat : 0)
-            );
-        }, 0),
-    );
-    const roundedTotalPrice = invoiceData.roundTotal
-        ? _.round(totalPrice, 0)
-        : totalPrice;
-    const roundedBy = _.round(roundedTotalPrice - totalPrice, 2);
+    const withoutVatText = "bez DPH";
 
     return (
         <Document>
@@ -283,9 +266,14 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 </Text>
                             )}
 
-                            <View style={styles.space} />
-                            <View style={styles.line} />
-                            <View style={styles.space} />
+                            {(invoiceData.paymentType ||
+                                invoiceData.paymentInfo) && (
+                                <>
+                                    <View style={styles.space} />
+                                    <View style={styles.line} />
+                                    <View style={styles.space} />
+                                </>
+                            )}
 
                             {invoiceData.paymentType && (
                                 <Text>
@@ -301,9 +289,16 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                             <Text style={styles.h2}>Odběratel</Text>
                             <BillingView billing={invoiceData.billing} />
 
-                            <View style={styles.space} />
-                            <View style={styles.line} />
-                            <View style={styles.space} />
+                            {(invoiceData?.issuedAt ||
+                                invoiceData?.paidAt ||
+                                invoiceData?.pickedUpAt ||
+                                invoiceData?.paymentDueDate) && (
+                                <>
+                                    <View style={styles.space} />
+                                    <View style={styles.line} />
+                                    <View style={styles.space} />
+                                </>
+                            )}
 
                             <View style={{ fontSize: 10 }}>
                                 {invoiceData?.issuedAt && (
@@ -339,7 +334,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 {invoiceData?.paymentDueDate && (
                                     <Text>
                                         <Text style={styles.italic}>
-                                            Datum převzetí:{" "}
+                                            Datum splatnosti:{" "}
                                         </Text>
                                         {moment(invoiceData?.paymentDueDate)
                                             .locale("cs")
@@ -364,7 +359,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 Cena za MJ
                             </Text>
                             <Text style={styles.itemTotal}>
-                                Celkem {invoiceData.countVat && withoutVatText}
+                                Cena {invoiceData.countVat && withoutVatText}
                             </Text>
                             {invoiceData.countVat && (
                                 <>
@@ -373,12 +368,12 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                         DPH %
                                     </Text>
                                     <Text style={styles.itemTotalWithVat}>
-                                        Celkem
+                                        Cena s DPH
                                     </Text>
                                 </>
                             )}
                         </View>
-                        {items.map((item) => (
+                        {invoiceData.items.map((item) => (
                             <View
                                 style={styles.item}
                                 key={item.name + item.count + item.id}
@@ -417,20 +412,52 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 )}
                             </View>
                         ))}
+                        <View style={styles.totalRow}>
+                            <Text
+                                style={{
+                                    ...styles.itemCount,
+                                    ...styles.italic,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Celkem:
+                            </Text>
+                            <Text style={styles.itemMeasurementUnit}></Text>
+                            <Text style={styles.itemName}></Text>
+                            <Text style={styles.itemPriceForMU}></Text>
+                            <Text style={styles.itemTotal}>
+                                {fromCents(invoiceData.totalPriceWithoutVat)}
+                            </Text>
+                            {invoiceData.countVat && (
+                                <>
+                                    <Text style={styles.itemVat}>
+                                        {fromCents(invoiceData.totalVat)}
+                                    </Text>
+                                    <Text
+                                        style={styles.itemVatPercentage}
+                                    ></Text>
+                                    <Text style={styles.itemTotalWithVat}>
+                                        {fromCents(invoiceData.totalPrice)}
+                                    </Text>
+                                </>
+                            )}
+                        </View>
                     </View>
                     {invoiceData.roundTotal && (
                         <Text style={styles.rounded}>
                             <Text style={{ ...styles.italic }}>
                                 Zaokrouhlení:
                             </Text>{" "}
-                            {roundedBy} {invoiceData?.currency}
+                            {fromCents(invoiceData.roundedTotalPriceBy)}{" "}
+                            {invoiceData?.currency}
                         </Text>
                     )}
                     <Text style={styles.totalPrice}>
                         <Text style={{ fontWeight: 500, ...styles.italic }}>
-                            Celkem:
+                            Celkem k platbě:
                         </Text>{" "}
-                        {roundedTotalPrice} {invoiceData?.currency}
+                        {fromCents(invoiceData.roundedTotalPrice)}{" "}
+                        {invoiceData?.currency}
                     </Text>
                 </View>
                 <View style={styles.footer}>

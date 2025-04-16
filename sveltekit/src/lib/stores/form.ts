@@ -1,8 +1,13 @@
-import { EInvoiceType, type IInvoiceProps } from "$lib/pdf/invoice-types";
-import { useLocalStorageContext } from "./sharedStore.svelte";
+import {
+    EInvoiceType,
+    type IInvoiceValues,
+    type IItem,
+} from "$lib/pdf/invoice-types";
+import type { YupErrorsList } from "$lib/types/types";
+import { useLocalStorageContext, useStoreContext } from "./sharedStore.svelte";
 
 // Define default values
-const defaultForm: IInvoiceProps["invoiceData"] = {
+const defaultForm: IInvoiceValues = {
     items: [],
     supplierBilling: {
         fullname: "",
@@ -40,6 +45,48 @@ const defaultForm: IInvoiceProps["invoiceData"] = {
     roundTotal: false,
 };
 
-export function useFormStore(initialValue?: typeof defaultForm) {
-    return useLocalStorageContext("invoice-form", defaultForm, initialValue);
+export function useFormStore({
+    initialValue,
+    key,
+}: {
+    initialValue?: typeof defaultForm;
+    key?: string;
+} = {}) {
+    return useLocalStorageContext(
+        "invoice-form" + (key || ""),
+        defaultForm,
+        initialValue,
+    );
+}
+
+const defaultFormErrors: YupErrorsList<IInvoiceValues> = {};
+
+export function useFormErrorsStore({
+    initialValue,
+    key,
+}: {
+    initialValue?: typeof defaultFormErrors;
+    key?: string;
+} = {}) {
+    return useStoreContext(
+        "invoice-form-errors-" + (key || ""),
+        defaultFormErrors,
+        initialValue,
+    );
+}
+
+const defaultFormItemErrors: YupErrorsList<IItem> = {};
+
+export function useFormItemErrors({
+    initialValue,
+    key,
+}: {
+    initialValue?: typeof defaultFormItemErrors;
+    key?: string;
+} = {}) {
+    return useStoreContext(
+        "invoice-form-item-errors-" + (key || ""),
+        defaultFormItemErrors,
+        initialValue,
+    );
 }

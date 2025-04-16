@@ -1,27 +1,38 @@
 import type { IBilling } from "$lib";
 
+export interface IInvoiceValues {
+    companyName?: string;
+    items: IItem[];
+    supplierBilling: IBilling;
+    billing: IBilling;
+    refId: string;
+    totalPrice: number | string;
+    currency: string;
+    invoiceType: EInvoiceType;
+    paidAt?: string;
+    issuedAt?: string;
+    pickedUpAt?: string;
+    paymentDueDate?: string;
+    paymentType?: string;
+    paymentInfo?: string;
+    isSupplierSelfEmployed?: boolean;
+    customTextUnderSupplier?: string;
+    customFooterText?: string;
+    countVat?: boolean;
+    roundTotal?: boolean;
+}
+
+export interface IInvoiceData extends IInvoiceValues {
+    totalPrice: number;
+    roundedTotalPrice: number;
+    roundedTotalPriceBy: number;
+    totalPriceWithoutVat: number;
+    totalVat: number;
+    items: IInvoiceDataItem[];
+}
+
 export interface IInvoiceProps {
-    invoiceData: {
-        companyName?: string;
-        items: IItem[];
-        supplierBilling: IBilling;
-        billing: IBilling;
-        refId: string;
-        totalPrice: number | string;
-        currency: string;
-        invoiceType: EInvoiceType;
-        paidAt?: Date | string;
-        issuedAt?: Date | string;
-        pickedUpAt?: Date | string;
-        paymentDueDate?: Date | string;
-        paymentType?: string;
-        paymentInfo?: string;
-        isSupplierSelfEmployed?: boolean;
-        customTextUnderSupplier?: string;
-        customFooterText?: string;
-        countVat?: boolean;
-        roundTotal?: boolean;
-    };
+    invoiceData: IInvoiceData;
 }
 
 export interface IItem {
@@ -34,6 +45,12 @@ export interface IItem {
     vatPercentage?: number;
 }
 
+export interface IInvoiceDataItem extends IItem {
+    total: number;
+    vat: number;
+    totalWithVat: number;
+}
+
 export const DefaultItem: IItem = {
     count: 0,
     measurementUnit: "",
@@ -41,7 +58,7 @@ export const DefaultItem: IItem = {
     singlePrice: 0,
     currency: "",
     id: "",
-    vatPercentage: 0,
+    vatPercentage: 21,
 };
 
 export enum EInvoiceType {

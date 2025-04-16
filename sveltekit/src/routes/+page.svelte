@@ -1,109 +1,151 @@
 <script lang="ts">
     import { renderInvoice } from "$lib";
-    import Crawl from "$lib/components/crawl.svelte";
+    import Crawl from "$lib/components/Crawl.svelte";
     import PdfViewer from "svelte-pdf";
     import Input from "$lib/components/form/Input.svelte";
     import { onMount } from "svelte";
-    import { useFormStore } from "$lib/stores/form";
+    import { useFormErrorsStore, useFormStore } from "$lib/stores/form";
     import { m } from "$lib/paraglide/messages";
-    import moment from "$lib/moment";
     import Item from "$lib/components/form/Item.svelte";
     import SvgPlusCircle from "$lib/svgs/svg-plus-circle.svelte";
     import _ from "lodash";
     import Switch from "$lib/components/form/Switch.svelte";
     import Datepicker from "$lib/components/form/Datepicker.svelte";
-    import { DefaultItem, EInvoiceType } from "$lib/pdf/invoice-types";
+    import {
+        DefaultItem,
+        EInvoiceType,
+        type IInvoiceValues,
+    } from "$lib/pdf/invoice-types";
     import Select from "$lib/components/form/Select.svelte";
     import { fade } from "svelte/transition";
     import { SaveIcon, X } from "@lucide/svelte";
+    import * as yup from "yup";
+    import { yupBillingValidation } from "$lib/validations/invoice";
+    import { createInvoiceData } from "$lib/pdf/utils";
+    import type { NestedKeyOf, YupShape } from "$lib/types/types";
+    import ButtonRequestAres from "$lib/components/ButtonRequestAres.svelte";
+    import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
+
+    // region:    --- Form validation
+
+    const schema = yup.object().shape<YupShape<Partial<IInvoiceValues>>>({
+        issuedAt: yup
+            .string()
+            .required(m["errors.this-field-is-recommended"]()),
+        paymentDueDate: yup
+            .string()
+            .when(
+                ["paymentInfo", "paymentType"] as NestedKeyOf<IInvoiceValues>[],
+                (values, schema) => {
+                    const [paymentInfo, paymentType]: [
+                        IInvoiceValues["paymentInfo"],
+                        IInvoiceValues["paymentType"],
+                    ] = values as any;
+
+                    if (paymentInfo?.length || paymentType?.length) {
+                        return yup
+                            .string()
+                            .required(m["errors.this-field-is-recommended"]());
+                    } else {
+                        return schema;
+                    }
+                },
+            ),
+        billing: yupBillingValidation,
+        supplierBilling: yupBillingValidation,
+    });
+
+    // endregion: --- Form validation
 
     let url: string | null = $state(null);
 
-    const invoiceData = useFormStore().value;
+    const invoiceValues = useFormStore().value;
+    let invoiceValuesErrors = useFormErrorsStore();
 
     const renderInvoiceFunc = (download?: boolean) =>
         renderInvoice({
             invoiceProps: {
-                invoiceData: {
-                    ...invoiceData,
-                    items: invoiceData.items.map((i) => ({
-                        ...i,
-                        singlePrice: i.singlePrice * 100,
-                    })),
-                },
+                invoiceData: createInvoiceData(invoiceValues),
             },
             download,
         });
 
-    function renderPDF() {
-        renderInvoiceFunc().then((d) => {
-            if (url) window.URL.revokeObjectURL(url);
-            url = d;
-        });
+    let timeoutId: number;
+    function renderPDF(skipTimeout?: boolean) {
+        clearTimeout(timeoutId);
+
+        schema
+            .validate(invoiceValues, { abortEarly: false })
+            .then(() => {
+                invoiceValuesErrors.reset();
+            })
+            .catch((e: yup.ValidationError) => {
+                requestAnimationFrame(() => {
+                    invoiceValuesErrors.reset();
+
+                    extractYupErrors(e, invoiceValuesErrors.value);
+                });
+            });
+
+        timeoutId = setTimeout(
+            () => {
+                renderInvoiceFunc().then((d) => {
+                    if (url) window.URL.revokeObjectURL(url);
+                    url = d;
+                });
+            },
+            skipTimeout ? 0 : 1000,
+        );
     }
 
     let isMounted = false;
-    let timeoutId: number;
     $effect(() => {
         ({
-            ...invoiceData,
-            ...invoiceData.items,
-            ...invoiceData.billing,
-            ...invoiceData.supplierBilling,
+            ...invoiceValues,
+            ...invoiceValues.items,
+            ...invoiceValues.billing,
+            ...invoiceValues.supplierBilling,
         });
 
         if (isMounted) {
-            timeoutId = setTimeout(() => {
-                renderPDF();
-            }, 1000);
+            renderPDF();
         }
+    });
+
+    onMount(() => {
+        renderPDF(true);
+        isMounted = true;
 
         return () => {
             clearTimeout(timeoutId);
         };
     });
 
-    onMount(() => {
-        renderPDF();
-        isMounted = true;
-    });
-
     let issuedAtDate = $derived(
-        invoiceData.issuedAt ? new Date(invoiceData.issuedAt) : undefined,
+        invoiceValues.issuedAt ? new Date(invoiceValues.issuedAt) : undefined,
     );
     let paidAtDate = $derived(
-        invoiceData.paidAt ? new Date(invoiceData.paidAt) : undefined,
+        invoiceValues.paidAt ? new Date(invoiceValues.paidAt) : undefined,
     );
     let pickedUpAtDate = $derived(
-        invoiceData.pickedUpAt ? new Date(invoiceData.pickedUpAt) : undefined,
+        invoiceValues.pickedUpAt
+            ? new Date(invoiceValues.pickedUpAt)
+            : undefined,
     );
     let paymentDueDate = $derived(
-        invoiceData.paymentDueDate
-            ? new Date(invoiceData.paymentDueDate)
+        invoiceValues.paymentDueDate
+            ? new Date(invoiceValues.paymentDueDate)
             : undefined,
     );
 
-    $effect(() => {
-        invoiceData.issuedAt = issuedAtDate ? issuedAtDate.toISOString() : "";
-        invoiceData.paidAt = paidAtDate ? paidAtDate.toISOString() : "";
-        invoiceData.pickedUpAt = pickedUpAtDate
-            ? pickedUpAtDate.toISOString()
-            : "";
-        invoiceData.paymentDueDate = paymentDueDate
-            ? paymentDueDate.toISOString()
-            : "";
-    });
-
-    let fullPreview = $state(false);
+    let isFullPreview = $state(false);
 
     $effect(() => {
-        document.body.style.overflow = fullPreview ? "hidden" : "";
+        document.body.style.overflow = isFullPreview ? "hidden" : "";
     });
 </script>
 
-<Crawl />
-
-{#if fullPreview}
+{#if isFullPreview}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
@@ -113,7 +155,7 @@
         <div class="relative h-[100%]">
             <button
                 onclick={() => {
-                    fullPreview = false;
+                    isFullPreview = false;
                 }}
                 type="button"
                 class="btn absolute top-0 left-0"
@@ -141,13 +183,13 @@
         class="relative m-0 mt-5 mb-15 flex w-full max-w-[420px] shrink-0 flex-col gap-2"
         onsubmit={(e) => {
             e.preventDefault();
-            renderPDF();
+            renderPDF(true);
         }}
     >
         <h2 class="h3 text-center">{m["labels.invoice"]()}</h2>
 
         <h3 class="h5 font-bold uppercase">{m["form.general"]()}</h3>
-        <Select bind:value={invoiceData.invoiceType}>
+        <Select bind:value={invoiceValues.invoiceType}>
             {#snippet options()}
                 {#each Object.values(EInvoiceType) as invoiceType (invoiceType)}
                     <option value={invoiceType}>
@@ -157,72 +199,95 @@
             {/snippet}
         </Select>
         <Input
-            bind:value={invoiceData.companyName}
+            bind:value={invoiceValues.companyName}
             label={m["form.company"]()}
         />
-        <Input bind:value={invoiceData.refId} label={m["form.refid"]()} />
-        <Input bind:value={invoiceData.currency} label={m["form.currency"]()} />
+        <Input bind:value={invoiceValues.refId} label={m["form.refid"]()} />
+        <Input
+            bind:value={invoiceValues.currency}
+            label={m["form.currency"]()}
+        />
         <Datepicker
             label={m["form.issued-at"]()}
             type="date"
             bind:value={issuedAtDate}
+            bind:isoDate={invoiceValues.issuedAt}
+            error={invoiceValuesErrors.value["issuedAt"]}
         />
         <Datepicker
             label={m["form.paid-at"]()}
             type="date"
             bind:value={paidAtDate}
+            bind:isoDate={invoiceValues.paidAt}
+            error={invoiceValuesErrors.value["paidAt"]}
         />
         <Datepicker
             label={m["form.pickup-at"]()}
             type="date"
             bind:value={pickedUpAtDate}
+            bind:isoDate={invoiceValues.pickedUpAt}
+            error={invoiceValuesErrors.value["pickedUpAt"]}
         />
         <Datepicker
             label={m["form.payment-due"]()}
             type="date"
             bind:value={paymentDueDate}
+            bind:isoDate={invoiceValues.paymentDueDate}
+            error={invoiceValuesErrors.value["paymentDueDate"]}
         />
 
         <hr class="hr mx-7 my-4 w-[auto]" />
 
         <h3 class="h5 font-bold uppercase">{m["form.supplier"]()}</h3>
         <Input
-            bind:value={invoiceData.supplierBilling.fullname}
+            bind:value={invoiceValues.supplierBilling.fullname}
             label={m["form.fullname"]()}
+            error={invoiceValuesErrors.value["supplierBilling.fullname"]}
         />
         <Input
-            bind:value={invoiceData.supplierBilling.line1}
+            bind:value={invoiceValues.supplierBilling.line1}
             label={m["form.address"]()}
+            error={invoiceValuesErrors.value["supplierBilling.line1"]}
         />
         <Input
-            bind:value={invoiceData.supplierBilling.postal}
+            bind:value={invoiceValues.supplierBilling.postal}
             label={m["form.postal"]()}
+            error={invoiceValuesErrors.value["supplierBilling.postal"]}
         />
         <Input
-            bind:value={invoiceData.supplierBilling.city}
+            bind:value={invoiceValues.supplierBilling.city}
             label={m["form.city"]()}
+            error={invoiceValuesErrors.value["supplierBilling.city"]}
         />
         <Input
-            bind:value={invoiceData.supplierBilling.country}
+            bind:value={invoiceValues.supplierBilling.country}
             label={m["form.country"]()}
         />
         <Input
-            bind:value={invoiceData.supplierBilling.ine}
+            bind:value={invoiceValues.supplierBilling.ine}
             label={m["form.ine"]()}
+            error={invoiceValuesErrors.value["supplierBilling.ine"]}
         />
+        {#if !invoiceValuesErrors.value["supplierBilling.ine"]}
+            <ButtonRequestAres
+                ine={invoiceValues.supplierBilling.ine}
+                bind:billing={invoiceValues.supplierBilling}
+            />
+        {/if}
+
         <Input
-            bind:value={invoiceData.supplierBilling.vat}
+            bind:value={invoiceValues.supplierBilling.vat}
             label={m["form.vat"]()}
         />
 
         <Switch
-            bind:checked={invoiceData.isSupplierSelfEmployed}
-            label={m["form.iam-selfemployed"]()}
+            bind:checked={invoiceValues.isSupplierSelfEmployed}
+            label={m["form.is-selfemployed"]()}
         />
 
-        {#if !invoiceData.isSupplierSelfEmployed}
+        {#if !invoiceValues.isSupplierSelfEmployed}
             <Input
-                bind:value={invoiceData.customTextUnderSupplier}
+                bind:value={invoiceValues.customTextUnderSupplier}
                 label={m["form.custom-text-under-supplier"]()}
                 type="textarea"
             />
@@ -232,45 +297,62 @@
 
         <h3 class="h5 font-bold uppercase">{m["form.receiver"]()}</h3>
         <Input
-            bind:value={invoiceData.billing.fullname}
+            bind:value={invoiceValues.billing.fullname}
             label={m["form.fullname"]()}
+            error={invoiceValuesErrors.value["billing.fullname"]}
         />
         <Input
-            bind:value={invoiceData.billing.line1}
+            bind:value={invoiceValues.billing.line1}
             label={m["form.address"]()}
+            error={invoiceValuesErrors.value["billing.line1"]}
         />
         <Input
-            bind:value={invoiceData.billing.postal}
+            bind:value={invoiceValues.billing.postal}
             label={m["form.postal"]()}
+            error={invoiceValuesErrors.value["billing.postal"]}
         />
-        <Input bind:value={invoiceData.billing.city} label={m["form.city"]()} />
         <Input
-            bind:value={invoiceData.billing.country}
+            bind:value={invoiceValues.billing.city}
+            label={m["form.city"]()}
+            error={invoiceValuesErrors.value["billing.city"]}
+        />
+        <Input
+            bind:value={invoiceValues.billing.country}
             label={m["form.country"]()}
         />
-        <Input bind:value={invoiceData.billing.ine} label={m["form.ine"]()} />
-        <Input bind:value={invoiceData.billing.vat} label={m["form.vat"]()} />
+        <Input
+            bind:value={invoiceValues.billing.ine}
+            label={m["form.ine"]()}
+            error={invoiceValuesErrors.value["billing.ine"]}
+        />
+        {#if !invoiceValuesErrors.value["billing.ine"]}
+            <ButtonRequestAres
+                ine={invoiceValues.billing.ine}
+                bind:billing={invoiceValues.billing}
+            />
+        {/if}
+        <Input bind:value={invoiceValues.billing.vat} label={m["form.vat"]()} />
 
         <hr class="hr mx-7 my-4 w-[auto]" />
 
         <h3 class="h5 font-bold uppercase">{m["form.items"]()}</h3>
         <Switch
-            bind:checked={invoiceData.countVat}
+            bind:checked={invoiceValues.countVat}
             label={m["form.count-vat"]()}
         />
         <Switch
-            bind:checked={invoiceData.roundTotal}
+            bind:checked={invoiceValues.roundTotal}
             label={m["form.round-total"]()}
         />
 
-        {#each invoiceData.items as item (item.id)}
+        {#each invoiceValues.items as item (item.id)}
             <Item {item} />
         {/each}
 
         <div>
             <button
                 onclick={() => {
-                    invoiceData.items.push(
+                    invoiceValues.items.push(
                         _.cloneDeep({
                             ...DefaultItem,
                             id:
@@ -291,11 +373,11 @@
         <hr class="hr mx-7 my-4 w-[auto]" />
 
         <Input
-            bind:value={invoiceData.paymentType}
+            bind:value={invoiceValues.paymentType}
             label={m["form.payment-type"]()}
         />
         <Input
-            bind:value={invoiceData.paymentInfo}
+            bind:value={invoiceValues.paymentInfo}
             label={m["form.payment-info"]()}
             type="textarea"
             class="min-h-[8rem]"
@@ -304,7 +386,7 @@
         <hr class="hr mx-7 my-4 w-[auto]" />
 
         <Input
-            bind:value={invoiceData.customFooterText}
+            bind:value={invoiceValues.customFooterText}
             label={m["form.custom-footer-text"]()}
             type="textarea"
         />
@@ -320,7 +402,7 @@
             </button>
             <button
                 onclick={() => {
-                    fullPreview = !fullPreview;
+                    isFullPreview = !isFullPreview;
                 }}
                 type="button"
                 class="btn preset-filled-primary-400-600"

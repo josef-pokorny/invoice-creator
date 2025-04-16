@@ -10,7 +10,10 @@
     "remove-item": "Odstranit položku",
     "save": "Uložit",
     "full-preview": "Ukázat",
-    "download": "Stáhnout PDF"
+    "download": "Stáhnout PDF",
+    "fill-in-by-ine": "Vyplnit údaje podle IČa",
+    "close": "Zavřít",
+    "change-language": "Změnit jazyk"
   },
   "form": {
     "receiver": "Odběratel",
@@ -34,7 +37,6 @@
     "measurement-unit": "Měrná jednotka (MJ)",
     "single-price": "Cena za MJ",
     "custom-text-under-supplier": "Vlastní text pod Dodavatelem",
-    "iam-selfemployed": "Jsem OSVČ",
     "custom-footer-text": "Vlastní text v zápatí",
     "INVOICE_TAX_DOC": "Faktura - daňový doklad",
     "INVOICE": "Faktura",
@@ -45,7 +47,17 @@
     "payment-type": "Způsob platby",
     "payment-info": "Platební údaje (Bankovní účet, VS, apod.)",
     "pickup-at": "Datum převzetí",
-    "payment-due": "Datum splatnosti"
+    "payment-due": "Datum splatnosti",
+    "is-selfemployed": "Je OSVČ"
+  },
+  "errors": {
+    "something-went-wrong-500": "Někde se stala chyba. Váš požadavek nebyl dokončen.",
+    "invalid-ine": "Toto IČO je neplatné",
+    "this-field-is-recommended": "Je doporučeno vyplnit toto pole",
+    "price-must-have-only-two-decimals": "Číslo musí mít maximálně dvě desetinná místa"
+  },
+  "text": {
+    "a": ""
   },
   "meta": {
     "title": "Vytvoření Faktury Zdarma",

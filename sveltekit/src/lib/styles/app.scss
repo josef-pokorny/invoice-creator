@@ -1,0 +1,32 @@
+:root {
+    --anchor-color: var(--color-primary-200);
+}
+
+.input[aria-invalid="true"] {
+    @include errorInput;
+}
+
+.anchor {
+    color: var(--anchor-color);
+    font-weight: 500;
+}
+
+button {
+    text-wrap: auto !important;
+    user-select: none;
+}
+
+div[data-scope="toast"] {
+    background-color: var(--color-error-600);
+
+    &[data-placement="bottom-end"] {
+        min-width: 400px;
+    }
+
+    &[data-part="root"] {
+        [data-part="description"] {
+            font-size: 1rem !important;
+            font-weight: 500;
+        }
+    }
+}

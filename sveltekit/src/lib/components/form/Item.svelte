@@ -1,18 +1,33 @@
 <script lang="ts">
-    import { DefaultItem, type IItem } from "$lib/pdf/invoice-types";
+    import { DefaultItem } from "$lib/pdf/invoice-types";
     import { m } from "$lib/paraglide/messages";
-    import type { IInvoiceProps } from "$lib/pdf/invoice-types";
-    import { useFormStore } from "$lib/stores/form";
-    import { CircleDollarSign, Trash } from "@lucide/svelte";
+    import type { IItem } from "$lib/pdf/invoice-types";
+    import { useFormItemErrors, useFormStore } from "$lib/stores/form";
+    import { Trash } from "@lucide/svelte";
     import Input from "./Input.svelte";
     import _ from "lodash";
+    import * as yup from "yup";
+    import type { YupShape } from "$lib/types/types";
+    import { yupHasNumberMaxTwoDecimalValidation } from "$lib/validations/ine";
+    import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
+    import { createId } from "$lib/utils";
+    import Error from "./Error.svelte";
+    import { fromCents, toCents } from "$lib/pdf/utils";
 
-    let { ...props }: { item: IInvoiceProps["invoiceData"]["items"][0] } =
-        $props();
+    let {
+        ...props
+    }: {
+        item: IItem;
+    } = $props();
 
-    const invoiceData = useFormStore().value;
+    const invoiceValues = useFormStore().value;
 
-    let item = $derived(props.item);
+    let item = $state(
+        _.cloneDeep({
+            ...props.item,
+            singlePrice: fromCents(props.item.singlePrice),
+        }),
+    );
 
     $effect(() => {
         const differentKeys =
@@ -24,6 +39,41 @@
             item = _.set(item, key, _.get(DefaultItem, key));
         });
     });
+
+    const itemErrors = useFormItemErrors();
+
+    const schema = yup.object().shape<YupShape<Partial<IItem>>>({
+        singlePrice: yupHasNumberMaxTwoDecimalValidation as any,
+    });
+
+    $effect(() => {
+        ({ ...item });
+
+        schema
+            .validate(item, { abortEarly: false })
+            .then(() => {
+                itemErrors.reset();
+            })
+            .catch((e: yup.ValidationError) => {
+                requestAnimationFrame(() => {
+                    itemErrors.reset();
+
+                    extractYupErrors(e, itemErrors.value);
+                });
+            });
+
+        requestAnimationFrame(() => {
+            invoiceValues.items = invoiceValues.items.map((i) => {
+                if (i.id === item.id) {
+                    return { ...item, singlePrice: toCents(item.singlePrice) };
+                } else {
+                    return i;
+                }
+            });
+        });
+    });
+
+    let InputSinglePriceId = $state(createId());
 </script>
 
 <div class="border-surface-500 flex flex-col gap-2 rounded-[10px] border-1 p-3">
@@ -33,7 +83,7 @@
             title={m["actions.remove-item"]()}
             type="button"
             onclick={() => {
-                invoiceData.items = invoiceData.items.filter(
+                invoiceValues.items = invoiceValues.items.filter(
                     (i) => i.id !== item.id,
                 );
             }}
@@ -47,6 +97,7 @@
         label={m["form.count"]()}
         type="number"
         min={0}
+        error={itemErrors.value["count"]}
     />
     <div class="grid grid-cols-[2fr_1fr] items-end gap-1">
         <Input
@@ -54,10 +105,18 @@
             label={m["form.single-price"]()}
             type="number"
             step="0.01"
+            bind:id={InputSinglePriceId}
+            error={itemErrors.value["singlePrice"]}
+            isErrorVisible={false}
         />
         <Input
             bind:value={item.measurementUnit}
             label={m["form.measurement-unit"]()}
+            error={itemErrors.value["measurementUnit"]}
+        />
+        <Error
+            id={InputSinglePriceId}
+            error={itemErrors.value["singlePrice"]}
         />
     </div>
     {#if !_.isUndefined(item.vatPercentage)}
@@ -68,6 +127,9 @@
             min={0}
             max={100}
             step={0.01}
+            error={itemErrors.value["vatPercentage"]}
         />
     {/if}
 </div>
+
+<style lang="scss"></style>
