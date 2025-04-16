@@ -57,6 +57,7 @@
 		"@internationalized/date": "^3.8.0",
 		"@lucide/svelte": "^0.488.0",
 		"@react-pdf/renderer": "^4.3.0",
+		"@sveltejs/adapter-vercel": "^5.7.0",
 		"@tailwindcss/postcss": "^4.1.4",
 		"@types/country-flag-icons": "^1.2.2",
 		"axios": "^1.8.4",
