@@ -1,6 +1,5 @@
 <script lang="ts">
     import { renderInvoice } from "$lib";
-    import Crawl from "$lib/components/Crawl.svelte";
     import PdfViewer from "svelte-pdf";
     import Input from "$lib/components/form/Input.svelte";
     import { onMount } from "svelte";
