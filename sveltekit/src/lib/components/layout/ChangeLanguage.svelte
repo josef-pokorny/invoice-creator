@@ -61,25 +61,6 @@
                             {@html GB}
                         {/if}
                     </button>
-                    <!-- <a
-                        class="anchor"
-                        href={localizeHref(page.url.pathname, {
-                            locale,
-                        })}
-                        aria-disabled={locale === getLocale()}
-                        onclick={() => setLocale(locale)}
-                        title={locale === "cs"
-                            ? "Čeština"
-                            : locale === "en"
-                              ? "English"
-                              : ""}
-                    >
-                        {#if locale === "cs"}
-                            {@html CZ}
-                        {:else if locale === "en"}
-                            {@html GB}
-                        {/if}
-                    </a> -->
                 {/each}
             </section>
         </div>
@@ -122,7 +103,6 @@
             align-items: center;
             justify-content: center;
 
-            a,
             button {
                 transition: border 150ms;
 

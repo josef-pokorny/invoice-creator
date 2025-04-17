@@ -1,3 +1,4 @@
+<!-- SVELTE 4 - DON'T CHANGE IT! -->
 <script lang="ts">
     import { m } from "$lib/paraglide/messages";
     import { fade } from "svelte/transition";
@@ -5,7 +6,7 @@
 
     const intervalMS = 5 * 60 * 1000;
 
-    const { needRefresh, updateServiceWorker } = useRegisterSW({
+    const { needRefresh, updateServiceWorker, offlineReady } = useRegisterSW({
         onRegistered(r: any) {
             // uncomment following code if you want check for updates
             r &&
@@ -22,6 +23,11 @@
     const close = () => {
         needRefresh.set(false);
     };
+
+    $: if ($needRefresh && $offlineReady) {
+        console.log("SW automatically reloaded!");
+        updateServiceWorker(true);
+    }
 </script>
 
 {#if $needRefresh}

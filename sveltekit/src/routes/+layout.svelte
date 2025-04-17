@@ -1,6 +1,6 @@
 <script lang="ts">
     import ChangeLanguage from "$lib/components/layout/ChangeLanguage.svelte";
-    import PWAMeta from "$lib/components/PWAMeta.svelte";
+    import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
     import "$lib/app.css";
     import "$lib/styles/app.scss";
     import { AppBar, Toaster } from "@skeletonlabs/skeleton-svelte";
@@ -10,7 +10,6 @@
     import { useToasterStore } from "$lib/stores/toaster";
     import {
         baseLocale,
-        getLocale,
         locales,
         localizeHref,
         setLocale,
@@ -62,7 +61,7 @@
     <Toaster toaster={toaster.value}></Toaster>
 
     <PWAMeta />
-    {#await import('$lib/components/ReloadPrompt.svelte') then { default: ReloadPrompt }}
+    {#await import('$lib/components/layout/PWAReloadPrompt.svelte') then { default: ReloadPrompt }}
         <ReloadPrompt />
     {/await}
 
