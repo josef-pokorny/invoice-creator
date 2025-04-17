@@ -15,12 +15,16 @@ export default defineConfig({
         }),
         SvelteKitPWA({
             strategies: "generateSW",
+            workbox: {
+                maximumFileSizeToCacheInBytes: 20097152,
+            },
             manifest: {
                 name: "Invoice Creator",
                 short_name: "Invoice",
                 display: "standalone",
                 theme_color: "#2E6DB4",
                 background_color: "black",
+                start_url: "/",
                 icons: [
                     {
                         src: "/favicon.png",
@@ -48,6 +52,6 @@ export default defineConfig({
         },
     },
     define: {
-        "process.env.NODE_ENV": '"development"',
+        "process.env.NODE_ENV": '"production"',
     },
 });
