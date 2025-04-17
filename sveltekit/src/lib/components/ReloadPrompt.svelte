@@ -1,14 +1,18 @@
 <script lang="ts">
+    import { m } from "$lib/paraglide/messages";
+    import { fade } from "svelte/transition";
     import { useRegisterSW } from "virtual:pwa-register/svelte";
 
-    const { needRefresh, updateServiceWorker, offlineReady } = useRegisterSW({
+    const intervalMS = 5 * 60 * 1000;
+
+    const { needRefresh, updateServiceWorker } = useRegisterSW({
         onRegistered(r: any) {
             // uncomment following code if you want check for updates
-            // r &&
-            //     setInterval(() => {
-            //         console.log("Checking for sw update");
-            //         r.update();
-            //     }, intervalMS);
+            r &&
+                setInterval(() => {
+                    console.log("Checking for sw update");
+                    r.update();
+                }, intervalMS);
             console.log(`SW Registered: `, r);
         },
         onRegisterError(error: any) {
@@ -16,36 +20,30 @@
         },
     });
     const close = () => {
-        offlineReady.set(false);
         needRefresh.set(false);
     };
-    $: toast = $offlineReady || $needRefresh;
 </script>
 
-{#if toast}
+{#if $needRefresh}
     <div
-        class="pwa-toast card preset-outlined-surface-500 bg-surface-900"
+        class="pwa-toast card preset-outlined-surface-600 bg-surface-900 shadow"
         role="alert"
+        transition:fade={{ duration: 150 }}
     >
         <div class="message">
-            {#if $offlineReady}
-                <span> App ready to work offline </span>
-            {:else}
-                <span>
-                    New content available, click on reload button to update.
-                </span>
-            {/if}
+            <span>
+                {m["pwa.new-update"]()}
+            </span>
         </div>
-        {#if $needRefresh}
-            <button
-                class="btn preset-filled-success-500 hover:preset-filled"
-                on:click={() => updateServiceWorker(true)}
-            >
-                Reload
-            </button>
-        {/if}
+
+        <button
+            class="btn preset-filled-success-500"
+            on:click={() => updateServiceWorker(true)}
+        >
+            {m["pwa.reload"]()}
+        </button>
         <button class="btn preset-tonal hover:preset-filled" on:click={close}>
-            Close
+            {m["actions.close"]()}
         </button>
     </div>
 {/if}
@@ -53,14 +51,14 @@
 <style lang="scss">
     .pwa-toast {
         position: fixed;
-        right: 0;
+        left: 0;
         bottom: 0;
         margin: 16px;
         padding: 12px;
         border-radius: 4px;
-        z-index: 2;
+        z-index: 2000;
         text-align: left;
-        box-shadow: 3px 4px 5px 0 #8885;
+        max-width: 400px;
     }
     .pwa-toast .message {
         margin-bottom: 8px;

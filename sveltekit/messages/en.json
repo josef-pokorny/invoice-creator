@@ -64,5 +64,9 @@
     "title": "Create Invoice for Free",
     "description": "Create your invoice online in just a few minutes. Free, easy, and without registration. The ideal solution for freelancers and small business owners.",
     "keywords": "invoice, online invoice, free invoice, invoice for entrepreneurs, create invoice, invoicing, invoicing tool"
+  },
+  "pwa": {
+    "reload": "Reload",
+    "new-update": "A new version of the app is now available. Please reload the page to update."
   }
 }

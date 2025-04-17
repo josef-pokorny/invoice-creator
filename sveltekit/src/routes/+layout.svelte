@@ -1,6 +1,6 @@
 <script lang="ts">
     import ChangeLanguage from "$lib/components/layout/ChangeLanguage.svelte";
-    import PWAMeta from "./../lib/components/PWAMeta.svelte";
+    import PWAMeta from "$lib/components/PWAMeta.svelte";
     import "$lib/app.css";
     import "$lib/styles/app.scss";
     import { AppBar, Toaster } from "@skeletonlabs/skeleton-svelte";

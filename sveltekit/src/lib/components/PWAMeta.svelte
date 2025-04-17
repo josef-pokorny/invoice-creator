@@ -4,7 +4,7 @@
     // @ts-expect-error
     import { pwaInfo } from "virtual:pwa-info";
 
-    const intervalMS = 30 * 60 * 1000;
+    const intervalMS = 5 * 60 * 1000;
 
     onMount(async () => {
         if (pwaInfo) {
