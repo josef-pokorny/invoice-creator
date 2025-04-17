@@ -57,7 +57,7 @@
     "price-must-have-only-two-decimals": "Číslo musí mít maximálně dvě desetinná místa"
   },
   "text": {
-    "you-can-fill-by-ine": "Všechny údaje se mohou automaticky doplnit po vyplnení pouze IČa."
+    "you-can-fill-by-ine": "Všechny údaje se mohou automaticky doplnit po pouhým vyplnení správného IČa."
   },
   "meta": {
     "title": "Vytvoření Faktury Zdarma",

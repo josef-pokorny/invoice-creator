@@ -20,7 +20,7 @@ export default defineConfig({
             },
             manifest: {
                 name: "Invoice Creator",
-                short_name: "Invoice",
+                short_name: "Invoice Creator",
                 display: "standalone",
                 theme_color: "#2E6DB4",
                 background_color: "black",
