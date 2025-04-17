@@ -57,11 +57,15 @@
     "price-must-have-only-two-decimals": "Číslo musí mít maximálně dvě desetinná místa"
   },
   "text": {
-    "you-can-fill-by-ine": "Všechny údaje se mohou automaticky doplnit po vyplnení pouze IČa."
+    "you-can-fill-by-ine": "Všechny údaje se mohou automaticky doplnit po pouhým vyplnení správného IČa."
   },
   "meta": {
     "title": "Vytvoření Faktury Zdarma",
     "description": "Vytvořte si fakturu online během pár minut. Zdarma, snadno a bez registrace. Ideální řešení pro OSVČ a malé podnikatele.",
     "keywords": "faktura, online faktura, faktura zdarma, faktura pro podnikatele, vytvořit fakturu, fakturování, fakturační nástroj"
+  },
+  "pwa": {
+    "reload": "Znovu načíst",
+    "new-update": "Nová verze aplikace je nyní dostupná. Prosím znovu načtěte stránku pro aktualizaci."
   }
 }

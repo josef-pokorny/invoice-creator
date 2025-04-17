@@ -52,7 +52,7 @@
     "is-selfemployed": "Is self employed"
   },
   "errors": {
-    "something-went-wrong-500": "Something went wrong. You request has not been completed.",
+    "something-went-wrong-500": "Something went wrong. Your request has not been completed.",
     "invalid-ine": "This INE is invalid",
     "this-field-is-recommended": "It's recommended to fill this field",
     "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places."
@@ -64,5 +64,9 @@
     "title": "Create Invoice for Free",
     "description": "Create your invoice online in just a few minutes. Free, easy, and without registration. The ideal solution for freelancers and small business owners.",
     "keywords": "invoice, online invoice, free invoice, invoice for entrepreneurs, create invoice, invoicing, invoicing tool"
+  },
+  "pwa": {
+    "reload": "Reload",
+    "new-update": "A new version of the app is now available. Please reload the page to update."
   }
 }
