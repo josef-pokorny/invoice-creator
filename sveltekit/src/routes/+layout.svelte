@@ -16,6 +16,7 @@
         setLocale,
     } from "$lib/paraglide/runtime";
     import SvgGithub from "$lib/svgs/svg-github.svelte";
+    import { goto } from "$app/navigation";
 
     let { children } = $props();
 
@@ -84,16 +85,29 @@
     <footer>
         <div class="footer-items">
             <div class="footer-item links">
-                {#each locales as locale}
+                {#each locales as lang}
                     <a
                         class="anchor"
-                        href={localizeHref(page.url.pathname, { locale })}
-                        aria-disabled={locale === getLocale()}
-                        onclick={() => setLocale(locale)}
+                        href={localizeHref(page.url.pathname, { locale: lang })}
+                        aria-disabled={lang === locale}
+                        onclick={(e) => {
+                            e.preventDefault();
+                            setLocale(lang, { reload: false });
+
+                            goto(
+                                localizeHref(page.url.pathname, {
+                                    locale: lang,
+                                }),
+                                {
+                                    invalidateAll: true,
+                                    noScroll: true,
+                                },
+                            );
+                        }}
                     >
-                        {#if locale === "cs"}
+                        {#if lang === "cs"}
                             Čeština
-                        {:else if locale === "en"}
+                        {:else if lang === "en"}
                             English
                         {/if}
                     </a>
