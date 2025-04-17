@@ -1,5 +1,3 @@
-import type { IBilling } from "$lib";
-
 export interface IInvoiceValues {
     companyName?: string;
     items: IItem[];
@@ -20,6 +18,16 @@ export interface IInvoiceValues {
     customFooterText?: string;
     countVat?: boolean;
     roundTotal?: boolean;
+}
+
+export interface IBilling {
+    fullname: string;
+    line1: string;
+    postal: string;
+    city: string;
+    country: string;
+    ine?: string;
+    vat?: string;
 }
 
 export interface IInvoiceData extends IInvoiceValues {

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { IBilling } from "$lib";
+    import type { IBilling } from "$lib/pdf/invoice-types";
     import { m } from "$lib/paraglide/messages";
     import { findAresByINE } from "$lib/requests/ares/ares-ine";
     import type { IGovEkonomickeSubjektyReturn } from "$lib/requests/ares/ares-types";

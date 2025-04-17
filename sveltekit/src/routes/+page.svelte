@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { renderInvoice } from "$lib";
     import PdfViewer from "svelte-pdf";
     import Input from "$lib/components/form/Input.svelte";
     import { onMount } from "svelte";
@@ -20,10 +19,11 @@
     import { SaveIcon, X } from "@lucide/svelte";
     import * as yup from "yup";
     import { yupBillingValidation } from "$lib/validations/invoice";
-    import { createInvoiceData } from "$lib/pdf/utils";
+    import { createInvoiceData, renderInvoiceBlobUrl } from "$lib/pdf/utils";
     import type { NestedKeyOf, YupShape } from "$lib/types/types";
     import ButtonRequestAres from "$lib/components/ButtonRequestAres.svelte";
     import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
+    import Message from "$lib/components/Message.svelte";
 
     // region:    --- Form validation
 
@@ -62,11 +62,12 @@
     let invoiceValuesErrors = useFormErrorsStore();
 
     const renderInvoiceFunc = (download?: boolean) =>
-        renderInvoice({
+        renderInvoiceBlobUrl({
             invoiceProps: {
                 invoiceData: createInvoiceData(invoiceValues),
             },
             download,
+            prefixFileName: `${m["labels.invoice"]()} - `,
         });
 
     let timeoutId: number;
@@ -238,6 +239,9 @@
         <hr class="hr mx-7 my-4 w-[auto]" />
 
         <h3 class="h5 font-bold uppercase">{m["form.supplier"]()}</h3>
+        <Message clossable id="supplier-ine-fill">
+            {m["text.you-can-fill-by-ine"]()}
+        </Message>
         <Input
             bind:value={invoiceValues.supplierBilling.fullname}
             label={m["form.fullname"]()}
@@ -295,6 +299,9 @@
         <hr class="hr mx-7 my-4 w-[auto]" />
 
         <h3 class="h5 font-bold uppercase">{m["form.receiver"]()}</h3>
+        <Message clossable id="receiver-ine-fill">
+            {m["text.you-can-fill-by-ine"]()}
+        </Message>
         <Input
             bind:value={invoiceValues.billing.fullname}
             label={m["form.fullname"]()}

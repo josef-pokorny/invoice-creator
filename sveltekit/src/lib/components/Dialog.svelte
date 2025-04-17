@@ -50,11 +50,11 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <dialog
     bind:this={elemModal}
-    class="rounded-container bg-surface-100-900 backdrop:bg-surface-50/75 dark:backdrop:bg-surface-950/75 top-1/2 left-1/2 z-10 max-w-[640px] -translate-1/2 text-inherit"
+    class=" backdrop:bg-surface-50/75 dark:backdrop:bg-surface-950/75 top-1/2 left-1/2 z-10 max-w-[640px] -translate-1/2 p-2"
 >
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
-        class="space-y-4 p-4"
+        class="rounded-container bg-surface-100-900 space-y-4 p-4 text-inherit"
         onclick={(e) => {
             e.stopPropagation();
         }}

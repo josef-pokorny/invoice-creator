@@ -23,4 +23,4 @@ You can preview the production build with `pnpm run preview`.
 - [x] rerender invoice on item property change
 - [x] FIX: date with wrong title in invoice
 - [x] sum every single column
-- [ ] Ares autocomplete
+- [x] Ares autocomplete

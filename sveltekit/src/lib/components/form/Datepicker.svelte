@@ -38,13 +38,14 @@
         isoDate = value ? value.toISOString() : "";
     });
 
+    let wrapperEl: HTMLElement | null;
     $effect(() => {
-        if (error) {
-            let input = document.querySelector(
-                `#wrapper-${id} .date-picker input`,
-            );
+        let input = wrapperEl?.querySelector(`.date-picker input`);
 
-            if (input) {
+        if (input) {
+            input.id = id;
+
+            if (error) {
                 input.ariaInvalid = "true";
 
                 return () => {
@@ -55,7 +56,7 @@
     });
 </script>
 
-<fieldset class="label" id="wrapper-{id}">
+<fieldset class="label" bind:this={wrapperEl}>
     {#if label}
         <label for={id} class="label-text text-surface-100 text-[0.9rem]">
             {label}

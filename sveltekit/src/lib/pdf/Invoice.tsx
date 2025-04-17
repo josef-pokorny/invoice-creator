@@ -10,93 +10,51 @@ import {
 import { EInvoiceType, type IInvoiceProps } from "./invoice-types";
 import moment from "$lib/moment";
 
-import MontserratRegular from "$lib/fonts/Montserrat-Regular.ttf";
-// import MontserratMedium from "$lib/fonts/Montserrat-Medium.ttf";
-import MontserratBold from "$lib/fonts/Montserrat-Bold.ttf";
-import { type IBilling } from "$lib/index";
-// import MontserratExtraBold from "$lib/fonts/Montserrat-ExtraBold.ttf";
-// import MontserratSemiBold from "$lib/fonts/Montserrat-SemiBold.ttf";
-// import MontserratLight from "$lib/fonts/Montserrat-Light.ttf";
+import { type IBilling } from "./invoice-types";
 
-import RobotoRegular from "$lib/fonts/Roboto-Regular.ttf";
-import RobotoBold from "$lib/fonts/Roboto-Bold.ttf";
-import RobotoItalicRegular from "$lib/fonts/Roboto-Italic.ttf";
-import RobotoItalicBold from "$lib/fonts/Roboto-BoldItalic.ttf";
-import RobotoSemiBold from "$lib/fonts/Roboto-SemiBold.ttf";
-import RobotoItalicSemiBold from "$lib/fonts/Roboto-SemiBoldItalic.ttf";
-import RobotoLight from "$lib/fonts/Roboto-Light.ttf";
-import RobotoItalicLight from "$lib/fonts/Roboto-LightItalic.ttf";
+import Roboto400 from "./fonts/roboto-400.ttf";
+import Roboto500 from "./fonts/roboto-500.ttf";
+import Roboto600 from "./fonts/roboto-600.ttf";
+
+import Roboto400Italic from "./fonts/roboto-400-italic.ttf";
+import Roboto500Italic from "./fonts/roboto-500-italic.ttf";
+import Roboto600Italic from "./fonts/roboto-600-italic.ttf";
+
 import { fromCents } from "./utils";
 
 Font.register({
     family: "Roboto",
     fonts: [
         {
-            src: RobotoLight,
-            fontWeight: 300,
-            fontStyle: "normal",
-        },
-        {
-            src: RobotoItalicLight,
-            fontWeight: 300,
-            fontStyle: "italic",
-        },
-        {
-            src: RobotoRegular,
+            src: Roboto400,
             fontWeight: 400,
             fontStyle: "normal",
         },
         {
-            src: RobotoItalicRegular,
+            src: Roboto400Italic,
             fontWeight: 400,
             fontStyle: "italic",
         },
         {
-            src: RobotoSemiBold,
+            src: Roboto500,
             fontWeight: 500,
             fontStyle: "normal",
         },
         {
-            src: RobotoItalicSemiBold,
+            src: Roboto500Italic,
             fontWeight: 500,
             fontStyle: "italic",
         },
         {
-            src: RobotoBold,
+            src: Roboto600,
             fontWeight: 600,
             fontStyle: "normal",
         },
         {
-            src: RobotoItalicBold,
+            src: Roboto600Italic,
             fontWeight: 600,
             fontStyle: "italic",
         },
-    ],
-});
-
-Font.register({
-    family: "Montserrat",
-    fonts: [
-        {
-            src: MontserratRegular,
-            fontWeight: 400,
-        },
-        // {
-        //   src: MontserratMedium,
-        //   fontWeight: 500,
-        // },
-        // {
-        //   src: MontserratSemiBold,
-        //   fontWeight: 600,
-        // },
-        {
-            src: MontserratBold,
-            fontWeight: 600,
-        },
-        // {
-        //   src: MontserratExtraBold,
-        //   fontWeight: 800,
-        // },
     ],
 });
 
@@ -126,7 +84,6 @@ const styles = StyleSheet.create({
         padding: "5 18 30",
     },
     companyName: {
-        fontFamily: "Montserrat",
         fontWeight: 600,
         fontSize: 18,
     },
@@ -241,7 +198,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 EInvoiceType.INVOICE_TAX_DOC
                               ? "Faktura - daňový doklad"
                               : "Faktura"}{" "}
-                        - {invoiceData?.refId}
+                        {invoiceData?.refId}
                     </Text>
                 </View>
                 <View style={styles.main}>

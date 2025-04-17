@@ -24,4 +24,9 @@ export default defineConfig({
             },
         },
     },
+    server: {
+        watch: {
+            ignored: ["**/project.inlang/**"],
+        },
+    },
 });

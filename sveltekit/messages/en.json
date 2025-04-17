@@ -55,10 +55,10 @@
     "something-went-wrong-500": "Something went wrong. You request has not been completed.",
     "invalid-ine": "This INE is invalid",
     "this-field-is-recommended": "It's recommended to fill this field",
-    "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places"
+    "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places."
   },
   "text": {
-    "a": ""
+    "you-can-fill-by-ine": "You can automatically fill in all the data after filling in only the INE."
   },
   "meta": {
     "title": "Create Invoice for Free",

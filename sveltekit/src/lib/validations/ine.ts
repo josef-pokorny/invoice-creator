@@ -1,4 +1,5 @@
 import { m } from "$lib/paraglide/messages";
+import { countDecimals } from "$lib/utils";
 import _ from "lodash";
 import * as yup from "yup";
 
@@ -11,7 +12,7 @@ export const yupInvoiceIneValidation = yup.string().test({
     message: m["errors.invalid-ine"](),
 });
 
-export const yupHasNumberMaxTwoDecimalValidation = yup.mixed().test({
+export const yupHasNumberMaxTwoDecimalValidation = yup.mixed().nullable().test({
     message: m["errors.price-must-have-only-two-decimals"](),
     test: hasNumberMaxTwoDecimalValidation,
 });
@@ -19,8 +20,8 @@ export const yupHasNumberMaxTwoDecimalValidation = yup.mixed().test({
 export function hasNumberMaxTwoDecimalValidation(value: any) {
     let number = Number(value);
 
-    if (number) {
-        return number * 100 === _.round(number * 100, 0);
+    if (number || number === 0) {
+        return countDecimals(number) <= 2;
     }
 
     return false;
