@@ -119,9 +119,8 @@
                     border-color: var(--color-primary-300);
                 }
 
-                &[aria-disabled="true"] {
+                &:disabled {
                     opacity: 0.5;
-                    pointer-events: none;
                 }
             }
         }

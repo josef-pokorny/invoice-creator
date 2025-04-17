@@ -1,17 +1,22 @@
 <!-- SVELTE 4 - DON'T CHANGE IT! -->
 <script lang="ts">
+    import { afterNavigate } from "$app/navigation";
     import { m } from "$lib/paraglide/messages";
     import { fade } from "svelte/transition";
     import { useRegisterSW } from "virtual:pwa-register/svelte";
 
     const intervalMS = 5 * 60 * 1000;
 
-    const { needRefresh, updateServiceWorker, offlineReady } = useRegisterSW({
+    let isSWFetchedAfterTimeout = false;
+
+    const { needRefresh, updateServiceWorker } = useRegisterSW({
         onRegistered(r: any) {
             // uncomment following code if you want check for updates
+
             r &&
                 setInterval(() => {
                     console.log("Checking for sw update");
+                    isSWFetchedAfterTimeout = true;
                     r.update();
                 }, intervalMS);
             console.log(`SW Registered: `, r);
@@ -24,7 +29,9 @@
         needRefresh.set(false);
     };
 
-    $: if ($needRefresh && $offlineReady) {
+    $: console.log({ $needRefresh, isSWFetchedAfterTimeout });
+
+    $: if ($needRefresh && !isSWFetchedAfterTimeout) {
         console.log("SW automatically reloaded!");
         updateServiceWorker(true);
     }
@@ -43,12 +50,17 @@
         </div>
 
         <button
+            type="button"
             class="btn preset-filled-success-500"
             on:click={() => updateServiceWorker(true)}
         >
             {m["pwa.reload"]()}
         </button>
-        <button class="btn preset-tonal hover:preset-filled" on:click={close}>
+        <button
+            type="button"
+            class="btn preset-tonal hover:preset-filled"
+            on:click={close}
+        >
             {m["actions.close"]()}
         </button>
     </div>
