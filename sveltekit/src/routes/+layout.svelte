@@ -1,4 +1,5 @@
 <script lang="ts">
+    import PWAMeta from "./../lib/components/PWAMeta.svelte";
     import "$lib/app.css";
     import "$lib/styles/app.scss";
     import { AppBar, Toaster } from "@skeletonlabs/skeleton-svelte";
@@ -15,6 +16,7 @@
     import SvgGithub from "$lib/svgs/svg-github.svelte";
     import Dialog from "$lib/components/Dialog.svelte";
     import { GB, CZ } from "country-flag-icons/string/1x1";
+    import { onMount } from "svelte";
 
     let { children } = $props();
 
@@ -45,6 +47,11 @@
 </svelte:head>
 
 <Toaster toaster={toaster.value}></Toaster>
+
+<PWAMeta />
+{#await import('$lib/components/ReloadPrompt.svelte') then { default: ReloadPrompt }}
+    <ReloadPrompt />
+{/await}
 
 <AppBar toolbarClasses="items-center">
     {#snippet lead()}

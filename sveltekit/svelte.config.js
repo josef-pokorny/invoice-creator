@@ -6,8 +6,10 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 const config = {
     preprocess: vitePreprocess(),
     kit: {
-        adapter:
-            process.env.NODE_ENV === "production" ? adapterVercel() : adapter(),
+        adapter: adapterVercel(),
+        serviceWorker: {
+            register: false,
+        },
     },
     alias: {
         $routes: "./src/routes",
