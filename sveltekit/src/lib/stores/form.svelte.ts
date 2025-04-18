@@ -4,7 +4,7 @@ import {
     type IItem,
 } from "$lib/pdf/invoice-types";
 import type { YupErrorsList } from "$lib/types/types";
-import { useLocalStorageContext, useStoreContext } from "./sharedStore.svelte";
+import { useLocalStorageStore, useStore } from "./sharedStore.svelte";
 
 // Define default values
 export const defaultForm: IInvoiceValues = {
@@ -57,7 +57,7 @@ export function useFormStore({
 } = {}) {
     $inspect("useFormStore: ", { key });
 
-    let store = useLocalStorageContext({
+    let store = useLocalStorageStore({
         key: InvoiceFormKeyPrefix + key,
         defaultValue: defaultForm,
         initialValue,
@@ -71,7 +71,7 @@ export function useFormKeyStore({
 }: {
     initialValue?: typeof defaultFormKey;
 } = {}) {
-    let store = useLocalStorageContext({
+    let store = useLocalStorageStore({
         key: "invoice-formkey",
         defaultValue: defaultFormKey,
         initialValue: initialValue,
@@ -89,7 +89,7 @@ export function useFormErrorsStore({
     initialValue?: typeof defaultFormErrors;
     key?: string;
 } = {}) {
-    return useStoreContext(
+    return useStore(
         "invoice-form-errors-" + (key || ""),
         defaultFormErrors,
         initialValue,
@@ -105,7 +105,7 @@ export function useFormItemErrors({
     initialValue?: typeof defaultFormItemErrors;
     key?: string;
 } = {}) {
-    return useStoreContext(
+    return useStore(
         "invoice-form-item-errors-" + (key || ""),
         defaultFormItemErrors,
         initialValue,

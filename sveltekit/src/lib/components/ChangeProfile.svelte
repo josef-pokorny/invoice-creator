@@ -1,9 +1,17 @@
+<script lang="ts" module>
+    import type { IInvoiceValues } from "$lib/pdf/invoice-types";
+
+    export type ISavedProfile = [string, IInvoiceValues];
+    export type ISavedProfiles = ISavedProfile[];
+</script>
+
 <script lang="ts">
     import { browser } from "$app/environment";
     import { m } from "$lib/paraglide/messages";
     import {
         InvoiceFormKeyPrefix,
         useFormKeyStore,
+        useFormStore,
     } from "$lib/stores/form.svelte";
     import { AppStoragePrefix } from "$lib/stores/sharedStore.svelte";
     import _ from "lodash";
@@ -11,8 +19,9 @@
     import Label from "./form/Label.svelte";
     import Select from "./form/Select.svelte";
     import { FileDown, FileUp, Plus } from "@lucide/svelte";
+    import { untrack } from "svelte";
 
-    const prefix = AppStoragePrefix + InvoiceFormKeyPrefix;
+    const Prefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
     const invoiceValuesKey = useFormKeyStore().value;
 
@@ -24,8 +33,8 @@
         if (browser) {
             setTimeout(() => {
                 invoiceValuesKeys = Object.entries(localStorage)
-                    .filter(([k]) => k.startsWith(prefix))
-                    .map(([k]) => k.substring(prefix.length))
+                    .filter(([k]) => k.startsWith(Prefix))
+                    .map(([k]) => k.substring(Prefix.length))
                     .sort((a, b) =>
                         a.localeCompare(b, undefined, { sensitivity: "base" }),
                     );
@@ -36,6 +45,53 @@
     });
 
     let newKey = $state("");
+
+    let profileFileInputEl: HTMLInputElement | undefined = $state();
+    let profileFileValue: FileList | undefined = $state();
+
+    let invoiceToStore: { key: string; value: IInvoiceValues } | undefined =
+        $state();
+    const formStoreToImport = $derived(
+        useFormStore({
+            get key() {
+                return invoiceToStore?.key;
+            },
+        }),
+    );
+
+    $effect(() => {
+        if (invoiceToStore?.key && invoiceToStore.value) {
+            console.log({ invoiceToStore });
+            formStoreToImport.value = _.cloneDeep(invoiceToStore.value);
+        }
+    });
+
+    async function handleFileChange() {
+        if (profileFileValue && profileFileValue.length > 0) {
+            const file = profileFileValue[0];
+            const text = await file.text();
+            try {
+                const jsonData: ISavedProfiles = JSON.parse(text);
+
+                jsonData.map(([k, v]) => {
+                    requestAnimationFrame(() => {
+                        invoiceToStore = {
+                            key: k.substring(Prefix.length),
+                            value: v,
+                        };
+                    });
+                });
+
+                profileFileValue = undefined;
+            } catch (e) {
+                console.error("Parsing error on Import:", e);
+            }
+        }
+    }
+
+    $effect(() => {
+        handleFileChange();
+    });
 </script>
 
 <div class="flex flex-col gap-2">
@@ -95,11 +151,27 @@
     <div class="flex flex-row gap-2">
         <button
             class="btn preset-filled-secondary-500 flex w-full items-center font-medium"
-            disabled
+            onclick={() => {
+                profileFileInputEl?.click();
+            }}
         >
             <FileDown />
             {m["actions.import"]()}
         </button>
+        {#key profileFileValue}
+            <input
+                bind:files={profileFileValue}
+                bind:this={profileFileInputEl}
+                type="file"
+                hidden
+            />
+        {/key}
+        <input
+            bind:files={profileFileValue}
+            bind:this={profileFileInputEl}
+            type="file"
+            hidden
+        />
         <button
             class="btn preset-filled-primary-500 flex w-full items-center font-medium"
             onclick={() => {
@@ -108,9 +180,9 @@
                     encodeURIComponent(
                         JSON.stringify([
                             ...Object.entries(localStorage)
-                                .filter(([k]) => k.startsWith(prefix))
+                                .filter(([k]) => k.startsWith(Prefix))
                                 .map(([k, v]) => [k, JSON.parse(v)]),
-                        ]),
+                        ] as ISavedProfiles),
                     );
                 let downloadAnchorNode = document.createElement("a");
                 downloadAnchorNode.setAttribute("href", dataStr);

@@ -1,5 +1,5 @@
 import { createToaster } from "@skeletonlabs/skeleton-svelte";
-import { useStoreContext } from "./sharedStore.svelte";
+import { useStore } from "./sharedStore.svelte";
 
 const defaultToaster: ReturnType<typeof createToaster> = createToaster({
     placement: "bottom-end",
@@ -12,7 +12,7 @@ export function useToasterStore({
     initialValue?: typeof defaultToaster;
     key?: string;
 } = {}) {
-    return useStoreContext(
+    return useStore(
         "toaster-" + (key || ""),
         defaultToaster,
         initialValue,

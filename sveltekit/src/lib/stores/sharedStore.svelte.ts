@@ -4,6 +4,9 @@ import _ from "lodash";
 export const AppStoragePrefix = "invoice-app-";
 
 const stores = $state(new Map<string, any>());
+const storesWithEffectForSetToLocalStorage: Record<string, boolean> = $state(
+    {},
+);
 
 export interface TSharedStorageState<T> {
     value: T;
@@ -12,7 +15,7 @@ export interface TSharedStorageState<T> {
 
 const UndefinedReplacement = "undefinened#6Wundefinened";
 
-export function useLocalStorageContext<T>({
+function createLocalStorageStore<T>({
     key,
     defaultValue,
     initialValue,
@@ -20,15 +23,11 @@ export function useLocalStorageContext<T>({
     key: string;
     defaultValue: T;
     initialValue?: T;
-}): TSharedStorageState<T> {
-    const storageKey = AppStoragePrefix + key;
-
+}) {
     let value = $state(initialValue || defaultValue);
 
-    if (stores.has(storageKey)) {
-        value = stores.get(storageKey) as any;
-    } else if (browser) {
-        const storedValue = localStorage.getItem(storageKey);
+    if (browser) {
+        const storedValue = localStorage.getItem(key);
 
         if (storedValue !== null) {
             try {
@@ -45,13 +44,13 @@ export function useLocalStorageContext<T>({
                         : [];
 
                 if (!parsedData && defaultValue) {
-                    value = defaultValue;
+                    value = _.cloneDeep(defaultValue);
                 } else if (parsedData && differentKeys.length > 0) {
-                    differentKeys.forEach((storageKey) => {
+                    differentKeys.forEach((key) => {
                         parsedData = _.set(
                             parsedData as NonNullable<T>,
-                            storageKey,
-                            _.get(defaultValue, storageKey),
+                            key,
+                            _.get(defaultValue, key),
                         );
                     });
 
@@ -61,25 +60,114 @@ export function useLocalStorageContext<T>({
                 }
             } catch (error) {
                 console.error(
-                    `Failed to parse localStorage key "${storageKey}":`,
+                    `Failed to parse localStorage key "${key}":`,
                     error,
                 );
             }
         }
-
-        stores.set(storageKey, value);
     }
 
-    $effect(() => {
-        if (browser) {
+    const reset = () => {
+        if (defaultValue) {
+            value = _.cloneDeep(defaultValue);
+        } else {
+            console.error(
+                "defaultValue isn't provided, reset() function has not been completed",
+            );
+        }
+    };
+
+    return {
+        get value() {
+            return value;
+        },
+        set value(newValue) {
+            value = newValue;
+
+            setTimeout(() => {
+                const differentKeys =
+                    defaultValue && newValue
+                        ? _.difference(
+                              Object.keys(defaultValue),
+                              Object.keys(newValue),
+                          )
+                        : [];
+
+                if (differentKeys.length) {
+                    differentKeys.forEach((storageKey) => {
+                        newValue = _.set(
+                            newValue as NonNullable<T>,
+                            storageKey,
+                            _.get(defaultValue, storageKey),
+                        );
+                    });
+
+                    value = newValue;
+                }
+            }, 0);
+        },
+        reset,
+    };
+}
+
+export function useLocalStorageStore<T>({
+    key,
+    defaultValue,
+    initialValue,
+}: {
+    key: string;
+    defaultValue: T;
+    initialValue?: T;
+}): TSharedStorageState<T> {
+    const localStorageKey = AppStoragePrefix + key;
+
+    let store: TSharedStorageState<T>;
+
+    if (stores.has(localStorageKey)) {
+        store = stores.get(localStorageKey);
+    } else {
+        stores.set(
+            localStorageKey,
+            createLocalStorageStore({
+                key: localStorageKey,
+                defaultValue,
+                initialValue,
+            }),
+        );
+        store = stores.get(localStorageKey);
+    }
+
+    $effect.root(() => {
+        if (storesWithEffectForSetToLocalStorage[localStorageKey] || !browser)
+            return;
+
+        storesWithEffectForSetToLocalStorage[localStorageKey] = true;
+
+        $effect(() => {
             localStorage.setItem(
-                storageKey,
-                JSON.stringify(value, (k, v) =>
+                localStorageKey,
+                JSON.stringify(store.value, (k, v) =>
                     v === undefined ? UndefinedReplacement : v,
                 ),
             );
-        }
+        });
+
+        return () => {
+            storesWithEffectForSetToLocalStorage[localStorageKey] = false;
+        };
     });
+
+    return store;
+}
+
+function createStore<T>({
+    defaultValue,
+    initialValue,
+}: {
+    defaultValue: T;
+    initialValue?: T;
+}) {
+    let value = $state(initialValue || defaultValue);
 
     const reset = () => {
         if (defaultValue) {
@@ -102,38 +190,21 @@ export function useLocalStorageContext<T>({
     };
 }
 
-export function useStoreContext<T>(
+export function useStore<T>(
     key: string,
     defaultValue: T,
     initialValue?: T,
 ): TSharedStorageState<T> {
-    const storageKeyStore = AppStoragePrefix + key;
+    const storeKey = AppStoragePrefix + key;
 
-    let value = $state(initialValue || defaultValue);
-
-    if (stores.has(storageKeyStore)) {
-        value = stores.get(storageKeyStore) as any;
+    if (stores.has(storeKey)) {
+        return stores.get(storeKey);
     } else {
-        stores.set(storageKeyStore, value);
+        const store = createStore({
+            defaultValue,
+            initialValue,
+        });
+        stores.set(storeKey, store);
+        return stores.get(storeKey);
     }
-
-    const reset = () => {
-        if (defaultValue) {
-            value = _.cloneDeep(defaultValue);
-        } else {
-            console.error(
-                "defaultValue isn't provided, reset() function has not been completed",
-            );
-        }
-    };
-
-    return {
-        get value() {
-            return value;
-        },
-        set value(newValue) {
-            value = newValue;
-        },
-        reset,
-    };
 }
