@@ -24,7 +24,7 @@
             if (container) {
                 container.style.opacity = "1";
             }
-        }, 150);
+        }, 0);
 
         return () => {
             clearTimeout(timeoutId);
