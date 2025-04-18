@@ -31,6 +31,8 @@
 <!-- <Crawl /> -->
 <svelte:head>
     {#key locale}
+        {@const originUrl = "https://invoice-creator.josefpokorny.cz"}
+
         <title>{m["meta.title"]()}</title>
 
         <meta name="description" content={m["meta.description"]()} />
@@ -40,20 +42,16 @@
         <meta property="og:title" content={m["meta.title"]()} />
         <meta property="og:description" content={m["meta.description"]()} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={page.url.origin} />
-        <meta property="og:image" content="{page.url.origin}/favicon.png" />
+        <meta property="og:url" content={originUrl} />
+        <meta property="og:image" content="{originUrl}/favicon.png" />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={m["meta.title"]()} />
         <meta name="twitter:description" content={m["meta.description"]()} />
-        <meta name="twitter:image" content="{page.url.origin}/favicon.png" />
+        <meta name="twitter:image" content="{originUrl}/favicon.png" />
 
-        <link rel="canonical" href={page.url.origin} />
-        <link
-            rel="icon"
-            href="{page.url.origin}/favicon.png"
-            type="image/x-icon"
-        />
+        <link rel="canonical" href={originUrl} />
+        <link rel="icon" href="{originUrl}/favicon.png" type="image/x-icon" />
     {/key}
 </svelte:head>
 
