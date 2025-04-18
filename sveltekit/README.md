@@ -26,3 +26,4 @@ You can preview the production build with `pnpm run preview`.
 - [x] Ares autocomplete
 - [ ] Storing "profiles" of invoices (different keys in localStorage)
 - [ ] Exporting/importing profiles to JSON file ("key-from-local-storage: { ...profile }") 
+- [ ] Sharing (navigator.share())

@@ -7,7 +7,7 @@ import type { YupErrorsList } from "$lib/types/types";
 import { useLocalStorageContext, useStoreContext } from "./sharedStore.svelte";
 
 // Define default values
-const defaultForm: IInvoiceValues = {
+export const defaultForm: IInvoiceValues = {
     items: [],
     supplierBilling: {
         fullname: "",
@@ -44,19 +44,40 @@ const defaultForm: IInvoiceValues = {
     countVat: false,
     roundTotal: false,
 };
+const defaultFormKey = { profileName: "default" };
+
+export const InvoiceFormKeyPrefix = "invoice-form-";
 
 export function useFormStore({
     initialValue,
-    key,
+    key = "",
 }: {
     initialValue?: typeof defaultForm;
     key?: string;
 } = {}) {
-    return useLocalStorageContext(
-        "invoice-form" + (key || ""),
-        defaultForm,
+    $inspect("useFormStore: ", { key });
+
+    let store = useLocalStorageContext({
+        key: InvoiceFormKeyPrefix + key,
+        defaultValue: defaultForm,
         initialValue,
-    );
+    });
+
+    return store;
+}
+
+export function useFormKeyStore({
+    initialValue,
+}: {
+    initialValue?: typeof defaultFormKey;
+} = {}) {
+    let store = useLocalStorageContext({
+        key: "invoice-formkey",
+        defaultValue: defaultFormKey,
+        initialValue: initialValue,
+    });
+
+    return store;
 }
 
 const defaultFormErrors: YupErrorsList<IInvoiceValues> = {};

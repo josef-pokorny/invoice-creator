@@ -11,7 +11,13 @@ export default defineConfig({
         paraglideVitePlugin({
             project: "./project.inlang",
             outdir: "./src/lib/paraglide",
-            strategy: ["url", "baseLocale"],
+            strategy: [
+                "cookie",
+                "preferredLanguage",
+                "url",
+                "localStorage",
+                "baseLocale",
+            ],
         }),
         SvelteKitPWA({
             strategies: "generateSW",
@@ -22,8 +28,8 @@ export default defineConfig({
                 name: "Invoice Creator",
                 short_name: "Invoice Creator",
                 display: "standalone",
-                theme_color: "#2E6DB4",
-                background_color: "black",
+                theme_color: "#000000",
+                background_color: "#000000",
                 start_url: "/",
                 icons: [
                     {

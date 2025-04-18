@@ -11,9 +11,9 @@ export function useMessageStore({
     initialValue?: typeof defaultMessage;
     key?: string;
 } = {}) {
-    return useLocalStorageContext(
-        "messages-" + (key || ""),
-        defaultMessage,
+    return useLocalStorageContext({
+        key: "messages-" + (key || ""),
+        defaultValue: defaultMessage,
         initialValue,
-    );
+    });
 }

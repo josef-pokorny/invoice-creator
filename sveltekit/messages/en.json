@@ -3,7 +3,10 @@
   "example_message": "Hello world {username}",
   "labels": {
     "choose_country": "Chooose country",
-    "invoice": "Invoice"
+    "invoice": "Invoice",
+    "saved-profiles": "Saved profiles",
+    "new-profile": "New profile",
+    "used-profile": "Profile used"
   },
   "actions": {
     "add-item": "Add item",
@@ -13,7 +16,9 @@
     "download": "Download PDF",
     "fill-in-by-ine": "Fill in information by INE",
     "close": "Close",
-    "change-language": "Change language"
+    "change-language": "Change language",
+    "import": "Import",
+    "export": "Export"
   },
   "form": {
     "receiver": "Receiver",

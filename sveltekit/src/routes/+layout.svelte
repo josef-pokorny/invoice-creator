@@ -114,7 +114,11 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p class="by">by <b>Josef Pokorný</b></p>
+            <p class="by">
+                <a href="https://github.com/josef-pokorny"
+                    >by <b>Josef Pokorný</b>
+                </a>
+            </p>
             <a
                 class="anchor"
                 href="https://github.com/josef-pokorny/invoice-creator"

@@ -2,7 +2,11 @@
     import { DefaultItem } from "$lib/pdf/invoice-types";
     import { m } from "$lib/paraglide/messages";
     import type { IItem } from "$lib/pdf/invoice-types";
-    import { useFormItemErrors, useFormStore } from "$lib/stores/form";
+    import {
+        useFormItemErrors,
+        useFormKeyStore,
+        useFormStore,
+    } from "$lib/stores/form.svelte";
     import { Trash } from "@lucide/svelte";
     import Input from "./Input.svelte";
     import _ from "lodash";
@@ -20,7 +24,14 @@
         item: IItem;
     } = $props();
 
-    const invoiceValues = useFormStore().value;
+    const invoiceValuesKey = useFormKeyStore();
+    let invoiceValues = $derived(
+        useFormStore({
+            get key() {
+                return invoiceValuesKey.value.profileName;
+            },
+        }).value,
+    );
 
     let item = $state(
         _.cloneDeep({

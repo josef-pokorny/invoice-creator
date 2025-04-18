@@ -1,6 +1,9 @@
 import { browser } from "$app/environment";
-import { getContext, hasContext, setContext } from "svelte";
 import _ from "lodash";
+
+export const AppStoragePrefix = "invoice-app-";
+
+const stores = $state(new Map<string, any>());
 
 export interface TSharedStorageState<T> {
     value: T;
@@ -9,18 +12,24 @@ export interface TSharedStorageState<T> {
 
 const UndefinedReplacement = "undefinened#6Wundefinened";
 
-export function localStorageState<T>({
-    value,
+export function useLocalStorageContext<T>({
     key,
     defaultValue,
+    initialValue,
 }: {
-    value: T;
     key: string;
-    defaultValue?: T;
+    defaultValue: T;
+    initialValue?: T;
 }): TSharedStorageState<T> {
-    let initialValue = value;
-    if (browser) {
-        const storedValue = localStorage.getItem(key);
+    const storageKey = AppStoragePrefix + key;
+
+    let value = $state(initialValue || defaultValue);
+
+    if (stores.has(storageKey)) {
+        value = stores.get(storageKey) as any;
+    } else if (browser) {
+        const storedValue = localStorage.getItem(storageKey);
+
         if (storedValue !== null) {
             try {
                 let parsedData = JSON.parse(storedValue, (k, v) =>
@@ -36,38 +45,36 @@ export function localStorageState<T>({
                         : [];
 
                 if (!parsedData && defaultValue) {
-                    initialValue = defaultValue;
+                    value = defaultValue;
                 } else if (parsedData && differentKeys.length > 0) {
-                    differentKeys.forEach((key) => {
+                    differentKeys.forEach((storageKey) => {
                         parsedData = _.set(
                             parsedData as NonNullable<T>,
-                            key,
-                            _.get(defaultValue, key),
+                            storageKey,
+                            _.get(defaultValue, storageKey),
                         );
                     });
 
-                    initialValue = parsedData;
+                    value = parsedData;
                 } else {
-                    initialValue = parsedData;
+                    value = parsedData;
                 }
             } catch (error) {
                 console.error(
-                    `Failed to parse localStorage key "${key}":`,
+                    `Failed to parse localStorage key "${storageKey}":`,
                     error,
                 );
             }
         }
-    }
 
-    const store = $state({
-        value: initialValue,
-    });
+        stores.set(storageKey, value);
+    }
 
     $effect(() => {
         if (browser) {
             localStorage.setItem(
-                key,
-                JSON.stringify(store.value, (k, v) =>
+                storageKey,
+                JSON.stringify(value, (k, v) =>
                     v === undefined ? UndefinedReplacement : v,
                 ),
             );
@@ -76,7 +83,7 @@ export function localStorageState<T>({
 
     const reset = () => {
         if (defaultValue) {
-            store.value = _.cloneDeep(defaultValue);
+            value = _.cloneDeep(defaultValue);
         } else {
             console.error(
                 "defaultValue isn't provided, reset() function has not been completed",
@@ -86,64 +93,10 @@ export function localStorageState<T>({
 
     return {
         get value() {
-            return store.value;
+            return value;
         },
         set value(newValue) {
-            store.value = newValue;
-        },
-        reset,
-    };
-}
-
-export function useLocalStorageContext<T>(
-    key: string,
-    defaultValue: T,
-    initialValue?: T,
-): TSharedStorageState<T> {
-    const storageKey = `invoice-app-${key}`;
-
-    if (hasContext(key)) {
-        return getContext<TSharedStorageState<T>>(key);
-    }
-
-    const store = localStorageState({
-        value: initialValue || defaultValue,
-        key: storageKey,
-        defaultValue: defaultValue,
-    });
-
-    setContext(key, store);
-
-    return store;
-}
-
-export function storeState<T>({
-    defaultValue,
-    initialValue,
-}: {
-    defaultValue: T;
-    initialValue?: T;
-}): TSharedStorageState<T> {
-    const store = $state({
-        value: initialValue || defaultValue,
-    });
-
-    const reset = () => {
-        if (defaultValue) {
-            store.value = _.cloneDeep(defaultValue);
-        } else {
-            console.error(
-                "defaultValue isn't provided, reset() function has not been completed",
-            );
-        }
-    };
-
-    return {
-        get value() {
-            return store.value;
-        },
-        set value(newValue) {
-            store.value = newValue;
+            value = newValue;
         },
         reset,
     };
@@ -154,13 +107,33 @@ export function useStoreContext<T>(
     defaultValue: T,
     initialValue?: T,
 ): TSharedStorageState<T> {
-    if (hasContext(key)) {
-        return getContext<TSharedStorageState<T>>(key);
+    const storageKeyStore = AppStoragePrefix + key;
+
+    let value = $state(initialValue || defaultValue);
+
+    if (stores.has(storageKeyStore)) {
+        value = stores.get(storageKeyStore) as any;
+    } else {
+        stores.set(storageKeyStore, value);
     }
 
-    const store = storeState({ defaultValue, initialValue });
+    const reset = () => {
+        if (defaultValue) {
+            value = _.cloneDeep(defaultValue);
+        } else {
+            console.error(
+                "defaultValue isn't provided, reset() function has not been completed",
+            );
+        }
+    };
 
-    setContext(key, store);
-
-    return store;
+    return {
+        get value() {
+            return value;
+        },
+        set value(newValue) {
+            value = newValue;
+        },
+        reset,
+    };
 }

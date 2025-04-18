@@ -9,6 +9,7 @@
     import Error from "./Error.svelte";
     import type { IYupError } from "$lib/types/types";
     import { createId } from "$lib/utils";
+    import Label from "./Label.svelte";
 
     type TExdended = HTMLInputAttributes &
         HTMLTextareaAttributes &
@@ -66,14 +67,7 @@
 
 <fieldset class="label">
     {#if label}
-        <label
-            aria-errormessage="{id}-error"
-            aria-invalid={!!error}
-            for={id}
-            class="label-text text-surface-100 text-[0.9rem]"
-        >
-            {label}
-        </label>
+        <Label for={id} {label} />
     {/if}
     {#if rest.type === "textarea"}
         <textarea

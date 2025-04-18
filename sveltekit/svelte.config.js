@@ -21,7 +21,7 @@ const config = {
         $src: "./src",
     },
     optimizeDeps: {
-        exclude: ["skeletonlabs", "pdfjs-dist"],
+        exclude: ["skeletonlabs"],
     },
 };
 
