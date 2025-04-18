@@ -1,9 +1,8 @@
 <script lang="ts">
     import PdfViewer from "svelte-pdf";
     import Input from "$lib/components/form/Input.svelte";
-    import { onMount, untrack } from "svelte";
+    import { onMount } from "svelte";
     import {
-        defaultForm,
         useFormErrorsStore,
         useFormKeyStore,
         useFormStore,
@@ -29,7 +28,6 @@
     import ButtonRequestAres from "$lib/components/ButtonRequestAres.svelte";
     import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
     import Message from "$lib/components/Message.svelte";
-    import ChangeProfile from "$lib/components/ChangeProfile.svelte";
 
     // region:    --- Form validation
 
@@ -197,10 +195,6 @@
     aria-hidden={isFullPreview}
 >
     <div class="w-full max-w-[370px] shrink-0">
-        <ChangeProfile />
-
-        <hr class="hr mx-7 my-10 w-[auto]" />
-
         <form
             class="relative m-0 mb-15 flex w-full flex-col gap-2"
             onsubmit={(e) => {

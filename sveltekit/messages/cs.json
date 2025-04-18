@@ -6,7 +6,8 @@
     "invoice": "Faktura",
     "saved-profiles": "Uložené profily",
     "new-profile": "Nový profil",
-    "used-profile": "Použitý profil"
+    "used-profile": "Použitý profil",
+    "settings": "Nastavení"
   },
   "actions": {
     "add-item": "Přidat položku",
@@ -62,7 +63,8 @@
     "price-must-have-only-two-decimals": "Číslo musí mít maximálně dvě desetinná místa"
   },
   "text": {
-    "you-can-fill-by-ine": "Všechny údaje se mohou automaticky doplnit po pouhým vyplnení správného IČa."
+    "you-can-fill-by-ine": "Všechny údaje se mohou automaticky doplnit po pouhým vyplnení správného IČa.",
+    "export-all": "Exportujte všechny faktury"
   },
   "meta": {
     "title": "Vytvoření Faktury Zdarma",

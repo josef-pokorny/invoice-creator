@@ -12,6 +12,7 @@
     import { goto } from "$app/navigation";
     import LocaleSync from "$lib/components/layout/LocaleSync.svelte";
     import { type Snippet } from "svelte";
+    import ChangeProfile from "../ChangeProfile.svelte";
 
     let { children, locale }: { children: Snippet; locale: string } = $props();
 
@@ -34,7 +35,9 @@
         </div>
     {/snippet}
     {#snippet trail()}
-        <div class="w-[40px]"></div>
+        <div class="trail w-[40px]">
+            <ChangeProfile />
+        </div>
     {/snippet}
     <h1 class="h1 text-primary-100 text-[1.1rem]">Invoice Creator</h1>
 </AppBar>
@@ -93,7 +96,8 @@
 </footer>
 
 <style lang="scss">
-    .lead {
+    .lead,
+    .trail {
         display: flex;
         align-items: center;
     }

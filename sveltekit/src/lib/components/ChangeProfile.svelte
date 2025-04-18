@@ -18,8 +18,9 @@
     import Input from "./form/Input.svelte";
     import Label from "./form/Label.svelte";
     import Select from "./form/Select.svelte";
-    import { FileDown, FileUp, Plus } from "@lucide/svelte";
+    import { FileDown, FileUp, Plus, Settings } from "@lucide/svelte";
     import moment from "$lib/moment";
+    import Dialog from "$lib/components/Dialog.svelte";
 
     const Prefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
@@ -94,112 +95,136 @@
     });
 </script>
 
-<div class="flex flex-col gap-2">
-    <Select
-        bind:value={invoiceValuesKey.profileName}
-        label={m["labels.used-profile"]()}
-    >
-        {#snippet options()}
-            {#each invoiceValuesKeys as profileName}
-                <option value={profileName}>
-                    {profileName}
-                </option>
-            {/each}
-        {/snippet}
-    </Select>
-
-    <form
-        onsubmit={(e) => {
-            e.preventDefault();
-
-            let same = 0;
-
-            function createKeyName(key: string) {
-                return key + (same ? ` (${same})` : "");
-            }
-
-            function findSameKey(keyToFind: string) {
-                if (invoiceValuesKeys.find((key) => key === keyToFind)) {
-                    ++same;
-                    console.log(createKeyName(newKey));
-                    findSameKey(createKeyName(newKey));
-                } else {
-                    newKey = createKeyName(newKey);
-                }
-            }
-            findSameKey(newKey);
-
-            invoiceValuesKey.profileName = String(newKey);
-            newKey = "";
-        }}
-    >
-        <div class="grid grid-cols-[1fr_auto] items-end gap-0.5">
-            <Label label={m["labels.new-profile"]()} for="input-new-profile" />
-            <div></div>
-
-            <Input bind:value={newKey} id="input-new-profile" />
-            <button
-                type="submit"
-                title={m["actions.save"]()}
-                class="btn-icon preset-filled-success-500 h-auto self-stretch px-2 py-0"
+<Dialog class="w-full max-w-[520px]" classContentContainer="p-6">
+    {#snippet button({ showModal, closeModal, isOpen })}
+        <button
+            class="w-full !p-0 hover:brightness-75"
+            type="button"
+            title={m["labels.settings"]()}
+            aria-label={m["labels.settings"]()}
+            onclick={() => {
+                isOpen ? closeModal && closeModal() : showModal && showModal();
+            }}
+            role="switch"
+            aria-checked={isOpen}
+        >
+            <Settings class="w-full" />
+        </button>
+    {/snippet}
+    {#snippet content()}
+        <h3 class="h4">{m["labels.settings"]()}</h3>
+        <section class="flex flex-col gap-2">
+            <Select
+                bind:value={invoiceValuesKey.profileName}
+                label={m["labels.used-profile"]()}
             >
-                <Plus class="stroke-success-contrast-500" />
-            </button>
-        </div>
-    </form>
+                {#snippet options()}
+                    {#each invoiceValuesKeys as profileName}
+                        <option value={profileName}>
+                            {profileName}
+                        </option>
+                    {/each}
+                {/snippet}
+            </Select>
 
-    <div class="flex flex-row gap-2">
-        <button
-            class="btn preset-filled-secondary-500 flex w-full items-center font-medium"
-            onclick={() => {
-                importProfileFileInputEl?.click();
-            }}
-        >
-            <FileDown />
-            {m["actions.import"]()}
-        </button>
-        {#key importProfileFileValue}
-            <input
-                bind:files={importProfileFileValue}
-                bind:this={importProfileFileInputEl}
-                type="file"
-                accept="application/JSON"
-                hidden
-            />
-        {/key}
-        <input
-            bind:files={importProfileFileValue}
-            bind:this={importProfileFileInputEl}
-            type="file"
-            hidden
-        />
-        <button
-            class="btn preset-filled-primary-500 flex w-full items-center font-medium"
-            onclick={() => {
-                let dataStr =
-                    "data:text/json;charset=utf-8," +
-                    encodeURIComponent(
-                        JSON.stringify([
-                            ...Object.entries(localStorage)
-                                .filter(([k]) => k.startsWith(Prefix))
-                                .map(([k, v]) => [k, JSON.parse(v)]),
-                        ] as ISavedProfiles),
-                    );
-                let downloadAnchorNode = document.createElement("a");
-                downloadAnchorNode.setAttribute("href", dataStr);
-                downloadAnchorNode.setAttribute(
-                    "download",
-                    "profiles " + moment().format().replace(":", "") + ".json",
-                );
-                document.body.appendChild(downloadAnchorNode);
-                downloadAnchorNode.click();
-                setTimeout(() => {
-                    downloadAnchorNode.remove();
-                }, 0);
-            }}
-        >
-            <FileUp />
-            {m["actions.export"]()}
-        </button>
-    </div>
-</div>
+            <form
+                onsubmit={(e) => {
+                    e.preventDefault();
+
+                    let same = 0;
+
+                    function createKeyName(key: string) {
+                        return key + (same ? ` (${same})` : "");
+                    }
+
+                    function findSameKey(keyToFind: string) {
+                        if (
+                            invoiceValuesKeys.find((key) => key === keyToFind)
+                        ) {
+                            ++same;
+                            console.log(createKeyName(newKey));
+                            findSameKey(createKeyName(newKey));
+                        } else {
+                            newKey = createKeyName(newKey);
+                        }
+                    }
+                    findSameKey(newKey);
+
+                    invoiceValuesKey.profileName = String(newKey);
+                    newKey = "";
+                }}
+            >
+                <div class="grid grid-cols-[1fr_auto] items-end gap-0.5">
+                    <Label
+                        label={m["labels.new-profile"]()}
+                        for="input-new-profile"
+                    />
+                    <div></div>
+
+                    <Input bind:value={newKey} id="input-new-profile" />
+                    <button
+                        type="submit"
+                        title={m["actions.save"]()}
+                        class="btn-icon preset-filled-success-500 h-auto self-stretch px-2 py-0"
+                    >
+                        <Plus class="stroke-success-contrast-500" />
+                    </button>
+                </div>
+            </form>
+
+            <div class="grid grid-cols-[1fr_1fr] gap-2">
+                <button
+                    class="btn preset-filled-secondary-500 flex w-full items-center font-medium"
+                    onclick={() => {
+                        importProfileFileInputEl?.click();
+                    }}
+                >
+                    <FileDown />
+                    {m["actions.import"]()}
+                </button>
+                <button
+                    class="btn preset-filled-primary-500 flex w-full items-center font-medium"
+                    onclick={() => {
+                        let dataStr =
+                            "data:text/json;charset=utf-8," +
+                            encodeURIComponent(
+                                JSON.stringify([
+                                    ...Object.entries(localStorage)
+                                        .filter(([k]) => k.startsWith(Prefix))
+                                        .map(([k, v]) => [k, JSON.parse(v)]),
+                                ] as ISavedProfiles),
+                            );
+                        let downloadAnchorNode = document.createElement("a");
+                        downloadAnchorNode.setAttribute("href", dataStr);
+                        downloadAnchorNode.setAttribute(
+                            "download",
+                            "profiles " +
+                                moment().format().replace(":", "") +
+                                ".json",
+                        );
+                        document.body.appendChild(downloadAnchorNode);
+                        downloadAnchorNode.click();
+                        setTimeout(() => {
+                            downloadAnchorNode.remove();
+                        }, 0);
+                    }}
+                >
+                    <FileUp />
+                    {m["actions.export"]()}
+                </button>
+                <p class="text-left text-gray-500"></p>
+                <p class="text-right text-gray-500">{m["text.export-all"]()}</p>
+            </div>
+
+            {#key importProfileFileValue}
+                <input
+                    bind:files={importProfileFileValue}
+                    bind:this={importProfileFileInputEl}
+                    type="file"
+                    accept="application/JSON"
+                    hidden
+                />
+            {/key}
+        </section>
+    {/snippet}
+</Dialog>

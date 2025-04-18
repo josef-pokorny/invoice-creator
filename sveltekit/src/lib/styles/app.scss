@@ -12,6 +12,8 @@
 }
 
 button {
+    transition: all var(--default-transition-duration)
+        var(--default-transition-timing-function);
     text-wrap: auto !important;
     user-select: none;
 }

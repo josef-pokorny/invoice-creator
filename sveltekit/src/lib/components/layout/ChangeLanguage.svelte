@@ -22,55 +22,62 @@
     }
 </script>
 
-<Dialog>
-    {#snippet button({ showModal, closeModal, isOpen })}
-        <button
-            type="button"
-            class="lang-change-trigger"
-            title={m["actions.change-language"]()}
-            onclick={() => {
-                isOpen ? closeModal && closeModal() : showModal && showModal();
-            }}
-            role="switch"
-            aria-checked={isOpen}
-        >
-            {#if getLocale() === "cs"}
-                {@html CZ}
-            {:else if getLocale() === "en"}
-                {@html GB}
-            {/if}
-        </button>
-    {/snippet}
-    {#snippet content()}
-        <div class="lang-change-content">
-            <h4 class="h4">{m["actions.change-language"]()}</h4>
-            <section class="languages">
-                {#each locales as locale}
-                    <button
-                        disabled={locale === getLocale()}
-                        onclick={() => onSetLocale(locale)}
-                        title={locale === "cs"
-                            ? "Čeština"
-                            : locale === "en"
-                              ? "English"
-                              : ""}
-                    >
-                        {#if locale === "cs"}
-                            {@html CZ}
-                        {:else if locale === "en"}
-                            {@html GB}
-                        {/if}
-                    </button>
-                {/each}
-            </section>
-        </div>
-    {/snippet}
-</Dialog>
+<div class="wrapper">
+    <Dialog>
+        {#snippet button({ showModal, closeModal, isOpen })}
+            <button
+                type="button"
+                class="lang-change-trigger"
+                title={m["actions.change-language"]()}
+                aria-label={m["actions.change-language"]()}
+                onclick={() => {
+                    isOpen
+                        ? closeModal && closeModal()
+                        : showModal && showModal();
+                }}
+                role="switch"
+                aria-checked={isOpen}
+            >
+                {#if getLocale() === "cs"}
+                    {@html CZ}
+                {:else if getLocale() === "en"}
+                    {@html GB}
+                {/if}
+            </button>
+        {/snippet}
+        {#snippet content()}
+            <div class="lang-change-content">
+                <h4 class="h4">{m["actions.change-language"]()}</h4>
+                <section class="languages">
+                    {#each locales as locale}
+                        <button
+                            disabled={locale === getLocale()}
+                            onclick={() => onSetLocale(locale)}
+                            title={locale === "cs"
+                                ? "Čeština"
+                                : locale === "en"
+                                  ? "English"
+                                  : ""}
+                        >
+                            {#if locale === "cs"}
+                                {@html CZ}
+                            {:else if locale === "en"}
+                                {@html GB}
+                            {/if}
+                        </button>
+                    {/each}
+                </section>
+            </div>
+        {/snippet}
+    </Dialog>
+</div>
 
 <style lang="scss">
-    :global(dialog) {
-        width: 100%;
-        max-width: 400px;
+    .wrapper {
+        :global(dialog) {
+            width: 100%;
+            max-width: 400px;
+        }
     }
 
     .lang-change-trigger {
