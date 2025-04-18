@@ -211,10 +211,7 @@
     --color-surface-contrast-950: var(--color-surface-contrast-light);
 }
 
-body {
-    background-color: var(--body-background-color-dark);
-    color: var(--base-font-color-dark);
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @source "../../node_modules/@skeletonlabs/skeleton-svelte/dist";
 
