@@ -19,7 +19,7 @@
     import Label from "./form/Label.svelte";
     import Select from "./form/Select.svelte";
     import { FileDown, FileUp, Plus } from "@lucide/svelte";
-    import { untrack } from "svelte";
+    import moment from "$lib/moment";
 
     const Prefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
@@ -46,8 +46,8 @@
 
     let newKey = $state("");
 
-    let profileFileInputEl: HTMLInputElement | undefined = $state();
-    let profileFileValue: FileList | undefined = $state();
+    let importProfileFileInputEl: HTMLInputElement | undefined = $state();
+    let importProfileFileValue: FileList | undefined = $state();
 
     let invoiceToStore: { key: string; value: IInvoiceValues } | undefined =
         $state();
@@ -67,8 +67,8 @@
     });
 
     async function handleFileChange() {
-        if (profileFileValue && profileFileValue.length > 0) {
-            const file = profileFileValue[0];
+        if (importProfileFileValue && importProfileFileValue.length > 0) {
+            const file = importProfileFileValue[0];
             const text = await file.text();
             try {
                 const jsonData: ISavedProfiles = JSON.parse(text);
@@ -82,7 +82,7 @@
                     });
                 });
 
-                profileFileValue = undefined;
+                importProfileFileValue = undefined;
             } catch (e) {
                 console.error("Parsing error on Import:", e);
             }
@@ -152,23 +152,24 @@
         <button
             class="btn preset-filled-secondary-500 flex w-full items-center font-medium"
             onclick={() => {
-                profileFileInputEl?.click();
+                importProfileFileInputEl?.click();
             }}
         >
             <FileDown />
             {m["actions.import"]()}
         </button>
-        {#key profileFileValue}
+        {#key importProfileFileValue}
             <input
-                bind:files={profileFileValue}
-                bind:this={profileFileInputEl}
+                bind:files={importProfileFileValue}
+                bind:this={importProfileFileInputEl}
                 type="file"
+                accept="application/JSON"
                 hidden
             />
         {/key}
         <input
-            bind:files={profileFileValue}
-            bind:this={profileFileInputEl}
+            bind:files={importProfileFileValue}
+            bind:this={importProfileFileInputEl}
             type="file"
             hidden
         />
@@ -188,7 +189,7 @@
                 downloadAnchorNode.setAttribute("href", dataStr);
                 downloadAnchorNode.setAttribute(
                     "download",
-                    "profiles" + ".json",
+                    "profiles " + moment().format().replace(":", "") + ".json",
                 );
                 document.body.appendChild(downloadAnchorNode);
                 downloadAnchorNode.click();
