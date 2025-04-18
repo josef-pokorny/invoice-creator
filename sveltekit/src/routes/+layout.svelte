@@ -16,6 +16,7 @@
     } from "$lib/paraglide/runtime";
     import SvgGithub from "$lib/svgs/svg-github.svelte";
     import { goto } from "$app/navigation";
+    import LocaleSync from "$lib/components/layout/LocaleSync.svelte";
 
     let { children } = $props();
 
@@ -57,6 +58,8 @@
 
 {#key locale}
     <Toaster toaster={toaster.value}></Toaster>
+
+    <LocaleSync />
 
     <PWAMeta />
     {#await import('$lib/components/layout/PWAReloadPrompt.svelte') then { default: ReloadPrompt }}

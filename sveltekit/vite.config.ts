@@ -13,9 +13,9 @@ export default defineConfig({
             outdir: "./src/lib/paraglide",
             strategy: [
                 "cookie",
-                "preferredLanguage",
-                "url",
                 "localStorage",
+                "url",
+                "preferredLanguage",
                 "baseLocale",
             ],
         }),
