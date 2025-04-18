@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browser } from "$app/environment";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import {
@@ -16,8 +17,7 @@
     );
 
     $effect(() => {
-        if (localeFromUrl !== getLocale()) {
-            console.log("NOOOOOPE");
+        if (localeFromUrl !== getLocale() && browser) {
             setLocale(getLocale(), { reload: false });
 
             goto(localizeHref(page.url.pathname, { locale: getLocale() }), {

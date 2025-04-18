@@ -1,4 +1,9 @@
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<script lang="ts">
+    import type { HTMLAttributes } from "svelte/elements";
+
+    let { ...props }: HTMLAttributes<SVGSVGElement> = $props();
+</script>
+
 <svg
     width="50px"
     version="1.1"
@@ -8,6 +13,7 @@
     viewBox="-39.26 -39.26 471.12 471.12"
     xml:space="preserve"
     fill="#000000"
+    {...props}
 >
     <g id="SVGRepo_bgCarrier" stroke-width="0">
         <path

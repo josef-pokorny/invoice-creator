@@ -211,6 +211,11 @@
     --color-surface-contrast-950: var(--color-surface-contrast-light);
 }
 
+body {
+    background-color: var(--body-background-color-dark);
+    color: var(--base-font-color-dark);
+}
+
 @source "../../node_modules/@skeletonlabs/skeleton-svelte/dist";
 
 @source "../../node_modules/flowbite-svelte/dist";
