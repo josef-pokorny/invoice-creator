@@ -19,7 +19,8 @@
     "close": "Zavřít",
     "change-language": "Změnit jazyk",
     "import": "Import",
-    "export": "Export"
+    "export": "Export",
+    "delete-profile": "Smazat profil"
   },
   "form": {
     "receiver": "Odběratel",

@@ -414,6 +414,7 @@
                 bind:value={invoiceValues.customFooterText}
                 label={m["form.custom-footer-text"]()}
                 type="textarea"
+                class="min-h-[8rem]"
             />
 
             <hr class="hr mx-7 my-5 w-[auto]" />

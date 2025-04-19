@@ -59,7 +59,7 @@ export default defineConfig({
     },
     server: {
         watch: {
-            ignored: ["**/project.inlang/**"],
+            ignored: ["project.inlang/**", "messages/**"],
         },
     },
     define: {

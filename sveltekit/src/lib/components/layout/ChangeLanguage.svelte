@@ -74,6 +74,8 @@
 
 <style lang="scss">
     .wrapper {
+        display: contents;
+
         :global(dialog) {
             width: 100%;
             max-width: 400px;

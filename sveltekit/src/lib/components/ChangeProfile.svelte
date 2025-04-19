@@ -9,6 +9,7 @@
     import { browser } from "$app/environment";
     import { m } from "$lib/paraglide/messages";
     import {
+        defaultFormKey,
         InvoiceFormKeyPrefix,
         useFormKeyStore,
         useFormStore,
@@ -18,13 +19,20 @@
     import Input from "./form/Input.svelte";
     import Label from "./form/Label.svelte";
     import Select from "./form/Select.svelte";
-    import { FileDown, FileUp, Plus, Settings } from "@lucide/svelte";
+    import { FileDown, FileUp, Plus, Settings, Trash } from "@lucide/svelte";
     import moment from "$lib/moment";
     import Dialog from "$lib/components/Dialog.svelte";
 
     const Prefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
     const invoiceValuesKey = useFormKeyStore().value;
+    let invoiceValues = $derived(
+        useFormStore({
+            get key() {
+                return invoiceValuesKey.profileName;
+            },
+        }),
+    );
 
     let invoiceValuesKeys: string[] = $state([]);
 
@@ -90,21 +98,24 @@
         }
     }
 
+    function deleteProfile() {
+        invoiceValues.deleteStore();
+        invoiceValuesKey.profileName = defaultFormKey.profileName;
+    }
+
     $effect(() => {
         handleFileChange();
     });
 </script>
 
-<Dialog class="w-full max-w-[520px]" classContentContainer="p-6">
-    {#snippet button({ showModal, closeModal, isOpen })}
+<Dialog class="w-full max-w-[520px]">
+    {#snippet button({ toggleOpen, isOpen })}
         <button
             class="w-full !p-0 hover:brightness-75"
             type="button"
             title={m["labels.settings"]()}
             aria-label={m["labels.settings"]()}
-            onclick={() => {
-                isOpen ? closeModal && closeModal() : showModal && showModal();
-            }}
+            onclick={toggleOpen}
             role="switch"
             aria-checked={isOpen}
         >
@@ -126,10 +137,20 @@
                     {/each}
                 {/snippet}
             </Select>
+            <div class="flex flex-row">
+                <button
+                    class="btn preset-filled-error-500 font-medium"
+                    onclick={deleteProfile}
+                >
+                    <Trash />
+                    {m["actions.delete-profile"]()}
+                </button>
+            </div>
 
             <form
                 onsubmit={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
 
                     let same = 0;
 
@@ -172,7 +193,7 @@
                 </div>
             </form>
 
-            <div class="grid grid-cols-[1fr_1fr] gap-2">
+            <div class="mt-4 grid grid-cols-[1fr_1fr] gap-x-2">
                 <button
                     class="btn preset-filled-secondary-500 flex w-full items-center font-medium"
                     onclick={() => {
@@ -212,8 +233,10 @@
                     <FileUp />
                     {m["actions.export"]()}
                 </button>
-                <p class="text-left text-gray-500"></p>
-                <p class="text-right text-gray-500">{m["text.export-all"]()}</p>
+                <p class="text-left text-sm text-gray-400"></p>
+                <p class="text-right text-sm text-gray-400">
+                    {m["text.export-all"]()}
+                </p>
             </div>
 
             {#key importProfileFileValue}

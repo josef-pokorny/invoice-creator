@@ -19,7 +19,8 @@
     "close": "Close",
     "change-language": "Change language",
     "import": "Import",
-    "export": "Export"
+    "export": "Export",
+    "delete-profile": "Delete profile"
   },
   "form": {
     "receiver": "Receiver",

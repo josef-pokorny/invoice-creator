@@ -11,6 +11,7 @@ const storesWithEffectForSetToLocalStorage: Record<string, boolean> = $state(
 export interface TSharedStorageState<T> {
     value: T;
     reset: () => void;
+    deleteStore: () => void;
 }
 
 const UndefinedReplacement = "undefinened#6Wundefinened";
@@ -67,7 +68,7 @@ function createLocalStorageStore<T>({
         }
     }
 
-    const reset = () => {
+    function reset() {
         if (defaultValue) {
             value = _.cloneDeep(defaultValue);
         } else {
@@ -75,7 +76,15 @@ function createLocalStorageStore<T>({
                 "defaultValue isn't provided, reset() function has not been completed",
             );
         }
-    };
+    }
+
+    function deleteStore() {
+        if (browser) {
+            value = _.cloneDeep(defaultValue);
+            localStorage.removeItem(key);
+            stores.delete(key);
+        }
+    }
 
     return {
         get value() {
@@ -107,6 +116,7 @@ function createLocalStorageStore<T>({
             }, 0);
         },
         reset,
+        deleteStore,
     };
 }
 

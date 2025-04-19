@@ -44,7 +44,7 @@ export const defaultForm: IInvoiceValues = {
     countVat: false,
     roundTotal: false,
 };
-const defaultFormKey = { profileName: "default" };
+export const defaultFormKey = { profileName: "default" };
 
 export const InvoiceFormKeyPrefix = "invoice-form-";
 

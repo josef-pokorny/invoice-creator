@@ -8,6 +8,8 @@
         content,
         button,
         classContentContainer,
+        classForm,
+        footerButtons,
         ...props
     }: {
         isOpen?: boolean;
@@ -15,13 +17,17 @@
         button?: Snippet<
             [
                 {
-                    showModal?: () => void;
-                    closeModal?: () => void;
+                    showModal: () => void;
+                    closeModal: () => void;
+                    toggleOpen: () => void;
                     isOpen: boolean;
                 },
             ]
         >;
         classContentContainer?: ClassValue;
+        classForm?: ClassValue;
+        /** use type="submit" on <button> when you want to close the modal */
+        footerButtons?: Snippet;
     } & HTMLAttributes<HTMLDialogElement> = $props();
 
     let elemModal: HTMLDialogElement | null = $state(null);
@@ -32,6 +38,10 @@
 
     function closeModal() {
         isOpen = false;
+    }
+
+    function toggleOpen() {
+        isOpen = !isOpen;
     }
 
     $effect(() => {
@@ -55,20 +65,22 @@
 <dialog
     bind:this={elemModal}
     {...props}
-    class="   backdrop:bg-surface-950/85 top-1/2 left-1/2 z-10 max-w-[640px] -translate-1/2 bg-transparent p-3 {props.class}"
+    class="{isOpen ? 'grid' : ''} {props.class}"
 >
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
-        class="rounded-container bg-surface-950 border-surface-700 space-y-4 border-2 p-4 text-inherit shadow {classContentContainer}"
+        class="rounded-container"
         onclick={(e) => {
             e.stopPropagation();
         }}
     >
-        {@render content()}
+        <div class="content">
+            {@render content()}
+        </div>
 
-        <form method="dialog" class="flex justify-end">
+        <form method="dialog" class={classForm} onsubmit={closeModal}>
             <button
-                type="button"
+                type="submit"
                 class="btn preset-tonal hover:preset-filled"
                 onclick={closeModal}
             >
@@ -81,10 +93,37 @@
 {@render button?.({
     showModal,
     closeModal,
+    toggleOpen,
     isOpen,
 })}
 
-<style>
+<style lang="scss">
+    dialog {
+        @apply backdrop:bg-surface-950/85 fixed inset-0 top-1/2 left-1/2 z-10 h-screen max-w-[640px] -translate-1/2 items-center overflow-hidden bg-transparent p-3 !outline-none;
+
+        .rounded-container {
+            @apply bg-surface-950 border-surface-700 my-auto flex max-h-full flex-col space-y-4 overflow-hidden border-2 p-0 text-inherit shadow;
+
+            .content {
+                @apply m-0 min-w-1 flex-1 overflow-auto p-6;
+            }
+
+            form {
+                @apply flex justify-end p-4;
+                border-top: 1px solid var(--color-surface-700);
+            }
+        }
+
+        &[open],
+        &[open]::backdrop {
+            opacity: 1;
+
+            @starting-style {
+                opacity: 0.1;
+            }
+        }
+    }
+
     dialog,
     dialog::backdrop {
         --anim-duration: 200ms;
@@ -93,17 +132,5 @@
             overlay var(--anim-duration) allow-discrete,
             opacity var(--anim-duration);
         opacity: 0;
-    }
-
-    dialog[open],
-    dialog[open]::backdrop {
-        opacity: 1;
-    }
-
-    @starting-style {
-        dialog[open],
-        dialog[open]::backdrop {
-            opacity: 0.5;
-        }
     }
 </style>
