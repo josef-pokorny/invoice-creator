@@ -1,7 +1,7 @@
 <script lang="ts">
     import _ from "lodash";
     import type { ComponentProps } from "svelte";
-    import { Toggle } from "flowbite-svelte";
+    import Toggle from "flowbite-svelte/Toggle.svelte";
 
     interface IProps extends ComponentProps<typeof Toggle> {
         label?: string;

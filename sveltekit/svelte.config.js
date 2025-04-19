@@ -20,9 +20,6 @@ const config = {
         $static: "./static",
         $src: "./src",
     },
-    optimizeDeps: {
-        exclude: ["skeletonlabs"],
-    },
 };
 
 export default config;

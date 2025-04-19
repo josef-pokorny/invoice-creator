@@ -6,7 +6,8 @@
     "invoice": "Invoice",
     "saved-profiles": "Saved profiles",
     "new-profile": "New profile",
-    "used-profile": "Profile used"
+    "used-profile": "Profile used",
+    "settings": "Settings"
   },
   "actions": {
     "add-item": "Add item",
@@ -63,7 +64,8 @@
     "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places."
   },
   "text": {
-    "you-can-fill-by-ine": "You can automatically fill in all the data after filling in only the INE."
+    "you-can-fill-by-ine": "You can automatically fill in all the data after filling in only the INE.",
+    "export-all": "Export all invoices"
   },
   "meta": {
     "title": "Create Invoice for Free",

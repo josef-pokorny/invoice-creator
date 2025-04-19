@@ -4,6 +4,7 @@
 @import "@skeletonlabs/skeleton/themes/cerberus";
 
 @plugin '@tailwindcss/forms';
+@plugin 'flowbite/plugin';
 
 [data-theme="dark"] {
     --text-scaling: 1.067;

@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { Datepicker } from "flowbite-svelte";
     import _ from "lodash";
-    import type { ComponentProps } from "svelte";
     import type {
         HTMLInputAttributes,
         HTMLTextareaAttributes,
@@ -11,14 +9,7 @@
     import { createId } from "$lib/utils";
     import Label from "./Label.svelte";
 
-    type TExdended = HTMLInputAttributes &
-        HTMLTextareaAttributes &
-        Partial<
-            Omit<
-                ComponentProps<typeof Datepicker>,
-                "date" | "value" | "onchange"
-            >
-        >;
+    type TExdended = HTMLInputAttributes & HTMLTextareaAttributes;
     interface IProps extends TExdended {
         label?: string;
         value?: string | number;

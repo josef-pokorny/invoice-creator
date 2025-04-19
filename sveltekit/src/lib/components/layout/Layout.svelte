@@ -1,10 +1,7 @@
 <script lang="ts">
     import ChangeLanguage from "$lib/components/layout/ChangeLanguage.svelte";
-    import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
-    import "$lib/app.css";
-    import "$lib/styles/app.scss";
+    // import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
     import { AppBar, Toaster } from "@skeletonlabs/skeleton-svelte";
-    import "@fontsource-variable/montserrat";
     import { page } from "$app/state";
     import { useToasterStore } from "$lib/stores/toaster";
     import { locales, localizeHref, setLocale } from "$lib/paraglide/runtime";
@@ -23,10 +20,10 @@
 
 <LocaleSync />
 
-<PWAMeta />
-{#await import('$lib/components/layout/PWAReloadPrompt.svelte') then { default: ReloadPrompt }}
+<!-- <PWAMeta /> -->
+<!-- {#await import('$lib/components/layout/PWAReloadPrompt.svelte') then { default: ReloadPrompt }}
     <ReloadPrompt />
-{/await}
+{/await} -->
 
 <AppBar toolbarClasses="items-center">
     {#snippet lead()}
@@ -78,10 +75,10 @@
             {/each}
         </div>
     </div>
-    <div class="footer-bottom">
-        <p class="by">
-            <a href="https://github.com/josef-pokorny"
-                >by <b>Josef Pokorný</b>
+    <div class="footer-bottom flex flex-row flex-wrap items-center">
+        <p class="by mr-2">
+            <a href="https://github.com/josef-pokorny">
+                by <b>Josef Pokorný</b>
             </a>
         </p>
         <a

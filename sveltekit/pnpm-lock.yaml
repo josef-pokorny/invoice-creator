@@ -11,9 +11,6 @@ importers:
       vite:
         specifier: ^6.3.2
         version: 6.3.2(jiti@2.4.2)(lightningcss@1.29.2)(sass-embedded@1.86.3)(terser@5.39.0)
-      yup-locales:
-        specifier: ^1.2.28
-        version: 1.2.28
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.8
@@ -105,9 +102,12 @@ importers:
       eslint-plugin-unused-imports:
         specifier: ^4.1.4
         version: 4.1.4(@typescript-eslint/eslint-plugin@8.30.1(@typescript-eslint/parser@8.30.1(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))
+      flowbite:
+        specifier: ^3.1.2
+        version: 3.1.2(rollup@4.40.0)
       flowbite-svelte:
-        specifier: 1.0.0-next.10
-        version: 1.0.0-next.10(rollup@4.40.0)(svelte@5.27.3)(tailwind-merge@3.2.0)(tailwind-variants@1.0.0(tailwindcss@4.1.4))
+        specifier: 1.0.0-next.14
+        version: 1.0.0-next.14(rollup@4.40.0)(svelte@5.27.3)(tailwind-merge@3.2.0)(tailwind-variants@1.0.0(tailwindcss@4.1.4))
       flowbite-svelte-icons:
         specifier: ^2.1.1
         version: 2.1.1(svelte@5.27.3)(tailwind-merge@3.2.0)
@@ -177,6 +177,9 @@ importers:
       typescript-eslint:
         specifier: ^8.30.1
         version: 8.30.1(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3)
+      vite-plugin-circular-dependency:
+        specifier: ^0.5.0
+        version: 0.5.0(rollup@4.40.0)
       vite-plugin-pwa:
         specifier: ^1.0.0
         version: 1.0.0(vite@6.3.2(jiti@2.4.2)(lightningcss@1.29.2)(sass-embedded@1.86.3)(terser@5.39.0))(workbox-build@7.3.0)(workbox-window@7.3.0)
@@ -189,6 +192,9 @@ importers:
       yup:
         specifier: ^1.6.1
         version: 1.6.1
+      yup-locales:
+        specifier: ^1.2.28
+        version: 1.2.28
 
 packages:
 
@@ -2435,8 +2441,8 @@ packages:
       svelte: ^5.0.0
       tailwind-merge: ^3.0.0
 
-  flowbite-svelte@1.0.0-next.10:
-    resolution: {integrity: sha512-fndIlFWyqqm1DTFjszLphRmcuYG/p2lmsFjqguIXKZCy8rxIPVY5o+UiVA4xj+nTX9U82w9hNj5C7jxqmtEOrQ==}
+  flowbite-svelte@1.0.0-next.14:
+    resolution: {integrity: sha512-qEmpt0TDmIxasG4L0Es25hc/UeEeYQOA4Xwqd7xm/KJ9mvbTJi9eHgfeaFphL1TylDnO4svmn8JVb0hqoeTZ+Q==}
     peerDependencies:
       svelte: ^5.0.0
       tailwind-merge: ^3.2.0
@@ -3916,6 +3922,9 @@ packages:
   vite-compatible-readable-stream@3.6.1:
     resolution: {integrity: sha512-t20zYkrSf868+j/p31cRIGN28Phrjm3nRSLR2fyc2tiWi4cZGVdv68yNlwnIINTkMTmPoMiSlc0OadaO7DXZaQ==}
     engines: {node: '>= 6'}
+
+  vite-plugin-circular-dependency@0.5.0:
+    resolution: {integrity: sha512-7SQX1IZbf5to/S3A3/syfntRNg20Cth6KgTCwHpNZIcuDCtPclV2Bwvdd9HWG+alKZ04mmdlchNOPQgBl7/vQQ==}
 
   vite-plugin-pwa@1.0.0:
     resolution: {integrity: sha512-X77jo0AOd5OcxmWj3WnVti8n7Kw2tBgV1c8MCXFclrSlDV23ePzv2eTDIALXI2Qo6nJ5pZJeZAuX0AawvRfoeA==}
@@ -6680,7 +6689,7 @@ snapshots:
       svelte: 5.27.3
       tailwind-merge: 3.2.0
 
-  flowbite-svelte@1.0.0-next.10(rollup@4.40.0)(svelte@5.27.3)(tailwind-merge@3.2.0)(tailwind-variants@1.0.0(tailwindcss@4.1.4)):
+  flowbite-svelte@1.0.0-next.14(rollup@4.40.0)(svelte@5.27.3)(tailwind-merge@3.2.0)(tailwind-variants@1.0.0(tailwindcss@4.1.4)):
     dependencies:
       '@floating-ui/dom': 1.6.13
       '@floating-ui/utils': 0.2.9
@@ -8090,6 +8099,13 @@ snapshots:
       inherits: 2.0.4
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
+
+  vite-plugin-circular-dependency@0.5.0(rollup@4.40.0):
+    dependencies:
+      '@rollup/pluginutils': 5.1.4(rollup@4.40.0)
+      chalk: 4.1.2
+    transitivePeerDependencies:
+      - rollup
 
   vite-plugin-pwa@1.0.0(vite@6.3.2(jiti@2.4.2)(lightningcss@1.29.2)(sass-embedded@1.86.3)(terser@5.39.0))(workbox-build@7.3.0)(workbox-window@7.3.0):
     dependencies:

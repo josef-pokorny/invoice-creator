@@ -55,7 +55,7 @@
 <dialog
     bind:this={elemModal}
     {...props}
-    class="  backdrop:bg-surface-950/85 top-1/2 left-1/2 z-10 max-w-[640px] -translate-1/2 bg-transparent p-3 {props.class}"
+    class="   backdrop:bg-surface-950/85 top-1/2 left-1/2 z-10 max-w-[640px] -translate-1/2 bg-transparent p-3 {props.class}"
 >
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
@@ -103,7 +103,7 @@
     @starting-style {
         dialog[open],
         dialog[open]::backdrop {
-            opacity: 0;
+            opacity: 0.5;
         }
     }
 </style>

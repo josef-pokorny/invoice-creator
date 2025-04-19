@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 import { SvelteKitPWA } from "@vite-pwa/sveltekit";
+import circleDependency from "vite-plugin-circular-dependency";
 
 export default defineConfig({
     plugins: [
@@ -40,6 +41,10 @@ export default defineConfig({
                 ],
             },
         }),
+        circleDependency({
+            outputFilePath: "./circleDep",
+            circleImportThrowErr: false,
+        }),
     ],
     css: {
         preprocessorOptions: {
@@ -59,5 +64,14 @@ export default defineConfig({
     },
     define: {
         "process.env.NODE_ENV": '"production"',
+    },
+    optimizeDeps: {
+        exclude: [
+            "skeletonlabs",
+            "svelte-pdf",
+            "pdfjs-dist",
+            "tailwind-variants",
+            "tailwind-merge",
+        ],
     },
 });

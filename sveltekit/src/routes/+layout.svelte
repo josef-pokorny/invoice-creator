@@ -4,6 +4,9 @@
     import { baseLocale, locales } from "$lib/paraglide/runtime";
     import { page } from "$app/state";
     import { onMount } from "svelte";
+    import "$lib/app.css";
+    import "$lib/styles/app.scss";
+    import "@fontsource-variable/montserrat";
 
     let { children } = $props();
 
