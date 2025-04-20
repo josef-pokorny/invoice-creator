@@ -1,6 +1,5 @@
 import { m } from "$lib/paraglide/messages";
 import { countDecimals } from "$lib/utils";
-import _ from "lodash";
 import * as yup from "yup";
 
 export function isINEValid(ine?: string): boolean {

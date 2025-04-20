@@ -9,7 +9,7 @@
     } from "$lib/stores/form.svelte";
     import { Trash } from "@lucide/svelte";
     import Input from "./Input.svelte";
-    import _ from "lodash";
+    import { cloneDeep, difference, get, isUndefined, set } from "lodash-es";
     import * as yup from "yup";
     import type { YupShape } from "$lib/types/types";
     import { yupHasNumberMaxTwoDecimalValidation } from "$lib/validations/ine";
@@ -34,7 +34,7 @@
     );
 
     let item = $state(
-        _.cloneDeep({
+        cloneDeep({
             ...props.item,
             singlePrice: fromCents(props.item.singlePrice),
         }),
@@ -43,11 +43,11 @@
     $effect(() => {
         const differentKeys =
             DefaultItem && item
-                ? _.difference(Object.keys(DefaultItem), Object.keys(item))
+                ? difference(Object.keys(DefaultItem), Object.keys(item))
                 : [];
 
         differentKeys.forEach((key) => {
-            item = _.set(item, key, _.get(DefaultItem, key));
+            item = set(item, key, get(DefaultItem, key));
         });
     });
 
@@ -130,7 +130,7 @@
             error={itemErrors.value["singlePrice"]}
         />
     </div>
-    {#if !_.isUndefined(item.vatPercentage)}
+    {#if !isUndefined(item.vatPercentage)}
         <Input
             bind:value={item.vatPercentage}
             label={m["form.vat-percentage"]()}

@@ -4,7 +4,12 @@ import {
     type IItem,
 } from "$lib/pdf/invoice-types";
 import type { YupErrorsList } from "$lib/types/types";
+import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
+import { invoiceFormSchema } from "$lib/validations/schemas/invoice-form.svelte";
+import { untrack } from "svelte";
 import { useLocalStorageStore, useStore } from "./sharedStore.svelte";
+import * as yup from "yup";
+import { useLocaleStore } from "./locale.svelte";
 
 // Define default values
 export const defaultForm: IInvoiceValues = {
@@ -55,8 +60,6 @@ export function useFormStore({
     initialValue?: typeof defaultForm;
     key?: string;
 } = {}) {
-    $inspect("useFormStore: ", { key });
-
     let store = useLocalStorageStore({
         key: InvoiceFormKeyPrefix + key,
         defaultValue: defaultForm,
@@ -82,18 +85,38 @@ export function useFormKeyStore({
 
 const defaultFormErrors: YupErrorsList<IInvoiceValues> = {};
 
-export function useFormErrorsStore({
-    initialValue,
-    key,
-}: {
-    initialValue?: typeof defaultFormErrors;
-    key?: string;
-} = {}) {
-    return useStore(
-        "invoice-form-errors-" + (key || ""),
-        defaultFormErrors,
-        initialValue,
+export function useFormErrorsStore() {
+    const store = useStore("invoice-form-errors-", defaultFormErrors);
+
+    let locale = useLocaleStore();
+
+    const invoiceValuesKey = useFormKeyStore();
+    let invoiceValues = $derived(
+        useFormStore({
+            get key() {
+                return invoiceValuesKey.value.profileName;
+            },
+        }),
     );
+
+    $effect(() => {
+        locale.locale;
+
+        invoiceFormSchema()
+            .validate(invoiceValues.value, { abortEarly: false })
+            .then(() => {
+                store.reset();
+            })
+            .catch((e: yup.ValidationError) => {
+                store.reset();
+
+                untrack(() => {
+                    extractYupErrors(e, store.value);
+                });
+            });
+    });
+
+    return store;
 }
 
 const defaultFormItemErrors: YupErrorsList<IItem> = {};

@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-import _ from "lodash";
+import { uniqueId } from "lodash-es";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -7,9 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function createId(prefix: string = "input_") {
-    return (
-        _.uniqueId(prefix) + String(Math.round(Math.random() * 999999999999))
-    );
+    return uniqueId(prefix) + String(Math.round(Math.random() * 999999999999));
 }
 
 export function countDecimals(value: number) {

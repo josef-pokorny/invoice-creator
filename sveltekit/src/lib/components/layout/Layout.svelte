@@ -10,8 +10,11 @@
     import LocaleSync from "$lib/components/layout/LocaleSync.svelte";
     import { type Snippet } from "svelte";
     import ChangeProfile from "../ChangeProfile.svelte";
+    import { useLocaleStore } from "$lib/stores/locale.svelte";
 
-    let { children, locale }: { children: Snippet; locale: string } = $props();
+    let { children }: { children: Snippet } = $props();
+
+    let locale = useLocaleStore();
 
     const toaster = useToasterStore();
 </script>
@@ -50,7 +53,7 @@
                 <a
                     class="anchor"
                     href={localizeHref(page.url.pathname, { locale: lang })}
-                    aria-disabled={lang === locale}
+                    aria-disabled={lang === locale.locale}
                     onclick={(e) => {
                         e.preventDefault();
                         setLocale(lang, { reload: false });

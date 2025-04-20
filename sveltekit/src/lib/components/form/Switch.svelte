@@ -1,7 +1,7 @@
 <script lang="ts">
-    import _ from "lodash";
     import type { ComponentProps } from "svelte";
     import Toggle from "flowbite-svelte/Toggle.svelte";
+    import { createId } from "$lib/utils";
 
     interface IProps extends ComponentProps<typeof Toggle> {
         label?: string;
@@ -10,7 +10,7 @@
     let {
         label,
         checked = $bindable(false),
-        id = _.uniqueId("switch_") + Math.random() + Math.random(),
+        id = createId(),
         ...rest
     }: IProps = $props();
 </script>

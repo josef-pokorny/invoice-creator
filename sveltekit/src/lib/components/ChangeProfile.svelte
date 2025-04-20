@@ -15,21 +15,23 @@
         useFormStore,
     } from "$lib/stores/form.svelte";
     import { AppStoragePrefix } from "$lib/stores/sharedStore.svelte";
-    import _ from "lodash";
     import Input from "./form/Input.svelte";
     import Label from "./form/Label.svelte";
     import Select from "./form/Select.svelte";
     import { FileDown, FileUp, Plus, Settings, Trash } from "@lucide/svelte";
     import moment from "$lib/moment";
     import Dialog from "$lib/components/Dialog.svelte";
+    import { cloneDeep } from "lodash-es";
 
     const Prefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
-    const invoiceValuesKey = useFormKeyStore().value;
+    function a() {}
+
+    const invoiceValuesKey = useFormKeyStore();
     let invoiceValues = $derived(
         useFormStore({
             get key() {
-                return invoiceValuesKey.profileName;
+                return invoiceValuesKey.value.profileName;
             },
         }),
     );
@@ -37,7 +39,7 @@
     let invoiceValuesKeys: string[] = $state([]);
 
     $effect(() => {
-        [...invoiceValuesKey.profileName];
+        [...invoiceValuesKey.value.profileName];
 
         if (browser) {
             setTimeout(() => {
@@ -71,7 +73,7 @@
     $effect(() => {
         if (invoiceToStore?.key && invoiceToStore.value) {
             console.log({ invoiceToStore });
-            formStoreToImport.value = _.cloneDeep(invoiceToStore.value);
+            formStoreToImport.value = cloneDeep(invoiceToStore.value);
         }
     });
 
@@ -92,6 +94,10 @@
                 });
 
                 importProfileFileValue = undefined;
+
+                requestAnimationFrame(() => {
+                    invoiceValuesKey.reset();
+                });
             } catch (e) {
                 console.error("Parsing error on Import:", e);
             }
@@ -100,7 +106,7 @@
 
     function deleteProfile() {
         invoiceValues.deleteStore();
-        invoiceValuesKey.profileName = defaultFormKey.profileName;
+        invoiceValuesKey.value.profileName = defaultFormKey.profileName;
     }
 
     $effect(() => {
@@ -126,7 +132,7 @@
         <h3 class="h4">{m["labels.settings"]()}</h3>
         <section class="flex flex-col gap-2">
             <Select
-                bind:value={invoiceValuesKey.profileName}
+                bind:value={invoiceValuesKey.value.profileName}
                 label={m["labels.used-profile"]()}
             >
                 {#snippet options()}
@@ -171,7 +177,7 @@
                     }
                     findSameKey(newKey);
 
-                    invoiceValuesKey.profileName = String(newKey);
+                    invoiceValuesKey.value.profileName = String(newKey);
                     newKey = "";
                 }}
             >
@@ -199,6 +205,7 @@
                     onclick={() => {
                         importProfileFileInputEl?.click();
                     }}
+                    type="button"
                 >
                     <FileDown />
                     {m["actions.import"]()}
@@ -229,6 +236,7 @@
                             downloadAnchorNode.remove();
                         }, 0);
                     }}
+                    type="button"
                 >
                     <FileUp />
                     {m["actions.export"]()}

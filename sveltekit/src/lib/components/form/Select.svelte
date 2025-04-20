@@ -1,5 +1,5 @@
 <script lang="ts">
-    import _ from "lodash";
+    import { createId } from "$lib/utils";
     import type { Snippet } from "svelte";
     import type { HTMLSelectAttributes } from "svelte/elements";
 
@@ -12,7 +12,7 @@
         label,
         value = $bindable(),
         options,
-        id = _.uniqueId("select_") + Math.random() + Math.random(),
+        id = createId(),
         ...rest
     }: IProps = $props();
 </script>

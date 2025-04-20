@@ -4,16 +4,16 @@ import type { YupShape } from "$lib/types/types";
 import { yupInvoiceIneValidation } from "./ine";
 import * as yup from "yup";
 
-export const yupItsRecommended = yup
-    .string()
-    .required(m["errors.this-field-is-recommended"]());
+export function yupItsRecommended() {
+    return yup.string().required(m["errors.this-field-is-recommended"]());
+}
 
-export const yupBillingValidation = yup
-    .object()
-    .shape<YupShape<Partial<IBilling>>>({
-        fullname: yupItsRecommended,
-        line1: yupItsRecommended,
-        city: yupItsRecommended,
-        postal: yupItsRecommended,
+export function yupBillingValidation() {
+    return yup.object().shape<YupShape<Partial<IBilling>>>({
+        fullname: yupItsRecommended(),
+        line1: yupItsRecommended(),
+        city: yupItsRecommended(),
+        postal: yupItsRecommended(),
         ine: yupInvoiceIneValidation,
     }) as any;
+}

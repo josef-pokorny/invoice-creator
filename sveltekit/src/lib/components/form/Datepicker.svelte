@@ -2,7 +2,6 @@
     import { getLocale } from "$lib/paraglide/runtime";
     import type { IYupError } from "$lib/types/types";
     import Datepicker from "flowbite-svelte/Datepicker.svelte";
-    import _ from "lodash";
     import type { ComponentProps } from "svelte";
     import type { HTMLInputAttributes } from "svelte/elements";
     import Error from "./Error.svelte";

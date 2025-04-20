@@ -27,5 +27,5 @@ You can preview the production build with `pnpm run preview`.
 - [x] Storing "profiles" of invoices (different keys in localStorage)
 - [x] Exporting/importing profiles to JSON file ("key-from-local-storage: { ...profile }") 
 - [ ] Sharing (navigator.share())
-- [ ] Deleting profiles
+- [x] Deleting profiles
 - [ ] Make multiple pages pdf when more items (activate pages buttons in svelte-pdf, add "Page x of y" in footer)

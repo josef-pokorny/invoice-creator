@@ -1,20 +1,15 @@
 <script lang="ts">
     import { m } from "$lib/paraglide/messages";
     import Layout from "$lib/components/layout/Layout.svelte";
-    import { baseLocale, locales } from "$lib/paraglide/runtime";
-    import { page } from "$app/state";
     import { onMount } from "svelte";
     import "$lib/app.css";
     import "$lib/styles/app.scss";
     import "@fontsource-variable/montserrat";
+    import { useLocaleStore } from "$lib/stores/locale.svelte";
 
     let { children } = $props();
 
-    let locale = $derived(
-        locales.find(
-            (locale) => locale === page.url.pathname.substring(1, 3),
-        ) || baseLocale,
-    );
+    let locale = useLocaleStore();
 
     onMount(() => {
         const timeoutId = setTimeout(() => {
@@ -37,7 +32,7 @@
 
 <!-- <Crawl /> -->
 <svelte:head>
-    {#key locale}
+    {#key locale.locale}
         {@const originUrl = "https://invoice-creator.josefpokorny.cz"}
 
         <title>{m["meta.title"]()}</title>
@@ -62,8 +57,8 @@
     {/key}
 </svelte:head>
 
-{#key locale}
-    <Layout {locale}>
+{#key locale.locale}
+    <Layout>
         {@render children()}
     </Layout>
 {/key}

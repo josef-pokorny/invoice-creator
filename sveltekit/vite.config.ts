@@ -59,11 +59,14 @@ export default defineConfig({
     },
     server: {
         watch: {
-            ignored: ["project.inlang/**", "messages/**"],
+            ignored: ["project.inlang/**", "messages/**", "README.md"],
         },
     },
     define: {
-        "process.env.NODE_ENV": '"production"',
+        "process.env.NODE_ENV":
+            process.env.NODE_ENV !== "development"
+                ? '"production"'
+                : "'development'",
     },
     optimizeDeps: {
         exclude: [

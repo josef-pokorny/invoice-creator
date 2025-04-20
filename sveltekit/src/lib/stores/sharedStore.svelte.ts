@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import _ from "lodash";
+import { cloneDeep, difference, get, set } from "lodash-es";
 
 export const AppStoragePrefix = "invoice-app-";
 
@@ -38,20 +38,20 @@ function createLocalStorageStore<T>({
 
                 const differentKeys =
                     defaultValue && parsedData
-                        ? _.difference(
+                        ? difference(
                               Object.keys(defaultValue),
                               Object.keys(parsedData),
                           )
                         : [];
 
                 if (!parsedData && defaultValue) {
-                    value = _.cloneDeep(defaultValue);
+                    value = cloneDeep(defaultValue);
                 } else if (parsedData && differentKeys.length > 0) {
                     differentKeys.forEach((key) => {
-                        parsedData = _.set(
+                        parsedData = set(
                             parsedData as NonNullable<T>,
                             key,
-                            _.get(defaultValue, key),
+                            get(defaultValue, key),
                         );
                     });
 
@@ -70,7 +70,7 @@ function createLocalStorageStore<T>({
 
     function reset() {
         if (defaultValue) {
-            value = _.cloneDeep(defaultValue);
+            value = cloneDeep(defaultValue);
         } else {
             console.error(
                 "defaultValue isn't provided, reset() function has not been completed",
@@ -80,7 +80,7 @@ function createLocalStorageStore<T>({
 
     function deleteStore() {
         if (browser) {
-            value = _.cloneDeep(defaultValue);
+            value = cloneDeep(defaultValue);
             localStorage.removeItem(key);
             stores.delete(key);
         }
@@ -96,7 +96,7 @@ function createLocalStorageStore<T>({
             setTimeout(() => {
                 const differentKeys =
                     defaultValue && newValue
-                        ? _.difference(
+                        ? difference(
                               Object.keys(defaultValue),
                               Object.keys(newValue),
                           )
@@ -104,10 +104,10 @@ function createLocalStorageStore<T>({
 
                 if (differentKeys.length) {
                     differentKeys.forEach((storageKey) => {
-                        newValue = _.set(
+                        newValue = set(
                             newValue as NonNullable<T>,
                             storageKey,
-                            _.get(defaultValue, storageKey),
+                            get(defaultValue, storageKey),
                         );
                     });
 
@@ -181,7 +181,7 @@ function createStore<T>({
 
     const reset = () => {
         if (defaultValue) {
-            value = _.cloneDeep(defaultValue);
+            value = cloneDeep(defaultValue);
         } else {
             console.error(
                 "defaultValue isn't provided, reset() function has not been completed",

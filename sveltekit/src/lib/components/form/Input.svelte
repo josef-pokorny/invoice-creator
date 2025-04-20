@@ -1,5 +1,5 @@
 <script lang="ts">
-    import _ from "lodash";
+    import { isNumber } from "lodash-es";
     import type {
         HTMLInputAttributes,
         HTMLTextareaAttributes,
@@ -43,13 +43,13 @@
         if (rest.type === "number") {
             const currentValue = Number(e.currentTarget.value);
 
-            if (!e.currentTarget.value.length || !_.isNumber(currentValue)) {
+            if (!e.currentTarget.value.length || !isNumber(currentValue)) {
                 value = rest.min || 0;
             }
 
-            if (_.isNumber(rest.min) && currentValue < rest.min) {
+            if (isNumber(rest.min) && currentValue < rest.min) {
                 value = rest.min;
-            } else if (_.isNumber(rest.max) && currentValue > rest.max) {
+            } else if (isNumber(rest.max) && currentValue > rest.max) {
                 value = rest.max;
             }
         }
