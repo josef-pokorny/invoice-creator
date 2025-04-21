@@ -1,4 +1,5 @@
 import { browser } from "$app/environment";
+import { getNestedKeys } from "$lib/utils";
 import { cloneDeep, difference, get, set } from "lodash-es";
 
 export const AppStoragePrefix = "invoice-app-";
@@ -39,8 +40,8 @@ function createLocalStorageStore<T>({
                 const differentKeys =
                     defaultValue && parsedData
                         ? difference(
-                              Object.keys(defaultValue),
-                              Object.keys(parsedData),
+                              getNestedKeys(defaultValue),
+                              getNestedKeys(parsedData),
                           )
                         : [];
 

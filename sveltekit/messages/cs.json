@@ -55,13 +55,17 @@
     "payment-info": "Platební údaje (Bankovní účet, VS, apod.)",
     "pickup-at": "Datum převzetí",
     "payment-due": "Datum splatnosti",
-    "is-selfemployed": "Je OSVČ"
+    "is-selfemployed": "Je OSVČ",
+    "reverse-charge": "Reverse charge",
+    "none": "- Žádný -"
   },
   "errors": {
     "something-went-wrong-500": "Někde se stala chyba. Váš požadavek nebyl dokončen.",
     "invalid-ine": "Toto IČO je neplatné",
     "this-field-is-recommended": "Je doporučeno vyplnit toto pole",
-    "price-must-have-only-two-decimals": "Číslo musí mít maximálně dvě desetinná místa"
+    "price-must-have-only-two-decimals": "Číslo musí mít maximálně dvě desetinná místa",
+    "offline-title": "Offline",
+    "offline-description": "Nemáte přístup k internetu."
   },
   "text": {
     "you-can-fill-by-ine": "Všechny údaje se mohou automaticky doplnit po pouhým vyplnení správného IČa.",

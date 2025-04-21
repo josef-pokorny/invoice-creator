@@ -3,10 +3,9 @@
     import { m } from "$lib/paraglide/messages";
     import { findAresByINE } from "$lib/requests/ares/ares-ine";
     import type { IGovEkonomickeSubjektyReturn } from "$lib/requests/ares/ares-types";
-    import { useToasterStore } from "$lib/stores/toaster";
     import { isINEValid } from "$lib/validations/ine";
-
-    const toaster = useToasterStore().value;
+    import toast from "svelte-french-toast";
+    import { isAxiosError, type AxiosError } from "axios";
 
     let {
         aresINEData = $bindable(),
@@ -47,10 +46,12 @@
                     ine,
                     vat: icoId,
                 };
-            } catch (e) {
-                toaster.error({
-                    description: m["errors.something-went-wrong-500"](),
-                });
+            } catch (e: AxiosError | unknown) {
+                if (isAxiosError(e)) {
+                    if (e.response?.data.kod) {
+                        toast.error(m["errors.invalid-ine"]());
+                    }
+                }
             }
         }
     }

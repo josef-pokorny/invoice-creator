@@ -106,6 +106,11 @@
         bind:isoDate={invoiceValues.paymentDueDate}
         error={invoiceValuesErrors.value["paymentDueDate"]}
     />
+    <Switch
+        classContainer="mt-4"
+        bind:checked={invoiceValues.reverseCharge}
+        label={m["form.reverse-charge"]()}
+    />
 
     <hr class="hr mx-7 my-5 w-[auto]" />
 

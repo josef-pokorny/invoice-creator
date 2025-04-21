@@ -1,9 +1,8 @@
 <script lang="ts">
     import ChangeLanguage from "$lib/components/layout/ChangeLanguage.svelte";
     // import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
-    import { AppBar, Toaster } from "@skeletonlabs/skeleton-svelte";
+    import { AppBar } from "@skeletonlabs/skeleton-svelte";
     import { page } from "$app/state";
-    import { useToasterStore } from "$lib/stores/toaster";
     import { locales, localizeHref, setLocale } from "$lib/paraglide/runtime";
     import SvgGithub from "$lib/svgs/svg-github.svelte";
     import { goto } from "$app/navigation";
@@ -11,15 +10,14 @@
     import { type Snippet } from "svelte";
     import ChangeProfile from "../ChangeProfile.svelte";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
+    import { Toaster } from "svelte-french-toast";
 
     let { children }: { children: Snippet } = $props();
 
     let locale = useLocaleStore();
-
-    const toaster = useToasterStore();
 </script>
 
-<Toaster toaster={toaster.value}></Toaster>
+<Toaster toastOptions={{ className: "toast" }} />
 
 <LocaleSync />
 

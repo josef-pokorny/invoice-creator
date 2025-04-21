@@ -56,13 +56,17 @@
     "payment-info": "Payment information (Bank account, etc.)",
     "pickup-at": "Picked up on",
     "payment-due": "Payment due date",
-    "is-selfemployed": "Is self employed"
+    "is-selfemployed": "Is self employed",
+    "reverse-charge": "Reverse charge",
+    "none": "- None -"
   },
   "errors": {
     "something-went-wrong-500": "Something went wrong. Your request has not been completed.",
     "invalid-ine": "This INE is invalid",
     "this-field-is-recommended": "It's recommended to fill this field",
-    "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places."
+    "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places.",
+    "offline-title": "Offline",
+    "offline-description": "You do not have access to the internet."
   },
   "text": {
     "you-can-fill-by-ine": "You can automatically fill in all the data after filling in only the INE.",

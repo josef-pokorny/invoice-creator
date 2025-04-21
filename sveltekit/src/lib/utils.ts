@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-import { uniqueId } from "lodash-es";
+import { isArray, isPlainObject, uniqueId } from "lodash-es";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -22,4 +22,24 @@ export function countDecimals(value: number) {
     }
 
     return parseInt(str.split("-")[1] || "0", 10);
+}
+
+export function getNestedKeys(obj: Record<string, any>, prefix = ""): string[] {
+    const keys: string[] = [];
+
+    for (const key in obj) {
+        if (!obj.hasOwnProperty(key)) continue;
+
+        const value = obj[key];
+        const path = prefix ? `${prefix}.${key}` : key;
+
+        if (isPlainObject(value)) {
+            keys.push(path);
+            keys.push(...getNestedKeys(value, path));
+        } else {
+            keys.push(path);
+        }
+    }
+
+    return keys;
 }

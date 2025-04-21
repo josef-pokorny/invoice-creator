@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      svelte-french-toast:
+        specifier: ^1.2.0
+        version: 1.2.0(svelte@5.28.1)
       vite:
         specifier: ^6.3.2
         version: 6.3.2(jiti@2.4.2)(lightningcss@1.29.2)(sass-embedded@1.86.3)(terser@5.39.0)
@@ -3709,6 +3712,11 @@ packages:
       svelte:
         optional: true
 
+  svelte-french-toast@1.2.0:
+    resolution: {integrity: sha512-5PW+6RFX3xQPbR44CngYAP1Sd9oCq9P2FOox4FZffzJuZI2mHOB7q5gJBVnOiLF5y3moVGZ7u2bYt7+yPAgcEQ==}
+    peerDependencies:
+      svelte: ^3.57.0 || ^4.0.0
+
   svelte-hmr@0.16.0:
     resolution: {integrity: sha512-Gyc7cOS3VJzLlfj7wKS0ZnzDVdv3Pn2IuVeJPk9m2skfhcu5bq3wtIZyQGggr7/Iim5rH5cncyQft/kRLupcnA==}
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
@@ -3724,6 +3732,11 @@ packages:
     resolution: {integrity: sha512-/0rHrKQuA4MQ7CyHj6d9lD5jSO3woq86LR+ATUS/lx9hxwiQee6awjJ2nzy639Giu6m/Bhzereu9738CkWprfw==}
     engines: {node: '>= 14.17.0'}
     hasBin: true
+
+  svelte-writable-derived@3.1.1:
+    resolution: {integrity: sha512-w4LR6/bYZEuCs7SGr+M54oipk/UQKtiMadyOhW0PTwAtJ/Ai12QS77sLngEcfBx2q4H8ZBQucc9ktSA5sUGZWw==}
+    peerDependencies:
+      svelte: ^3.2.1 || ^4.0.0-next.1 || ^5.0.0-next.94
 
   svelte@5.28.1:
     resolution: {integrity: sha512-iOa9WmfNG95lSOSJdMhdjJ4Afok7IRAQYXpbnxhd5EINnXseG0GVa9j6WPght4eX78XfFez45Fi+uRglGKPV/Q==}
@@ -7870,6 +7883,11 @@ snapshots:
     optionalDependencies:
       svelte: 5.28.1
 
+  svelte-french-toast@1.2.0(svelte@5.28.1):
+    dependencies:
+      svelte: 5.28.1
+      svelte-writable-derived: 3.1.1(svelte@5.28.1)
+
   svelte-hmr@0.16.0(svelte@5.28.1):
     dependencies:
       svelte: 5.28.1
@@ -7888,6 +7906,10 @@ snapshots:
       fast-glob: 3.3.3
       minimist: 1.2.8
       xmlbuilder2: 3.1.1
+
+  svelte-writable-derived@3.1.1(svelte@5.28.1):
+    dependencies:
+      svelte: 5.28.1
 
   svelte@5.28.1:
     dependencies:

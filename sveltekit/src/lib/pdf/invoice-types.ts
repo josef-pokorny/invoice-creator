@@ -18,6 +18,17 @@ export interface IInvoiceValues {
     customFooterText?: string;
     countVat?: boolean;
     roundTotal?: boolean;
+    reverseCharge?: boolean;
+}
+
+export enum ECzechReverseChargeParagraph {
+    "92a" = "92a",
+    "92b" = "92b",
+    "92c" = "92c",
+    "92d" = "92d",
+    "92e" = "92e",
+    "92f" = "92f",
+    "92g" = "92g",
 }
 
 export interface IBilling {

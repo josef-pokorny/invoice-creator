@@ -1,4 +1,5 @@
 import {
+    ECzechReverseChargeParagraph,
     EInvoiceType,
     type IInvoiceValues,
     type IItem,
@@ -48,6 +49,7 @@ export const defaultForm: IInvoiceValues = {
     customFooterText: "",
     countVat: false,
     roundTotal: false,
+    reverseCharge: false,
 };
 export const defaultFormKey = { profileName: "default" };
 

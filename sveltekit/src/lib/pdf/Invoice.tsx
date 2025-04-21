@@ -418,6 +418,19 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                     </Text>
                 </View>
                 <View style={styles.footer}>
+                    {invoiceData?.reverseCharge && (
+                        <>
+                            <View style={styles.space} />
+                            <View style={styles.line} />
+                            <View style={styles.space} />
+                            <Text style={{ paddingLeft: 5 }}>
+                                Reverse charge - daň odvede zákazník
+                            </Text>
+                            <View style={styles.space} />
+                            <View style={styles.line} />
+                            <View style={{ ...styles.space, height: 10 }} />
+                        </>
+                    )}
                     <Text>{invoiceData.customFooterText}</Text>
                 </View>
             </Page>

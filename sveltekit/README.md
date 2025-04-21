@@ -29,3 +29,4 @@ You can preview the production build with `pnpm run preview`.
 - [ ] Sharing (navigator.share())
 - [x] Deleting profiles
 - [ ] Make multiple pages pdf when more items (activate pages buttons in svelte-pdf, add "Page x of y" in footer)
+- [ ] Checking VAT ID with VIES (https://ec.europa.eu/taxation_customs/vies/#/technical-information)

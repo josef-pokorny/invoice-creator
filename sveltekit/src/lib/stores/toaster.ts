@@ -12,9 +12,5 @@ export function useToasterStore({
     initialValue?: typeof defaultToaster;
     key?: string;
 } = {}) {
-    return useStore(
-        "toaster-" + (key || ""),
-        defaultToaster,
-        initialValue,
-    );
+    return useStore("toaster-" + (key || ""), defaultToaster, initialValue);
 }

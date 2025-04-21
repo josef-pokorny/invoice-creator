@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     import "$lib/app.css";
     import "$lib/styles/app.scss";
+    import "$lib/styles/toaster.scss";
     import "@fontsource-variable/montserrat";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
 
