@@ -12,7 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"machine-translate": "inlang machine translate --project project.inlang",
+		"machine-translate": "inlang machine translate --project src/project.inlang",
 		"postbuild": "npx svelte-sitemap --domain https://invoice-creator.josefpokorny.cz -o .vercel/output/static"
 	},
 	"devDependencies": {
