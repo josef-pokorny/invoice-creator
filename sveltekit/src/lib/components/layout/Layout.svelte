@@ -1,6 +1,6 @@
 <script lang="ts">
     import ChangeLanguage from "$lib/components/layout/ChangeLanguage.svelte";
-    // import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
+    import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
     import { AppBar } from "@skeletonlabs/skeleton-svelte";
     import { page } from "$app/state";
     import { locales, localizeHref, setLocale } from "$lib/paraglide/runtime";
@@ -18,10 +18,10 @@
 
 <LocaleSync />
 
-<!-- <PWAMeta /> -->
-<!-- {#await import('$lib/components/layout/PWAReloadPrompt.svelte') then { default: ReloadPrompt }}
+<PWAMeta /> -->
+{#await import('$lib/components/layout/PWAReloadPrompt.svelte') then { default: ReloadPrompt }}
     <ReloadPrompt />
-{/await} -->
+{/await}
 
 <AppBar toolbarClasses="items-center">
     {#snippet lead()}
