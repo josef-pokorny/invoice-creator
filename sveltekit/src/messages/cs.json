@@ -57,7 +57,8 @@
     "payment-due": "Datum splatnosti",
     "is-selfemployed": "Je OSVČ",
     "reverse-charge": "Reverse charge",
-    "none": "- Žádný -"
+    "none": "- Žádný -",
+    "a": "x"
   },
   "errors": {
     "something-went-wrong-500": "Někde se stala chyba. Váš požadavek nebyl dokončen.",

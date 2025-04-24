@@ -1,10 +1,10 @@
-import type { AxiosError, AxiosResponse } from "axios";
+import type { AxiosError } from "axios";
 import type { IGovEkonomickeSubjektyReturn, IGovError } from "./ares-types";
-import axios from "axios";
+import AxiosClient from "$lib/requests/client";
 
 export async function findAresByINE({ ine }: { ine: string }) {
     try {
-        const { data } = await axios<IGovEkonomickeSubjektyReturn>({
+        const { data } = await AxiosClient<IGovEkonomickeSubjektyReturn>({
             url: `https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ine}`,
             method: "get",
         });

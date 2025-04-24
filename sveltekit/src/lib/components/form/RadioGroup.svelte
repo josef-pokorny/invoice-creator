@@ -1,10 +1,9 @@
 <script lang="ts">
-    import type { HTMLInputAttributes } from "svelte/elements";
+    import type { ClassValue, HTMLInputAttributes } from "svelte/elements";
     import Error from "./Error.svelte";
     import type { IYupError } from "$lib/types/types";
     import { createId } from "$lib/utils";
     import Label from "./Label.svelte";
-    import type { ClassValue } from "clsx";
     import { m } from "$lib/paraglide/messages";
 
     type TExdended = HTMLInputAttributes;

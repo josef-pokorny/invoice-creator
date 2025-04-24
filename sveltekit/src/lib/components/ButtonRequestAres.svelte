@@ -4,8 +4,8 @@
     import { findAresByINE } from "$lib/requests/ares/ares-ine";
     import type { IGovEkonomickeSubjektyReturn } from "$lib/requests/ares/ares-types";
     import { isINEValid } from "$lib/validations/ine";
-    import toast from "svelte-french-toast";
     import { isAxiosError, type AxiosError } from "axios";
+    import { addToast } from "$lib/components/Toaster.svelte";
 
     let {
         aresINEData = $bindable(),
@@ -49,7 +49,12 @@
             } catch (e: AxiosError | unknown) {
                 if (isAxiosError(e)) {
                     if (e.response?.data.kod) {
-                        toast.error(m["errors.invalid-ine"]());
+                        addToast({
+                            data: {
+                                title: m["errors.invalid-ine"](),
+                                variant: "error",
+                            },
+                        });
                     }
                 }
             }

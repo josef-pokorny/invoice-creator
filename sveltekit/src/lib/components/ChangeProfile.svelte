@@ -18,7 +18,11 @@
     import Input from "./form/Input.svelte";
     import Label from "./form/Label.svelte";
     import Select from "./form/Select.svelte";
-    import { FileDown, FileUp, Plus, Settings, Trash } from "@lucide/svelte";
+    import FileDown from "@lucide/svelte/icons/file-down";
+    import FileUp from "@lucide/svelte/icons/file-up";
+    import Plus from "@lucide/svelte/icons/plus";
+    import Settings from "@lucide/svelte/icons/settings";
+    import Trash from "@lucide/svelte/icons/trash";
     import moment from "$lib/moment";
     import Dialog from "$lib/components/Dialog.svelte";
     import { cloneDeep } from "lodash-es";

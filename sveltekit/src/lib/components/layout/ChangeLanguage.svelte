@@ -12,6 +12,10 @@
     } from "$lib/paraglide/runtime";
     import { GB, CZ } from "country-flag-icons/string/1x1";
 
+    function a() {
+        let a = "a"
+    }
+
     function onSetLocale(locale: Locale) {
         setLocale(locale, { reload: false });
 

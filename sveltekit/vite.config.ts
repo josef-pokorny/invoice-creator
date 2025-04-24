@@ -10,7 +10,7 @@ export default defineConfig({
         tailwindcss(),
         sveltekit(),
         paraglideVitePlugin({
-            project: "./project.inlang",
+            project: "./src/project.inlang",
             outdir: "./src/lib/paraglide",
             strategy: [
                 "cookie",
@@ -49,7 +49,7 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                api: "modern-compiler",
+                // api: "modern-compiler",
                 additionalData: `
                     @use "$lib/styles/_mixins.scss" as *;
                     @reference "$lib/app.css";
@@ -64,17 +64,12 @@ export default defineConfig({
     },
     define: {
         "process.env.NODE_ENV":
+            // @ts-expect-error
             process.env.NODE_ENV !== "development"
                 ? '"production"'
                 : "'development'",
     },
     optimizeDeps: {
-        exclude: [
-            "skeletonlabs",
-            "svelte-pdf",
-            "pdfjs-dist",
-            "tailwind-variants",
-            "tailwind-merge",
-        ],
+        exclude: ["skeletonlabs", "svelte-pdf", "pdfjs-dist"],
     },
 });

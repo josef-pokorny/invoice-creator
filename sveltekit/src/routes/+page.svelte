@@ -5,7 +5,7 @@
     import { m } from "$lib/paraglide/messages";
     import { fade } from "svelte/transition";
     import { createInvoiceData, renderInvoiceBlobUrl } from "$lib/pdf/utils";
-    import { X } from "@lucide/svelte";
+    import X from "@lucide/svelte/icons/x";
     import InvoiceForm from "$lib/components/InvoiceForm.svelte";
 
     // region:    --- Form validation

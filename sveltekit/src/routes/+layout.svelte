@@ -5,8 +5,10 @@
     import "$lib/app.css";
     import "$lib/styles/app.scss";
     import "$lib/styles/toaster.scss";
+    import "$lib/styles/skeletonlab.scss";
     import "@fontsource-variable/montserrat";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
+    import Toaster from "$lib/components/Toaster.svelte";
 
     let { children } = $props();
 
@@ -58,6 +60,7 @@
     {/key}
 </svelte:head>
 
+<Toaster />
 {#key locale.locale}
     <Layout>
         {@render children()}

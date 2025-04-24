@@ -6,7 +6,7 @@
     import Datepicker from "$lib/components/form/Datepicker.svelte";
     import { DefaultItem, EInvoiceType } from "$lib/pdf/invoice-types";
     import Select from "$lib/components/form/Select.svelte";
-    import { SaveIcon } from "@lucide/svelte";
+    import SaveIcon from "@lucide/svelte/icons/save";
     import ButtonRequestAres from "$lib/components/ButtonRequestAres.svelte";
     import Message from "$lib/components/Message.svelte";
     import { cloneDeep } from "lodash-es";

@@ -10,14 +10,11 @@
     import { type Snippet } from "svelte";
     import ChangeProfile from "../ChangeProfile.svelte";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
-    import { Toaster } from "svelte-french-toast";
 
     let { children }: { children: Snippet } = $props();
 
     let locale = useLocaleStore();
 </script>
-
-<Toaster toastOptions={{ className: "toast" }} />
 
 <LocaleSync />
 

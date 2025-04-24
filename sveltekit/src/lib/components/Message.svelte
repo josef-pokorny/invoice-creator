@@ -1,7 +1,7 @@
 <script lang="ts">
     import { m } from "$lib/paraglide/messages";
     import { useMessageStore } from "$lib/stores/message";
-    import { InfoIcon } from "@lucide/svelte";
+    import InfoIcon from "@lucide/svelte/icons/info";
     import type { Snippet } from "svelte";
     import { fade } from "svelte/transition";
 
@@ -16,7 +16,7 @@
         clossable?: boolean;
         id?: string;
     } = $props();
-
+    
     const messageState = useMessageStore({ key: id });
 
     let isClosed = $derived(id ? messageState.value.closed : false);

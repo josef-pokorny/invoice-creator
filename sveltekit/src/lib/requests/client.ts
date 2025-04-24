@@ -1,13 +1,13 @@
 import { m } from "$lib/paraglide/messages";
 import axios, { type AxiosInstance } from "axios";
-import toast from "svelte-french-toast";
+import { addToast } from "$lib/components/Toaster.svelte";
 
-const apiClient: AxiosInstance = axios.create({
+const AxiosClient: AxiosInstance = axios.create({
     baseURL: "https://api.example.com",
     timeout: 10000,
 });
 
-apiClient.interceptors.request.use(
+AxiosClient.interceptors.request.use(
     (config) => {
         return config;
     },
@@ -16,17 +16,22 @@ apiClient.interceptors.request.use(
     },
 );
 
-apiClient.interceptors.response.use(
+AxiosClient.interceptors.response.use(
     (response) => {
         return response;
     },
     (error) => {
         if (error.code === "ERR_NETWORK" || !navigator.onLine) {
-            toast.error(m["errors.offline-description"]());
+            addToast({
+                data: {
+                    description: m["errors.offline-description"](),
+                    variant: "error",
+                },
+            });
         }
 
         return Promise.reject(error);
     },
 );
 
-export default apiClient;
+export default AxiosClient;

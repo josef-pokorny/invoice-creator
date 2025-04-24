@@ -1,10 +1,4 @@
-import { type ClassValue, clsx } from "clsx";
-import { isArray, isPlainObject, uniqueId } from "lodash-es";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+import { isPlainObject, uniqueId } from "lodash-es";
 
 export function createId(prefix: string = "input_") {
     return uniqueId(prefix) + String(Math.round(Math.random() * 999999999999));

@@ -7,7 +7,7 @@
         useFormKeyStore,
         useFormStore,
     } from "$lib/stores/form.svelte";
-    import { Trash } from "@lucide/svelte";
+    import Trash from "@lucide/svelte/icons/trash";
     import Input from "./Input.svelte";
     import { cloneDeep, difference, get, isUndefined, set } from "lodash-es";
     import * as yup from "yup";
