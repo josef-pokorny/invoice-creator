@@ -18,7 +18,7 @@
 
 <LocaleSync />
 
-<PWAMeta /> -->
+<PWAMeta />
 {#await import('$lib/components/layout/PWAReloadPrompt.svelte') then { default: ReloadPrompt }}
     <ReloadPrompt />
 {/await}
