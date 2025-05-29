@@ -60,6 +60,7 @@
     {#if label}
         <Label for={id} {label} />
     {/if}
+
     {#if rest.type === "textarea"}
         <textarea
             aria-errormessage="{id}-error"
@@ -81,36 +82,8 @@
             {onchange}
         />
     {/if}
+
     {#if isErrorVisible}
         <Error id={id || ""} {error} />
     {/if}
 </fieldset>
-
-<style lang="scss">
-    .date-picker {
-        :global(input[type="text"]) {
-            @apply input;
-        }
-
-        :global(#datepicker-dropdown) {
-            width: 100%;
-            max-width: 350px;
-
-            :global([role="grid"]) {
-                width: 100%;
-            }
-
-            :global(.mt-4.flex.justify-between) {
-                :global(button:nth-of-type(1)) {
-                    @apply btn bg-primary-500 text-white;
-                }
-                :global(button:nth-of-type(2)) {
-                    @apply btn;
-                }
-                :global(button:nth-of-type(3)) {
-                    @apply btn bg-success-600 text-white;
-                }
-            }
-        }
-    }
-</style>

@@ -26,7 +26,9 @@ You can preview the production build with `pnpm run preview`.
 - [x] Ares autocomplete
 - [x] Storing "profiles" of invoices (different keys in localStorage)
 - [x] Exporting/importing profiles to JSON file ("key-from-local-storage: { ...profile }") 
-- [ ] Sharing (navigator.share())
+- [x] Sharing (navigator.share())
 - [x] Deleting profiles
 - [ ] Make multiple pages pdf when more items (activate pages buttons in svelte-pdf, add "Page x of y" in footer)
-- [ ] Checking VAT ID with VIES (https://ec.europa.eu/taxation_customs/vies/#/technical-information)
+- [ ] Checking VAT ID with VIES (https://ec.europa.eu/taxation_customs/vies/#/technical-information) - npm: https://www.npmjs.com/package/viesapi-client 
+- [ ] Rename "Profiles" to "Invoices"
+- [ ] Storing suppliers and receivers (button -> dialog for storing with name), autocomplete in form

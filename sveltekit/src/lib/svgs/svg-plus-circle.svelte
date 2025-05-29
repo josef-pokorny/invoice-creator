@@ -1,9 +1,9 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 
 <script lang="ts">
-    import type { HTMLAttributes } from "svelte/elements";
+    import type { SVGAttributes } from "svelte/elements";
 
-    let props: HTMLAttributes<SVGSVGElement> = $props();
+    let props: SVGAttributes<any> = $props();
 </script>
 
 <svg

@@ -21,7 +21,6 @@ export default ts.config(
     {
         plugins: {
             "simple-import-sort": simpleImportSort,
-            "simple-import-sort/imports": "error",
             "unused-imports": unusedImports,
         },
         rules: {
