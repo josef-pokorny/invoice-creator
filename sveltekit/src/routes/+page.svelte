@@ -1,5 +1,4 @@
 <script lang="ts">
-    import PdfViewer from "svelte-pdf";
     import { onMount } from "svelte";
     import { useFormKeyStore, useFormStore } from "$lib/stores/form.svelte";
     import { m } from "$lib/paraglide/messages";
@@ -24,6 +23,7 @@
     import { createId } from "$lib/utils";
     import { useFormErrorsStore } from "$lib/stores/form.svelte";
     import SvgShare from "$lib/svgs/svg-share.svelte";
+    import { getLocale } from "$lib/paraglide/runtime";
 
     let invoiceValuesErrors = useFormErrorsStore();
 
@@ -114,21 +114,18 @@
     });
 
     let isFullPreview = $state(false);
-    let fullPreviewElem: HTMLElement | undefined = $state();
 
     $effect(() => {
         document.body.style.overflow = isFullPreview ? "hidden" : "";
     });
+
+    let currentPageNum = $state(1);
 </script>
 
 {#if isFullPreview}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-        bind:this={fullPreviewElem}
-        transition:fade={{ duration: 120 }}
-        class="pdf-full-preview"
-    >
+    <div transition:fade={{ duration: 120 }} class="pdf-full-preview">
         <button
             onclick={() => {
                 isFullPreview = false;
@@ -139,16 +136,26 @@
             <X class="stroke-error-600 h-[48px] w-[48px]" />
         </button>
         <div class="pdf-viewer-wrap">
-            {#if url}
-                {#key url}
-                    <PdfViewer
-                        {url}
-                        showTopButton={false}
-                        showButtons={["navigation"]}
-                        scale={4}
-                    />
-                {/key}
-            {/if}
+            {#await import('@josef-pokorny/svelte-pdf') then { default: PdfViewer }}
+                {#await import(`../messages/${getLocale()}.json`) then { default: translations }}
+                    {#if url}
+                        {#key url}
+                            <PdfViewer
+                                {url}
+                                showTopButton={false}
+                                showButtons={["navigation", "pageInfo"]}
+                                scale={4}
+                                bind:currentPageNum
+                                pdfjsWorkerSrc={new URL(
+                                    "pdfjs-dist/build/pdf.worker.mjs",
+                                    import.meta.url,
+                                ).toString()}
+                                translations={translations["svelte-pdf"]}
+                            />
+                        {/key}
+                    {/if}
+                {/await}
+            {/await}
         </div>
     </div>
 {/if}
@@ -428,106 +435,92 @@
     </div>
 
     <div class="pdf-viewer-wrap">
-        {#if url}
-            {#key url}
-                <PdfViewer
-                    {url}
-                    showTopButton={false}
-                    showButtons={["navigation"]}
-                    scale={2.5}
-                />
-            {/key}
-        {/if}
+        {#await import('@josef-pokorny/svelte-pdf') then { default: PdfViewer }}
+            {#await import(`../messages/${getLocale()}.json`) then { default: translations }}
+                {#if url}
+                    {#key url}
+                        <PdfViewer
+                            {url}
+                            showTopButton={false}
+                            showButtons={["navigation", "pageInfo"]}
+                            scale={2.5}
+                            bind:currentPageNum
+                            pdfjsWorkerSrc={new URL(
+                                "pdfjs-dist/build/pdf.worker.mjs",
+                                import.meta.url,
+                            ).toString()}
+                            translations={translations["svelte-pdf"]}
+                        />
+                    {/key}
+                {/if}
+            {/await}
+        {/await}
     </div>
 </div>
 
 <style lang="scss">
     .pdf-viewer-wrap {
-        :global(.parent),
-        :global(.control),
-        :global(.control-start) {
+        :global(.svelte-pdf) {
+            height: 100%;
+
+            --theme-color: var(--color-primary-300);
+        }
+
+        :global(.control) {
             margin: 0;
             padding: 0;
             border-radius: 0;
             border: 0;
+
+            display: flex;
+            flex-direction: column;
             height: 100%;
-        }
 
-        :global(.control-start .line) {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            background-color: var(--color-surface-900);
-            justify-content: start;
-            padding: 5px 10px;
-            gap: 15px;
+            :global(.line) {
+                background-color: var(--color-surface-900);
+                justify-content: start;
+                padding: 5px 10px;
+                gap: 15px;
+                margin: 0;
 
-            :global(.activator) {
-                :global(.tooltip) {
-                    display: none;
+                :global(.melt-tooltip-container .content),
+                :global(.melt-tooltip-container .melt-tooltip-arrow) {
+                    background-color: var(--color-surface-700) !important;
+                    color: var(--color-white);
+
+                    &::before {
+                        display: none;
+                    }
                 }
 
                 :global(.button-control) {
-                    margin: 0;
                     border: 0;
+                }
+            }
 
-                    :global(svg) {
-                        fill: var(--color-primary-300);
-                    }
-                }
-                :global(.button-control.disabled) {
-                    opacity: 0.4;
-                }
+            :global(.viewer) {
+                flex: 1;
+                min-width: 1px;
             }
         }
     }
 
     .main-wrap {
-        @apply relative mt-8 mb-40 flex justify-center gap-x-3 px-2;
+        @apply mt-8 mb-40 flex justify-center gap-x-3 px-2;
 
         .pdf-viewer-wrap {
-            @apply sticky top-0 z-1 m-0 h-[100svh] w-[100%] max-w-[750px] flex-1 overflow-auto;
-
-            :global(.control-start .line) {
-                position: sticky;
-                top: 0;
-                background-color: var(--color-surface-900);
-                justify-content: start;
-                padding: 5px 10px;
-                gap: 15px;
-
-                :global(.activator) {
-                    :global(.tooltip) {
-                        display: none;
-                    }
-
-                    :global(.button-control) {
-                        margin: 0;
-                        border: 0;
-
-                        :global(svg) {
-                            fill: var(--color-primary-300);
-                        }
-                    }
-                    :global(.button-control.disabled) {
-                        opacity: 0.4;
-                    }
-                }
-            }
+            @apply sticky top-0 z-1 m-0 h-[100svh] max-w-[750px] min-w-1 flex-1;
 
             :global(.viewer) {
-                border: 0;
+                :global(canvas) {
+                    min-width: 650px;
+                    width: 115%;
+                }
             }
 
-            :global(.parent) {
+            @media (max-width: 850px) {
+                position: unset;
                 width: 100%;
-                overflow: hidden;
-                min-width: 650px;
-                max-width: 720px;
-
-                :global(canvas) {
-                    width: 100%;
-                }
             }
         }
 
@@ -539,39 +532,21 @@
 
     .pdf-full-preview {
         @apply fixed top-1/2 left-1/2 z-10 h-[100vh] w-[100vw] -translate-1/2;
-        background-color: rgba(0, 0, 0, 0.555);
+        background-color: var(--color-surface-900);
         display: grid;
         align-items: center;
 
         .pdf-viewer-wrap {
             overflow: auto;
             height: 100%;
-            width: auto;
+            width: 100%;
 
-            :global(.parent) {
-                width: auto;
-                min-width: 0;
-                margin: auto;
-            }
-
-            :global(.viewer),
-            :global(.control),
-            :global(.parent),
-            :global(canvas) {
-                width: auto;
-                height: 100%;
-                border: 0;
-                border-radius: 0;
-            }
-
-            :global(.control) {
-                margin: 0;
-                @apply bg-surface-950;
-            }
-
-            :global(canvas) {
-                margin: 0 auto;
-                pointer-events: none;
+            :global(.viewer) {
+                :global(canvas) {
+                    margin: 0 auto;
+                    height: 100%;
+                    max-height: 1500px;
+                }
             }
         }
     }

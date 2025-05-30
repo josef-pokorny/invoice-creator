@@ -80,5 +80,20 @@
   "pwa": {
     "reload": "Znovu načíst",
     "new-update": "Nová verze aplikace je nyní dostupná. Prosím znovu načtěte stránku pro aktualizaci."
+  },
+  "svelte-pdf": {
+    "document-requires-password": "Tento dokument vyžaduje heslo pro otevření:",
+    "submit": "Odeslat",
+    "zoom-out": "Oddálit",
+    "print": "Tisk",
+    "anti-clockwise": "Proti směru hodinových ručiček",
+    "clockwise": "Po směru hodinových ručiček",
+    "download": "Stáhnout",
+    "previous": "Předchozí",
+    "next": "Další",
+    "zoom-in": "Přiblížit",
+    "auto-turn-page": "Automatické otáčení stránek",
+    "min": "min",
+    "back-to-top": "Zpět nahoru"
   }
 }

@@ -7,7 +7,8 @@
     "saved-profiles": "Saved profiles",
     "new-profile": "New profile",
     "used-profile": "Profile used",
-    "settings": "Settings"
+    "settings": "Settings",
+    "share": "Share"
   },
   "actions": {
     "add-item": "Add item",
@@ -80,5 +81,20 @@
   "pwa": {
     "reload": "Reload",
     "new-update": "A new version of the app is now available. Please reload the page to update."
+  },
+  "svelte-pdf": {
+    "document-requires-password": "This document requires a password to open:",
+    "submit": "Submit",
+    "zoom-out": "Zoom Out",
+    "print": "Print",
+    "anti-clockwise": "Anti-Clockwise",
+    "clockwise": "Clockwise",
+    "download": "Download",
+    "previous": "Previous",
+    "next": "Next",
+    "zoom-in": "Zoom In",
+    "auto-turn-page": "Auto Turn Page",
+    "min": "min",
+    "back-to-top": "Back to Top"
   }
 }

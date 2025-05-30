@@ -64,7 +64,7 @@ export default defineConfig({
     },
     define: {
         "process.env.NODE_ENV":
-            // @ts-expect-error
+            // @ts-expect-error: a
             process.env.NODE_ENV !== "development"
                 ? '"production"'
                 : "'development'",
