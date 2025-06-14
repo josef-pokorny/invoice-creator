@@ -1,6 +1,6 @@
 <script lang="ts">
     import Trash from "@lucide/svelte/icons/trash";
-    import { cloneDeep, difference, get, isUndefined, set } from "lodash-es";
+    import _ from "lodash";
     import * as yup from "yup";
 
     import { m } from "$lib/paraglide/messages";
@@ -36,7 +36,7 @@
     );
 
     let item = $state(
-        cloneDeep({
+        _.cloneDeep({
             ...props.item,
             singlePrice: fromCents(props.item.singlePrice),
         }),
@@ -45,11 +45,11 @@
     $effect(() => {
         const differentKeys =
             DefaultItem && item
-                ? difference(Object.keys(DefaultItem), Object.keys(item))
+                ? _.difference(Object.keys(DefaultItem), Object.keys(item))
                 : [];
 
         differentKeys.forEach((key) => {
-            item = set(item, key, get(DefaultItem, key));
+            item = _.set(item, key, _.get(DefaultItem, key));
         });
     });
 
@@ -132,7 +132,7 @@
             error={itemErrors.value["singlePrice"]}
         />
     </div>
-    {#if !isUndefined(item.vatPercentage)}
+    {#if !_.isUndefined(item.vatPercentage)}
         <Input
             error={itemErrors.value["vatPercentage"]}
             label={m["form.vat-percentage"]()}

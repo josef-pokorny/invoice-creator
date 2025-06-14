@@ -11,7 +11,7 @@
     import { useLocaleStore } from "$lib/stores/locale.svelte";
     import SvgGithub from "$lib/svgs/svg-github.svelte";
 
-    import ChangeProfile from "../ChangeProfile.svelte";
+    import ChangeInvoice from "../ChangeInvoice.svelte";
 
     let { children }: { children: Snippet } = $props();
 
@@ -33,13 +33,13 @@
     {/snippet}
     {#snippet trail()}
         <div class="trail w-[40px]">
-            <ChangeProfile />
+            <ChangeInvoice />
         </div>
     {/snippet}
     <h1 class="h1 text-primary-100 text-[1.1rem]">Invoice Creator</h1>
 </AppBar>
 
-<main class="p-1">
+<main>
     {@render children()}
 </main>
 

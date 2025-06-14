@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { isNumber } from "lodash-es";
+    import _ from "lodash";
+    import type { Snippet } from "svelte";
     import type {
         HTMLInputAttributes,
         HTMLTextareaAttributes,
@@ -19,6 +20,7 @@
         date?: string | Date;
         error?: IYupError;
         isErrorVisible?: boolean;
+        suffix?: Snippet;
     }
 
     let {
@@ -29,6 +31,7 @@
         id = $bindable(createId()),
         error,
         isErrorVisible = true,
+        suffix,
         ...rest
     }: IProps = $props();
 
@@ -45,45 +48,62 @@
         if (rest.type === "number") {
             const currentValue = Number(e.currentTarget.value);
 
-            if (!e.currentTarget.value.length || !isNumber(currentValue)) {
+            if (!e.currentTarget.value.length || !_.isNumber(currentValue)) {
                 value = rest.min || 0;
             }
 
-            if (isNumber(rest.min) && currentValue < rest.min) {
+            if (_.isNumber(rest.min) && currentValue < rest.min) {
                 value = rest.min;
-            } else if (isNumber(rest.max) && currentValue > rest.max) {
+            } else if (_.isNumber(rest.max) && currentValue > rest.max) {
                 value = rest.max;
             }
         }
     }
+
+    let hasSuffix = _.isFunction(suffix);
 </script>
 
-<fieldset class="label">
+<fieldset class="w-full">
     {#if label}
         <Label for={id} {label} />
     {/if}
 
-    {#if rest.type === "textarea"}
-        <textarea
-            {id}
-            aria-errormessage="{id}-error"
-            aria-invalid={!!error}
-            {onchange}
-            bind:value
-            {...rest}
-            class={"input min-h-[2rem] " + rest.class}
-        ></textarea>
-    {:else}
-        <input
-            {id}
-            aria-errormessage="{id}-error"
-            aria-invalid={!!error}
-            {onchange}
-            bind:value
-            {...rest}
-            class={"input " + rest.class}
-        />
-    {/if}
+    <div
+        class:contents={!hasSuffix}
+        class="input-group flex w-full items-stretch"
+    >
+        {#if rest.type === "textarea"}
+            <textarea
+                {id}
+                aria-errormessage="{id}-error"
+                aria-invalid={!!error}
+                {onchange}
+                bind:value
+                {...rest}
+                class={"min-h-[2rem] flex-1 " +
+                    (hasSuffix ? "ig-input" : "input") +
+                    " " +
+                    rest.class}
+            ></textarea>
+        {:else}
+            <input
+                {id}
+                aria-errormessage="{id}-error"
+                aria-invalid={!!error}
+                {onchange}
+                bind:value
+                {...rest}
+                class={"flex-1 " +
+                    (hasSuffix ? "ig-input" : "input") +
+                    " " +
+                    rest.class}
+            />
+        {/if}
+
+        {#if hasSuffix && suffix}
+            {@render suffix()}
+        {/if}
+    </div>
 
     {#if isErrorVisible}
         <Error id={id || ""} {error} />

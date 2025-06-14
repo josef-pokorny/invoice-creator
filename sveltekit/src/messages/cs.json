@@ -2,13 +2,14 @@
     "$schema": "https://inlang.com/schema/inlang-message-format",
     "example_message": "Bry den {username}",
     "labels": {
+        "invoices": "Faktury",
         "choose_country": "Vyberte zemi",
         "invoice": "Faktura",
-        "saved-profiles": "Uložené profily",
-        "new-profile": "Nový profil",
-        "used-profile": "Použitý profil",
         "settings": "Nastavení",
-        "share": "Sdílet"
+        "share": "Sdílet",
+        "saved-invoices": "Uložené faktury",
+        "new-invoice": "Nová faktura",
+        "used-invoice": "Použitá faktura"
     },
     "actions": {
         "add-item": "Přidat položku",
@@ -21,7 +22,7 @@
         "change-language": "Změnit jazyk",
         "import": "Import",
         "export": "Export",
-        "delete-profile": "Smazat profil"
+        "delete-invoice": "Smazat fakturu"
     },
     "form": {
         "receiver": "Odběratel",

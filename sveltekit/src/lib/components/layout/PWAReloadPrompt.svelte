@@ -7,8 +7,6 @@
 
     const intervalMS = 5 * 60 * 1000;
 
-    let isSWFetchedAfterTimeout = false;
-
     const { needRefresh, updateServiceWorker } = useRegisterSW({
         onRegistered(r: any) {
             // uncomment following code if you want check for updates
@@ -16,7 +14,6 @@
             r &&
                 setInterval(() => {
                     console.log("Checking for sw update");
-                    isSWFetchedAfterTimeout = true;
                     r.update();
                 }, intervalMS);
             console.log(`SW Registered: `, r);
@@ -29,12 +26,7 @@
         needRefresh.set(false);
     };
 
-    $: console.log({ $needRefresh, isSWFetchedAfterTimeout });
-
-    $: if ($needRefresh && !isSWFetchedAfterTimeout) {
-        console.log("SW automatically reloaded!");
-        updateServiceWorker(true);
-    }
+    $: console.log({ $needRefresh });
 </script>
 
 {#if $needRefresh}

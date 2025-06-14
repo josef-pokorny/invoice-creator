@@ -47,16 +47,21 @@
 
     $effect(() => {
         if (isOpen) {
+            document.body.style.overflow = "hidden";
+
             elemModal?.showModal();
 
-            setTimeout(() => {
+            let timeoutId = setTimeout(() => {
                 document.addEventListener("click", closeModal);
             }, 100);
 
             return () => {
+                clearTimeout(timeoutId);
                 document.removeEventListener("click", closeModal);
             };
         } else {
+            document.body.style.overflow = "auto";
+
             elemModal?.close();
         }
     });

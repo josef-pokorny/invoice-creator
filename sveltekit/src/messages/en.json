@@ -2,13 +2,14 @@
     "$schema": "https://inlang.com/schema/inlang-message-format",
     "example_message": "Hello world {username}",
     "labels": {
+        "invoices": "Invoices",
         "choose_country": "Chooose country",
         "invoice": "Invoice",
-        "saved-profiles": "Saved profiles",
-        "new-profile": "New profile",
-        "used-profile": "Profile used",
         "settings": "Settings",
-        "share": "Share"
+        "share": "Share",
+        "saved-invoices": "Saved invoices",
+        "new-invoice": "New invoice",
+        "used-invoice": "Used invoice"
     },
     "actions": {
         "add-item": "Add item",
@@ -21,7 +22,7 @@
         "change-language": "Change language",
         "import": "Import",
         "export": "Export",
-        "delete-profile": "Delete profile"
+        "delete-invoice": "Delete invoice"
     },
     "form": {
         "receiver": "Receiver",

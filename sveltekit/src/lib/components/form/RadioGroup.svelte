@@ -1,4 +1,5 @@
-<script lang="ts">
+<script lang="ts" generics="T">
+    import type { Snippet } from "svelte";
     import type { ClassValue, HTMLInputAttributes } from "svelte/elements";
 
     import { m } from "$lib/paraglide/messages";
@@ -10,36 +11,37 @@
 
     interface IRadio extends HTMLInputAttributes {
         label?: string;
+        value?: T;
     }
 
     interface IProps {
         radios?: IRadio[];
         group?: string;
         type?: HTMLInputAttributes["type"] | "textarea";
-        date?: string | Date;
         error?: IYupError;
         isErrorVisible?: boolean;
         containerClass?: ClassValue;
         id?: string;
         uncheckable?: boolean;
         groupLabel?: string;
+        snippetRadio?: Snippet<[{ label?: string; value?: T }]>;
     }
 
     let {
         radios,
         group = $bindable(""),
-        date = $bindable(new Date()),
         error,
         isErrorVisible = true,
         containerClass,
         id = createId(),
         uncheckable,
         groupLabel,
+        snippetRadio,
     }: IProps = $props();
 </script>
 
 <div
-    class="radiogroup grid grid-cols-[auto_1fr] gap-x-2 gap-y-2 {containerClass}"
+    class="radiogroup flex flex-col gap-2 {containerClass}"
     aria-errormessage="{id}-error"
     aria-invalid={!!error}
     aria-label={groupLabel}
@@ -60,17 +62,25 @@
         {#each radios as { label, ...rest } (label)}
             {@const radioId = createId("radio")}
 
-            <input
-                id={radioId}
-                checked={group === rest.value}
-                type="radio"
-                bind:group
-                {...rest}
-                class={"radio " + rest.class}
-            />
-            {#if label}
-                <Label for={radioId} {label} />
-            {/if}
+            <fieldset class="flex items-center gap-2">
+                <input
+                    id={radioId}
+                    checked={group === rest.value}
+                    type="radio"
+                    bind:group
+                    aria-label={label}
+                    {...rest}
+                    class={"radio " + rest.class}
+                />
+
+                {#if label}
+                    {#if snippetRadio}
+                        {@render snippetRadio({ label, value: rest.value })}
+                    {:else}
+                        <Label for={radioId} {label} />
+                    {/if}
+                {/if}
+            </fieldset>
         {/each}
     {/if}
 
@@ -78,32 +88,3 @@
         <Error id={id || ""} {error} />
     {/if}
 </div>
-
-<style lang="scss">
-    .date-picker {
-        :global(input[type="text"]) {
-            @apply input;
-        }
-
-        :global(#datepicker-dropdown) {
-            width: 100%;
-            max-width: 350px;
-
-            :global([role="grid"]) {
-                width: 100%;
-            }
-
-            :global(.mt-4.flex.justify-between) {
-                :global(button:nth-of-type(1)) {
-                    @apply btn bg-primary-500 text-white;
-                }
-                :global(button:nth-of-type(2)) {
-                    @apply btn;
-                }
-                :global(button:nth-of-type(3)) {
-                    @apply btn bg-success-600 text-white;
-                }
-            }
-        }
-    }
-</style>

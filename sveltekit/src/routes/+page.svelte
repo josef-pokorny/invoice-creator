@@ -1,7 +1,7 @@
 <script lang="ts">
     import SaveIcon from "@lucide/svelte/icons/save";
     import X from "@lucide/svelte/icons/x";
-    import { cloneDeep } from "lodash-es";
+    import _ from "lodash";
     import { onMount } from "svelte";
     import { fade } from "svelte/transition";
 
@@ -155,233 +155,238 @@
     </div>
 {/if}
 
-<div class="main-wrap" aria-hidden={isFullPreview}>
+<div class="page-wrap" aria-hidden={isFullPreview}>
     <div class="w-full max-w-[380px] shrink-0">
         <form
-            class="relative m-0 mb-15 flex w-full flex-col gap-2"
+            class="relative mb-15 gap-2 px-1"
             onsubmit={(e) => {
                 e.preventDefault();
                 renderPDF(true);
             }}
         >
-            <h2 class="h3 text-center">{m["labels.invoice"]()}</h2>
+            <div class="flex w-full flex-col gap-2 px-1 mb-15">
+                <h2 class="h3 text-center">{m["labels.invoice"]()}</h2>
 
-            <h3 class="h5 font-bold uppercase">{m["form.general"]()}</h3>
-            <Select bind:value={invoiceValues.invoiceType}>
-                {#snippet options()}
-                    {#each Object.values(EInvoiceType) as invoiceType (invoiceType)}
-                        <option value={invoiceType}>
-                            {m[`form.${invoiceType}`]()}
-                        </option>
-                    {/each}
-                {/snippet}
-            </Select>
-            <Input
-                label={m["form.company"]()}
-                bind:value={invoiceValues.companyName}
-            />
-            <Input label={m["form.refid"]()} bind:value={invoiceValues.refId} />
-            <Input
-                label={m["form.currency"]()}
-                bind:value={invoiceValues.currency}
-            />
-            <Datepicker
-                error={invoiceValuesErrors.value["issuedAt"]}
-                label={m["form.issued-at"]()}
-                type="date"
-                bind:value={issuedAtDate}
-                bind:isoDate={invoiceValues.issuedAt}
-            />
-            <Datepicker
-                error={invoiceValuesErrors.value["paidAt"]}
-                label={m["form.paid-at"]()}
-                type="date"
-                bind:value={paidAtDate}
-                bind:isoDate={invoiceValues.paidAt}
-            />
-            <Datepicker
-                error={invoiceValuesErrors.value["pickedUpAt"]}
-                label={m["form.pickup-at"]()}
-                type="date"
-                bind:value={pickedUpAtDate}
-                bind:isoDate={invoiceValues.pickedUpAt}
-            />
-            <Datepicker
-                error={invoiceValuesErrors.value["paymentDueDate"]}
-                label={m["form.payment-due"]()}
-                type="date"
-                bind:value={paymentDueDate}
-                bind:isoDate={invoiceValues.paymentDueDate}
-            />
-            <Switch
-                classContainer="mt-4"
-                label={m["form.reverse-charge"]()}
-                bind:checked={invoiceValues.reverseCharge}
-            />
-
-            <hr class="hr mx-7 my-5 w-[auto]" />
-
-            <h3 class="h5 font-bold uppercase">{m["form.supplier"]()}</h3>
-            <Message id="supplier-ine-fill" clossable>
-                {m["text.you-can-fill-by-ine"]()}
-            </Message>
-            <Input
-                error={invoiceValuesErrors.value["supplierBilling.fullname"]}
-                label={m["form.fullname"]()}
-                bind:value={invoiceValues.supplierBilling.fullname}
-            />
-            <Input
-                error={invoiceValuesErrors.value["supplierBilling.line1"]}
-                label={m["form.address"]()}
-                bind:value={invoiceValues.supplierBilling.line1}
-            />
-            <Input
-                error={invoiceValuesErrors.value["supplierBilling.postal"]}
-                label={m["form.postal"]()}
-                bind:value={invoiceValues.supplierBilling.postal}
-            />
-            <Input
-                error={invoiceValuesErrors.value["supplierBilling.city"]}
-                label={m["form.city"]()}
-                bind:value={invoiceValues.supplierBilling.city}
-            />
-            <Input
-                label={m["form.country"]()}
-                bind:value={invoiceValues.supplierBilling.country}
-            />
-            <Input
-                error={invoiceValuesErrors.value["supplierBilling.ine"]}
-                label={m["form.ine"]()}
-                bind:value={invoiceValues.supplierBilling.ine}
-            />
-            {#if !invoiceValuesErrors.value["supplierBilling.ine"]}
-                <ButtonRequestAres
-                    ine={invoiceValues.supplierBilling.ine}
-                    bind:billing={invoiceValues.supplierBilling}
-                />
-            {/if}
-
-            <Input
-                label={m["form.vat"]()}
-                bind:value={invoiceValues.supplierBilling.vat}
-            />
-
-            <Switch
-                label={m["form.is-selfemployed"]()}
-                bind:checked={invoiceValues.isSupplierSelfEmployed}
-            />
-
-            {#if !invoiceValues.isSupplierSelfEmployed}
+                <h3 class="h5 font-bold uppercase">{m["form.general"]()}</h3>
+                <Select bind:value={invoiceValues.invoiceType}>
+                    {#snippet options()}
+                        {#each Object.values(EInvoiceType) as invoiceType (invoiceType)}
+                            <option value={invoiceType}>
+                                {m[`form.${invoiceType}`]()}
+                            </option>
+                        {/each}
+                    {/snippet}
+                </Select>
                 <Input
-                    label={m["form.custom-text-under-supplier"]()}
+                    label={m["form.company"]()}
+                    bind:value={invoiceValues.companyName}
+                />
+                <Input
+                    label={m["form.refid"]()}
+                    bind:value={invoiceValues.refId}
+                />
+                <Input
+                    label={m["form.currency"]()}
+                    bind:value={invoiceValues.currency}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["issuedAt"]}
+                    label={m["form.issued-at"]()}
+                    type="date"
+                    bind:value={issuedAtDate}
+                    bind:isoDate={invoiceValues.issuedAt}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["paidAt"]}
+                    label={m["form.paid-at"]()}
+                    type="date"
+                    bind:value={paidAtDate}
+                    bind:isoDate={invoiceValues.paidAt}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["pickedUpAt"]}
+                    label={m["form.pickup-at"]()}
+                    type="date"
+                    bind:value={pickedUpAtDate}
+                    bind:isoDate={invoiceValues.pickedUpAt}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["paymentDueDate"]}
+                    label={m["form.payment-due"]()}
+                    type="date"
+                    bind:value={paymentDueDate}
+                    bind:isoDate={invoiceValues.paymentDueDate}
+                />
+                <Switch
+                    classContainer="mt-4"
+                    label={m["form.reverse-charge"]()}
+                    bind:checked={invoiceValues.reverseCharge}
+                />
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <h3 class="h5 font-bold uppercase">{m["form.supplier"]()}</h3>
+                <Message id="supplier-ine-fill" clossable>
+                    {m["text.you-can-fill-by-ine"]()}
+                </Message>
+                <Input
+                    error={invoiceValuesErrors.value[
+                        "supplierBilling.fullname"
+                    ]}
+                    label={m["form.fullname"]()}
+                    bind:value={invoiceValues.supplierBilling.fullname}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["supplierBilling.line1"]}
+                    label={m["form.address"]()}
+                    bind:value={invoiceValues.supplierBilling.line1}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["supplierBilling.postal"]}
+                    label={m["form.postal"]()}
+                    bind:value={invoiceValues.supplierBilling.postal}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["supplierBilling.city"]}
+                    label={m["form.city"]()}
+                    bind:value={invoiceValues.supplierBilling.city}
+                />
+                <Input
+                    label={m["form.country"]()}
+                    bind:value={invoiceValues.supplierBilling.country}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["supplierBilling.ine"]}
+                    label={m["form.ine"]()}
+                    bind:value={invoiceValues.supplierBilling.ine}
+                />
+                {#if !invoiceValuesErrors.value["supplierBilling.ine"]}
+                    <ButtonRequestAres
+                        ine={invoiceValues.supplierBilling.ine}
+                        bind:billing={invoiceValues.supplierBilling}
+                    />
+                {/if}
+
+                <Input
+                    label={m["form.vat"]()}
+                    bind:value={invoiceValues.supplierBilling.vat}
+                />
+
+                <Switch
+                    label={m["form.is-selfemployed"]()}
+                    bind:checked={invoiceValues.isSupplierSelfEmployed}
+                />
+
+                {#if !invoiceValues.isSupplierSelfEmployed}
+                    <Input
+                        label={m["form.custom-text-under-supplier"]()}
+                        type="textarea"
+                        bind:value={invoiceValues.customTextUnderSupplier}
+                    />
+                {/if}
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <h3 class="h5 font-bold uppercase">{m["form.receiver"]()}</h3>
+                <Message id="receiver-ine-fill" clossable>
+                    {m["text.you-can-fill-by-ine"]()}
+                </Message>
+                <Input
+                    error={invoiceValuesErrors.value["billing.fullname"]}
+                    label={m["form.fullname"]()}
+                    bind:value={invoiceValues.billing.fullname}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["billing.line1"]}
+                    label={m["form.address"]()}
+                    bind:value={invoiceValues.billing.line1}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["billing.postal"]}
+                    label={m["form.postal"]()}
+                    bind:value={invoiceValues.billing.postal}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["billing.city"]}
+                    label={m["form.city"]()}
+                    bind:value={invoiceValues.billing.city}
+                />
+                <Input
+                    label={m["form.country"]()}
+                    bind:value={invoiceValues.billing.country}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["billing.ine"]}
+                    label={m["form.ine"]()}
+                    bind:value={invoiceValues.billing.ine}
+                />
+                {#if !invoiceValuesErrors.value["billing.ine"]}
+                    <ButtonRequestAres
+                        ine={invoiceValues.billing.ine}
+                        bind:billing={invoiceValues.billing}
+                    />
+                {/if}
+                <Input
+                    label={m["form.vat"]()}
+                    bind:value={invoiceValues.billing.vat}
+                />
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <h3 class="h5 font-bold uppercase">{m["form.items"]()}</h3>
+                <Switch
+                    label={m["form.count-vat"]()}
+                    bind:checked={invoiceValues.countVat}
+                />
+                <Switch
+                    label={m["form.round-total"]()}
+                    bind:checked={invoiceValues.roundTotal}
+                />
+
+                {#each invoiceValues.items as item (item.id)}
+                    <Item {item} />
+                {/each}
+
+                <div>
+                    <button
+                        class="btn btn-group preset-filled-success-100-900"
+                        onclick={() => {
+                            invoiceValues.items.push(
+                                _.cloneDeep({
+                                    ...DefaultItem,
+                                    id: createId(),
+                                }),
+                            );
+                        }}
+                        type="button"
+                    >
+                        <SvgPlusCircle class="fill-success-600 w-10" />
+                        {m["actions.add-item"]()}
+                    </button>
+                </div>
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <Input
+                    label={m["form.payment-type"]()}
+                    bind:value={invoiceValues.paymentType}
+                />
+                <Input
+                    class="min-h-[8rem]"
+                    label={m["form.payment-info"]()}
                     type="textarea"
-                    bind:value={invoiceValues.customTextUnderSupplier}
+                    bind:value={invoiceValues.paymentInfo}
                 />
-            {/if}
 
-            <hr class="hr mx-7 my-5 w-[auto]" />
+                <hr class="hr mx-7 my-5 w-[auto]" />
 
-            <h3 class="h5 font-bold uppercase">{m["form.receiver"]()}</h3>
-            <Message id="receiver-ine-fill" clossable>
-                {m["text.you-can-fill-by-ine"]()}
-            </Message>
-            <Input
-                error={invoiceValuesErrors.value["billing.fullname"]}
-                label={m["form.fullname"]()}
-                bind:value={invoiceValues.billing.fullname}
-            />
-            <Input
-                error={invoiceValuesErrors.value["billing.line1"]}
-                label={m["form.address"]()}
-                bind:value={invoiceValues.billing.line1}
-            />
-            <Input
-                error={invoiceValuesErrors.value["billing.postal"]}
-                label={m["form.postal"]()}
-                bind:value={invoiceValues.billing.postal}
-            />
-            <Input
-                error={invoiceValuesErrors.value["billing.city"]}
-                label={m["form.city"]()}
-                bind:value={invoiceValues.billing.city}
-            />
-            <Input
-                label={m["form.country"]()}
-                bind:value={invoiceValues.billing.country}
-            />
-            <Input
-                error={invoiceValuesErrors.value["billing.ine"]}
-                label={m["form.ine"]()}
-                bind:value={invoiceValues.billing.ine}
-            />
-            {#if !invoiceValuesErrors.value["billing.ine"]}
-                <ButtonRequestAres
-                    ine={invoiceValues.billing.ine}
-                    bind:billing={invoiceValues.billing}
+                <Input
+                    class="min-h-[8rem]"
+                    label={m["form.custom-footer-text"]()}
+                    type="textarea"
+                    bind:value={invoiceValues.customFooterText}
                 />
-            {/if}
-            <Input
-                label={m["form.vat"]()}
-                bind:value={invoiceValues.billing.vat}
-            />
-
-            <hr class="hr mx-7 my-5 w-[auto]" />
-
-            <h3 class="h5 font-bold uppercase">{m["form.items"]()}</h3>
-            <Switch
-                label={m["form.count-vat"]()}
-                bind:checked={invoiceValues.countVat}
-            />
-            <Switch
-                label={m["form.round-total"]()}
-                bind:checked={invoiceValues.roundTotal}
-            />
-
-            {#each invoiceValues.items as item (item.id)}
-                <Item {item} />
-            {/each}
-
-            <div>
-                <button
-                    class="btn btn-group preset-filled-success-100-900"
-                    onclick={() => {
-                        invoiceValues.items.push(
-                            cloneDeep({
-                                ...DefaultItem,
-                                id: createId(),
-                            }),
-                        );
-                    }}
-                    type="button"
-                >
-                    <SvgPlusCircle class="fill-success-600 w-10" />
-                    {m["actions.add-item"]()}
-                </button>
             </div>
-
-            <hr class="hr mx-7 my-5 w-[auto]" />
-
-            <Input
-                label={m["form.payment-type"]()}
-                bind:value={invoiceValues.paymentType}
-            />
-            <Input
-                class="min-h-[8rem]"
-                label={m["form.payment-info"]()}
-                type="textarea"
-                bind:value={invoiceValues.paymentInfo}
-            />
-
-            <hr class="hr mx-7 my-5 w-[auto]" />
-
-            <Input
-                class="min-h-[8rem]"
-                label={m["form.custom-footer-text"]()}
-                type="textarea"
-                bind:value={invoiceValues.customFooterText}
-            />
-
-            <hr class="hr mx-7 my-5 w-[auto]" />
 
             <div
                 class="sticky bottom-0 flex min-h-15 gap-1 bg-[var(--body-background-color-dark)]"
@@ -500,8 +505,8 @@
         }
     }
 
-    .main-wrap {
-        @apply mt-8 mb-40 flex justify-center gap-x-3 px-2;
+    .page-wrap {
+        @apply mt-8 mb-40 flex justify-center gap-x-1;
 
         .pdf-viewer-wrap {
             @apply sticky top-0 z-1 m-0 h-[100svh] max-w-[750px] min-w-1 flex-1;

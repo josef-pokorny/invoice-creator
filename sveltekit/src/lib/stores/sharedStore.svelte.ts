@@ -1,11 +1,13 @@
-import { cloneDeep, difference, get, set } from "lodash-es";
+import _ from "lodash";
 
 import { browser } from "$app/environment";
+import { AppStoragePrefix } from "$lib/constants";
+import { saveToLocalStorage, UndefinedReplacement } from "$lib/stores/utils";
 import { getNestedKeys } from "$lib/utils";
 
-export const AppStoragePrefix = "invoice-app-";
-
-const stores = $state(new Map<string, any>());
+export const stores = $state({
+    value: new Map<string, TSharedStorageState<unknown>>(),
+});
 const storesWithEffectForSetToLocalStorage: Record<string, boolean> = $state(
     {},
 );
@@ -15,8 +17,6 @@ export interface TSharedStorageState<T> {
     reset: () => void;
     deleteStore: () => void;
 }
-
-const UndefinedReplacement = "undefinened#6Wundefinened";
 
 function createLocalStorageStore<T>({
     key,
@@ -40,20 +40,20 @@ function createLocalStorageStore<T>({
 
                 const differentKeys =
                     defaultValue && parsedData
-                        ? difference(
+                        ? _.difference(
                               getNestedKeys(defaultValue),
                               getNestedKeys(parsedData),
                           )
                         : [];
 
                 if (!parsedData && defaultValue) {
-                    value = cloneDeep(defaultValue);
+                    value = _.cloneDeep(defaultValue);
                 } else if (parsedData && differentKeys.length > 0) {
                     differentKeys.forEach((key) => {
-                        parsedData = set(
+                        parsedData = _.set(
                             parsedData as NonNullable<T>,
                             key,
-                            get(defaultValue, key),
+                            _.get(defaultValue, key),
                         );
                     });
 
@@ -72,7 +72,7 @@ function createLocalStorageStore<T>({
 
     function reset() {
         if (defaultValue) {
-            value = cloneDeep(defaultValue);
+            value = _.cloneDeep(defaultValue);
         } else {
             console.error(
                 "defaultValue isn't provided, reset() function has not been completed",
@@ -82,9 +82,8 @@ function createLocalStorageStore<T>({
 
     function deleteStore() {
         if (browser) {
-            value = cloneDeep(defaultValue);
             localStorage.removeItem(key);
-            stores.delete(key);
+            stores.value.delete(key);
         }
     }
 
@@ -98,7 +97,7 @@ function createLocalStorageStore<T>({
             setTimeout(() => {
                 const differentKeys =
                     defaultValue && newValue
-                        ? difference(
+                        ? _.difference(
                               Object.keys(defaultValue),
                               Object.keys(newValue),
                           )
@@ -106,10 +105,10 @@ function createLocalStorageStore<T>({
 
                 if (differentKeys.length) {
                     differentKeys.forEach((storageKey) => {
-                        newValue = set(
+                        newValue = _.set(
                             newValue as NonNullable<T>,
                             storageKey,
-                            get(defaultValue, storageKey),
+                            _.get(defaultValue, storageKey),
                         );
                     });
 
@@ -135,10 +134,10 @@ export function useLocalStorageStore<T>({
 
     let store: TSharedStorageState<T>;
 
-    if (stores.has(localStorageKey)) {
-        store = stores.get(localStorageKey);
+    if (stores.value.has(localStorageKey)) {
+        store = stores.value.get(localStorageKey) as any;
     } else {
-        stores.set(
+        stores.value.set(
             localStorageKey,
             createLocalStorageStore({
                 key: localStorageKey,
@@ -146,7 +145,7 @@ export function useLocalStorageStore<T>({
                 initialValue,
             }),
         );
-        store = stores.get(localStorageKey);
+        store = stores.value.get(localStorageKey) as any;
     }
 
     $effect.root(() => {
@@ -156,12 +155,7 @@ export function useLocalStorageStore<T>({
         storesWithEffectForSetToLocalStorage[localStorageKey] = true;
 
         $effect(() => {
-            localStorage.setItem(
-                localStorageKey,
-                JSON.stringify(store.value, (k, v) =>
-                    v === undefined ? UndefinedReplacement : v,
-                ),
-            );
+            saveToLocalStorage(localStorageKey, store.value);
         });
 
         return () => {
@@ -183,7 +177,7 @@ function createStore<T>({
 
     const reset = () => {
         if (defaultValue) {
-            value = cloneDeep(defaultValue);
+            value = _.cloneDeep(defaultValue);
         } else {
             console.error(
                 "defaultValue isn't provided, reset() function has not been completed",
@@ -209,14 +203,22 @@ export function useStore<T>(
 ): TSharedStorageState<T> {
     const storeKey = AppStoragePrefix + key;
 
-    if (stores.has(storeKey)) {
-        return stores.get(storeKey);
+    if (stores.value.has(storeKey)) {
+        return stores.value.get(storeKey) as any;
     } else {
-        const store = createStore({
-            defaultValue,
-            initialValue,
-        });
-        stores.set(storeKey, store);
-        return stores.get(storeKey);
+        stores.value.set(
+            storeKey,
+            createStore({
+                defaultValue,
+                initialValue,
+            }) as any,
+        );
+        return stores.value.get(storeKey) as any;
+    }
+}
+
+export function deleteStore(key: string) {
+    if (!stores.value.get(key)?.deleteStore()) {
+        localStorage.removeItem(key);
     }
 }

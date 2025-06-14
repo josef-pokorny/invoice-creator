@@ -1,6 +1,7 @@
 import { untrack } from "svelte";
 import * as yup from "yup";
 
+import { InvoiceFormKeyPrefix } from "$lib/constants";
 import {
     EInvoiceType,
     type IInvoiceValues,
@@ -53,8 +54,6 @@ export const defaultForm: IInvoiceValues = {
     reverseCharge: false,
 };
 export const defaultFormKey = { profileName: "default" };
-
-export const InvoiceFormKeyPrefix = "invoice-form-";
 
 export function useFormStore({
     initialValue,

@@ -4,9 +4,11 @@ import tailwindcss from "@tailwindcss/vite";
 import { SvelteKitPWA } from "@vite-pwa/sveltekit";
 import { defineConfig } from "vite";
 import circleDependency from "vite-plugin-circular-dependency";
+import mkcert from "vite-plugin-mkcert";
 
 export default defineConfig({
     plugins: [
+        mkcert(),
         tailwindcss(),
         sveltekit(),
         paraglideVitePlugin({
@@ -61,6 +63,7 @@ export default defineConfig({
         watch: {
             ignored: ["project.inlang/**", "messages/**", "README.md"],
         },
+        https: true,
     },
     define: {
         "process.env.NODE_ENV":

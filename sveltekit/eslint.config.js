@@ -18,6 +18,14 @@ export default ts.config(
     ...ts.configs.recommended,
     ...svelte.configs["flat/recommended"],
     {
+        rules: {
+            "no-unused-expressions": "off",
+            "@typescript-eslint/no-unused-expressions": "off",
+            "@typescript-eslint/no-explicit-any": "off",
+            "no-self-assign": "off",
+        },
+    },
+    {
         plugins: {
             "unused-imports": unusedImports,
         },

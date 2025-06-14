@@ -1,7 +1,9 @@
-import { isPlainObject, uniqueId } from "lodash-es";
+import _ from "lodash";
 
 export function createId(prefix: string = "input_") {
-    return uniqueId(prefix) + String(Math.round(Math.random() * 999999999999));
+    return (
+        _.uniqueId(prefix) + String(Math.round(Math.random() * 999999999999))
+    );
 }
 
 export function countDecimals(value: number) {
@@ -22,12 +24,12 @@ export function getNestedKeys(obj: Record<string, any>, prefix = ""): string[] {
     const keys: string[] = [];
 
     for (const key in obj) {
-        if (!obj.hasOwnProperty(key)) continue;
+        if (!obj[key]) continue;
 
         const value = obj[key];
         const path = prefix ? `${prefix}.${key}` : key;
 
-        if (isPlainObject(value)) {
+        if (_.isPlainObject(value)) {
             keys.push(path);
             keys.push(...getNestedKeys(value, path));
         } else {

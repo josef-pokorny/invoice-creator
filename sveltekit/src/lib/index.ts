@@ -1,4 +1,4 @@
-import { orderBy } from "lodash-es";
+import _ from "lodash";
 
 import moment from "$lib/moment";
 
@@ -9,7 +9,7 @@ import { getLocale, type Locale } from "./paraglide/runtime";
 export function countriesList(locale?: Locale) {
     return [
         ["-", m["labels.choose_country"]],
-        ...orderBy(
+        ..._.orderBy(
             moment.tz
                 .countries()
                 .map((n) => [

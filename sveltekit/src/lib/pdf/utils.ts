@@ -1,5 +1,5 @@
 import { pdf } from "@react-pdf/renderer";
-import { round } from "lodash-es";
+import _ from "lodash";
 
 import { PDFInvoice } from "./Invoice";
 import type {
@@ -10,8 +10,8 @@ import type {
 
 export function createInvoiceData(invoiceValues: IInvoiceValues): IInvoiceData {
     const items = invoiceValues.items.map((item) => {
-        const total = round(Number(item.count) * Number(item.singlePrice), 0);
-        const vat = round((total / 100) * (item.vatPercentage || 0), 0);
+        const total = _.round(Number(item.count) * Number(item.singlePrice), 0);
+        const vat = _.round((total / 100) * (item.vatPercentage || 0), 0);
 
         return {
             ...item,
@@ -28,7 +28,7 @@ export function createInvoiceData(invoiceValues: IInvoiceValues): IInvoiceData {
     }, 0);
 
     const roundedTotalPrice = invoiceValues.roundTotal
-        ? toCents(round(fromCents(totalPrice), 0)) || 100
+        ? toCents(_.round(fromCents(totalPrice), 0)) || 100
         : totalPrice;
     const roundedTotalPriceBy = roundedTotalPrice - totalPrice;
 
@@ -122,9 +122,9 @@ const createInvoiceFileName = ({
     `${prefixFileName}${useRefInName ? (prefixFileName && refId ? " - " : "") + refId : ""}`;
 
 export function toCents(num: number): number {
-    return round(num * 100, 0);
+    return _.round(num * 100, 0);
 }
 
 export function fromCents(num: number): number {
-    return round(num / 100, 2);
+    return _.round(num / 100, 2);
 }

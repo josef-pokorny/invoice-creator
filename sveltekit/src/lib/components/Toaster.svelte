@@ -8,11 +8,11 @@
     const toaster = new Toaster<ToastData>();
 
     export const addToast = (args: Parameters<typeof toaster.addToast>[0]) => {
-        if (isString(args.data.description) && args.closeDelay) {
+        if (_.isString(args.data.description) && args.closeDelay) {
             args.closeDelay =
                 args.closeDelay + args.data.description.length * 30;
         }
-        if (isString(args.data.title) && args.closeDelay) {
+        if (_.isString(args.data.title) && args.closeDelay) {
             args.closeDelay = args.closeDelay + args.data.title.length * 30;
         }
 
@@ -21,7 +21,7 @@
 </script>
 
 <script lang="ts">
-    import { isFunction, isString } from "lodash-es";
+    import _ from "lodash";
     import { Toaster } from "melt/builders";
     import { Progress } from "melt/components";
     import type { Snippet } from "svelte";
@@ -49,7 +49,7 @@
             in:fly={{ y: 60, opacity: 0.9 }}
             out:fly={{ y: 20 }}
         >
-            {#if isFunction(toast.data.title)}
+            {#if _.isFunction(toast.data.title)}
                 {@render toast.data.title()}
             {:else if toast.data.title}
                 <h3 {...toast.title} class="text-[1.1rem] font-medium">
@@ -62,7 +62,7 @@
                     {...toast.description}
                     class:font-medium={variant === "error"}
                 >
-                    {#if isFunction(toast.data.description)}
+                    {#if _.isFunction(toast.data.description)}
                         {@render toast.data.description()}
                     {:else}
                         {toast.data.description}
