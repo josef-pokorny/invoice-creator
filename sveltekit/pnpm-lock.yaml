@@ -21,8 +21,8 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0(svelte@5.34.2)
       melt:
-        specifier: ^0.34.0
-        version: 0.34.0(@floating-ui/dom@1.7.1)(svelte@5.34.2)
+        specifier: ^0.35.0
+        version: 0.35.0(@floating-ui/dom@1.7.1)(svelte@5.34.2)
       vite:
         specifier: ^6.3.5
         version: 6.3.5(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.89.2)(terser@5.42.0)
@@ -2900,6 +2900,12 @@ packages:
 
   melt@0.34.0:
     resolution: {integrity: sha512-hJ6jqjH1YnedBcJTe2+HttEP4SYiccaewViUTok0SCrApcNwuzBk1TFGj+uOIUfe4pqzl+PdW2aQg3cBZk/Ppw==}
+    peerDependencies:
+      '@floating-ui/dom': ^1.6.0
+      svelte: ^5.30.1
+
+  melt@0.35.0:
+    resolution: {integrity: sha512-Y8/ImbAN83rf11AaqtQ6u9DXcZ2/Ozu6HM7/oV0BZUt0Dh8Q/j06TKyyBB3u65FRsZDJBuxiQHPklCW7dQcfLw==}
     peerDependencies:
       '@floating-ui/dom': ^1.6.0
       svelte: ^5.30.1
@@ -7102,6 +7108,15 @@ snapshots:
   media-engine@1.0.3: {}
 
   melt@0.34.0(@floating-ui/dom@1.7.1)(svelte@5.34.2):
+    dependencies:
+      '@floating-ui/dom': 1.7.1
+      dequal: 2.0.3
+      jest-axe: 9.0.0
+      nanoid: 5.1.5
+      runed: 0.23.4(svelte@5.34.2)
+      svelte: 5.34.2
+
+  melt@0.35.0(@floating-ui/dom@1.7.1)(svelte@5.34.2):
     dependencies:
       '@floating-ui/dom': 1.7.1
       dequal: 2.0.3
