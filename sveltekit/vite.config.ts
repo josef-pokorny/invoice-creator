@@ -1,8 +1,8 @@
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
-import tailwindcss from "@tailwindcss/vite";
 import { sveltekit } from "@sveltejs/kit/vite";
-import { defineConfig } from "vite";
+import tailwindcss from "@tailwindcss/vite";
 import { SvelteKitPWA } from "@vite-pwa/sveltekit";
+import { defineConfig } from "vite";
 import circleDependency from "vite-plugin-circular-dependency";
 
 export default defineConfig({
@@ -49,9 +49,9 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                // api: "modern-compiler",
+                api: "modern-compiler",
                 additionalData: `
-                    @use "$lib/styles/_mixins.scss" as *;
+                    @use "$lib/styles/_mixins" as *;
                     @reference "$lib/app.css";
                 `,
             },

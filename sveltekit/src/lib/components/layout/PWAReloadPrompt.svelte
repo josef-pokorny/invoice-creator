@@ -1,9 +1,9 @@
 <!-- SVELTE 4 - DON'T CHANGE IT! -->
 <script lang="ts">
-    import { afterNavigate } from "$app/navigation";
-    import { m } from "$lib/paraglide/messages";
     import { fade } from "svelte/transition";
     import { useRegisterSW } from "virtual:pwa-register/svelte";
+
+    import { m } from "$lib/paraglide/messages";
 
     const intervalMS = 5 * 60 * 1000;
 
@@ -50,15 +50,15 @@
         </div>
 
         <button
-            type="button"
             class="btn preset-filled-success-500"
+            type="button"
             on:click={() => updateServiceWorker(true)}
         >
             {m["pwa.reload"]()}
         </button>
         <button
-            type="button"
             class="btn preset-tonal hover:preset-filled"
+            type="button"
             on:click={close}
         >
             {m["actions.close"]()}

@@ -1,6 +1,7 @@
-import { m } from "$lib/paraglide/messages";
 import axios, { type AxiosInstance } from "axios";
+
 import { addToast } from "$lib/components/Toaster.svelte";
+import { m } from "$lib/paraglide/messages";
 
 const AxiosClient: AxiosInstance = axios.create({
     baseURL: "https://api.example.com",

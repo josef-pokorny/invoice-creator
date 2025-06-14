@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { m } from "$lib/paraglide/messages";
-    import { useMessageStore } from "$lib/stores/message";
     import InfoIcon from "@lucide/svelte/icons/info";
     import type { Snippet } from "svelte";
     import { fade } from "svelte/transition";
+
+    import { m } from "$lib/paraglide/messages";
+    import { useMessageStore } from "$lib/stores/message";
 
     let {
         children,
@@ -16,7 +17,7 @@
         clossable?: boolean;
         id?: string;
     } = $props();
-    
+
     const messageState = useMessageStore({ key: id });
 
     let isClosed = $derived(id ? messageState.value.closed : false);
@@ -30,13 +31,13 @@
 
 {#if !isClosed}
     <div
-        transition:fade={{ duration: 120 }}
+        {id}
         class="card {type === 'info'
             ? 'preset-outlined-surface-500'
             : type === 'error'
               ? 'preset-outlined-error-500'
               : 'preset-outlined-primary-500'} grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3"
-        {id}
+        transition:fade={{ duration: 120 }}
     >
         <div class="flex items-center gap-3">
             {#if type === "info"}

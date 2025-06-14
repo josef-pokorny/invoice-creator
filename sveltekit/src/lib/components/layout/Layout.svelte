@@ -1,19 +1,21 @@
 <script lang="ts">
-    import ChangeLanguage from "$lib/components/layout/ChangeLanguage.svelte";
-    import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
     import { AppBar } from "@skeletonlabs/skeleton-svelte";
-    import { page } from "$app/state";
-    import { locales, localizeHref, setLocale } from "$lib/paraglide/runtime";
-    import SvgGithub from "$lib/svgs/svg-github.svelte";
-    import { goto } from "$app/navigation";
-    import LocaleSync from "$lib/components/layout/LocaleSync.svelte";
     import { type Snippet } from "svelte";
-    import ChangeProfile from "../ChangeProfile.svelte";
+
+    import { goto } from "$app/navigation";
+    import { page } from "$app/state";
+    import ChangeLanguage from "$lib/components/layout/ChangeLanguage.svelte";
+    import LocaleSync from "$lib/components/layout/LocaleSync.svelte";
+    import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
+    import { locales, localizeHref, setLocale } from "$lib/paraglide/runtime";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
+    import SvgGithub from "$lib/svgs/svg-github.svelte";
+
+    import ChangeProfile from "../ChangeProfile.svelte";
 
     let { children }: { children: Snippet } = $props();
 
-    let locale = useLocaleStore();
+    const locale = useLocaleStore();
 </script>
 
 <LocaleSync />
@@ -47,8 +49,8 @@
             {#each locales as lang}
                 <a
                     class="anchor"
-                    href={localizeHref(page.url.pathname, { locale: lang })}
                     aria-disabled={lang === locale.locale}
+                    href={localizeHref(page.url.pathname, { locale: lang })}
                     onclick={(e) => {
                         e.preventDefault();
                         setLocale(lang, { reload: false });

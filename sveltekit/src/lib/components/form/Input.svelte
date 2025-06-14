@@ -4,9 +4,11 @@
         HTMLInputAttributes,
         HTMLTextareaAttributes,
     } from "svelte/elements";
-    import Error from "./Error.svelte";
+
     import type { IYupError } from "$lib/types/types";
     import { createId } from "$lib/utils";
+
+    import Error from "./Error.svelte";
     import Label from "./Label.svelte";
 
     type TExdended = HTMLInputAttributes & HTMLTextareaAttributes;
@@ -63,23 +65,23 @@
 
     {#if rest.type === "textarea"}
         <textarea
+            {id}
             aria-errormessage="{id}-error"
             aria-invalid={!!error}
-            {id}
+            {onchange}
             bind:value
             {...rest}
             class={"input min-h-[2rem] " + rest.class}
-            {onchange}
         ></textarea>
     {:else}
         <input
+            {id}
             aria-errormessage="{id}-error"
             aria-invalid={!!error}
-            {id}
+            {onchange}
             bind:value
             {...rest}
             class={"input " + rest.class}
-            {onchange}
         />
     {/if}
 

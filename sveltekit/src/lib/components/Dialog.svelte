@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { m } from "$lib/paraglide/messages";
     import type { Snippet } from "svelte";
     import type { ClassValue, HTMLAttributes } from "svelte/elements";
+
+    import { m } from "$lib/paraglide/messages";
 
     let {
         isOpen = $bindable(false),
@@ -65,7 +66,8 @@
 <dialog
     bind:this={elemModal}
     {...props}
-    class="{isOpen ? 'grid' : ''} {props.class}"
+    class={props.class}
+    class:grid={isOpen}
 >
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
@@ -78,11 +80,11 @@
             {@render content()}
         </div>
 
-        <form method="dialog" class={classForm} onsubmit={closeModal}>
+        <form class={classForm} method="dialog" onsubmit={closeModal}>
             <button
-                type="submit"
                 class="btn preset-tonal hover:preset-filled"
                 onclick={closeModal}
+                type="submit"
             >
                 {m["actions.close"]()}
             </button>

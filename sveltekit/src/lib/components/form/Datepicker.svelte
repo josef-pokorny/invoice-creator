@@ -1,11 +1,13 @@
 <script lang="ts">
-    import { getLocale } from "$lib/paraglide/runtime";
-    import type { IYupError } from "$lib/types/types";
     import Datepicker from "flowbite-svelte/Datepicker.svelte";
     import type { ComponentProps } from "svelte";
     import type { HTMLInputAttributes } from "svelte/elements";
-    import Error from "./Error.svelte";
+
+    import { getLocale } from "$lib/paraglide/runtime";
+    import type { IYupError } from "$lib/types/types";
     import { createId } from "$lib/utils";
+
+    import Error from "./Error.svelte";
 
     interface IProps extends Partial<ComponentProps<typeof Datepicker>> {
         label?: string;
@@ -36,7 +38,7 @@
 
     let wrapperEl: HTMLElement | null;
     $effect(() => {
-        let input = wrapperEl?.querySelector(`.date-picker input`);
+        const input = wrapperEl?.querySelector(`.date-picker input`);
 
         if (input) {
             input.id = id;
@@ -52,30 +54,30 @@
     });
 </script>
 
-<fieldset class="label" bind:this={wrapperEl}>
+<fieldset bind:this={wrapperEl} class="label">
     {#if label}
-        <label for={id} class="label-text text-surface-100 text-[0.9rem]">
+        <label class="label-text text-surface-100 text-[0.9rem]" for={id}>
             {label}
         </label>
     {/if}
     <div class="date-picker">
         <Datepicker
-            bind:value
-            color="green"
-            title={String(label)}
-            placeholder={String(label)}
             {id}
+            aria-invalid={!!error}
             autohide
-            range={false}
-            locale={getLocale()}
-            disabled={rest.disabled || false}
-            firstDayOfWeek={1}
+            color="green"
             dateFormat={{}}
+            disabled={rest.disabled || false}
+            locale={getLocale()}
+            placeholder={String(label)}
+            title={String(label)}
+            bind:value
+            range={false}
+            firstDayOfWeek={1}
             required={rest.required || false}
             inputClass="input"
             inline={false}
             showActionButtons
-            aria-invalid={!!error}
             {onchange}
             {...rest}
         />

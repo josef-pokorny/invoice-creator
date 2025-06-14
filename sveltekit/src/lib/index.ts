@@ -1,8 +1,10 @@
-import moment from "$lib/moment";
-import countries from "./i18n";
 import { orderBy } from "lodash-es";
-import { getLocale, type Locale } from "./paraglide/runtime";
+
+import moment from "$lib/moment";
+
+import countries from "./i18n";
 import { m } from "./paraglide/messages";
+import { getLocale, type Locale } from "./paraglide/runtime";
 
 export function countriesList(locale?: Locale) {
     return [

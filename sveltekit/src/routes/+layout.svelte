@@ -1,18 +1,20 @@
 <script lang="ts">
-    import { m } from "$lib/paraglide/messages";
-    import Layout from "$lib/components/layout/Layout.svelte";
-    import { onMount } from "svelte";
     import "$lib/app.css";
     import "$lib/styles/app.scss";
     import "$lib/styles/toaster.scss";
     import "$lib/styles/skeletonlab.scss";
     import "@fontsource-variable/montserrat";
-    import { useLocaleStore } from "$lib/stores/locale.svelte";
+
+    import { onMount } from "svelte";
+
+    import Layout from "$lib/components/layout/Layout.svelte";
     import Toaster from "$lib/components/Toaster.svelte";
+    import { m } from "$lib/paraglide/messages";
+    import { useLocaleStore } from "$lib/stores/locale.svelte";
 
     let { children } = $props();
 
-    let locale = useLocaleStore();
+    const locale = useLocaleStore();
 
     onMount(() => {
         const timeoutId = setTimeout(() => {
@@ -44,19 +46,19 @@
         <meta name="keywords" content={m["meta.keywords"]()} />
         <meta name="author" content="Josef Pokorný" />
 
-        <meta property="og:title" content={m["meta.title"]()} />
-        <meta property="og:description" content={m["meta.description"]()} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={originUrl} />
-        <meta property="og:image" content="{originUrl}/favicon.png" />
+        <meta content={m["meta.title"]()} property="og:title" />
+        <meta content={m["meta.description"]()} property="og:description" />
+        <meta content="website" property="og:type" />
+        <meta content={originUrl} property="og:url" />
+        <meta content="{originUrl}/favicon.png" property="og:image" />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={m["meta.title"]()} />
         <meta name="twitter:description" content={m["meta.description"]()} />
         <meta name="twitter:image" content="{originUrl}/favicon.png" />
 
-        <link rel="canonical" href={originUrl} />
-        <link rel="icon" href="{originUrl}/favicon.png" type="image/x-icon" />
+        <link href={originUrl} rel="canonical" />
+        <link href="{originUrl}/favicon.png" rel="icon" type="image/x-icon" />
     {/key}
 </svelte:head>
 

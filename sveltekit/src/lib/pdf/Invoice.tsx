@@ -1,25 +1,23 @@
-import React from "react";
 import {
     Document,
+    Font,
     Page,
+    StyleSheet,
     Text,
     View,
-    StyleSheet,
-    Font,
 } from "@react-pdf/renderer";
-import { EInvoiceType, type IInvoiceProps } from "./invoice-types";
+import React from "react";
+
 import moment from "$lib/moment";
 
-import { type IBilling } from "./invoice-types";
-
 import Roboto400 from "./fonts/roboto-400.ttf";
-import Roboto500 from "./fonts/roboto-500.ttf";
-import Roboto600 from "./fonts/roboto-600.ttf";
-
 import Roboto400Italic from "./fonts/roboto-400-italic.ttf";
+import Roboto500 from "./fonts/roboto-500.ttf";
 import Roboto500Italic from "./fonts/roboto-500-italic.ttf";
+import Roboto600 from "./fonts/roboto-600.ttf";
 import Roboto600Italic from "./fonts/roboto-600-italic.ttf";
-
+import { type IBilling } from "./invoice-types";
+import { EInvoiceType, type IInvoiceProps } from "./invoice-types";
 import { fromCents } from "./utils";
 
 Font.register({
@@ -206,7 +204,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                 <View style={{ flex: 1 }}>
                     <View fixed style={styles.header}>
                         <Text style={styles.companyName}>
-                            <Text>{invoiceData?.companyName}</Text>
+                            <Text>{invoiceData.companyName}</Text>
                         </Text>
                         <Text style={styles.refId}>
                             <InvoiceName
@@ -259,10 +257,10 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                             <Text style={styles.h2}>Odběratel</Text>
                             <BillingView billing={invoiceData.billing} />
 
-                            {(invoiceData?.issuedAt ||
-                                invoiceData?.paidAt ||
-                                invoiceData?.pickedUpAt ||
-                                invoiceData?.paymentDueDate) && (
+                            {(invoiceData.issuedAt ||
+                                invoiceData.paidAt ||
+                                invoiceData.pickedUpAt ||
+                                invoiceData.paymentDueDate) && (
                                 <>
                                     <View style={styles.space} />
                                     <View style={styles.line} />
@@ -271,42 +269,42 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                             )}
 
                             <View style={{ fontSize: 10 }}>
-                                {invoiceData?.issuedAt && (
+                                {invoiceData.issuedAt && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum vystavení:{" "}
                                         </Text>
-                                        {moment(invoiceData?.issuedAt)
+                                        {moment(invoiceData.issuedAt)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
                                 )}
-                                {invoiceData?.paidAt && (
+                                {invoiceData.paidAt && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum uskut. zdaň. plnění:{" "}
                                         </Text>
-                                        {moment(invoiceData?.paidAt)
+                                        {moment(invoiceData.paidAt)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
                                 )}
-                                {invoiceData?.pickedUpAt && (
+                                {invoiceData.pickedUpAt && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum převzetí:{" "}
                                         </Text>
-                                        {moment(invoiceData?.pickedUpAt)
+                                        {moment(invoiceData.pickedUpAt)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
                                 )}
-                                {invoiceData?.paymentDueDate && (
+                                {invoiceData.paymentDueDate && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum splatnosti:{" "}
                                         </Text>
-                                        {moment(invoiceData?.paymentDueDate)
+                                        {moment(invoiceData.paymentDueDate)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
@@ -424,7 +422,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                     Zaokrouhlení:
                                 </Text>{" "}
                                 {fromCents(invoiceData.roundedTotalPriceBy)}{" "}
-                                {invoiceData?.currency}
+                                {invoiceData.currency}
                             </Text>
                         )}
                         <Text style={styles.totalPrice}>
@@ -432,7 +430,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 Celkem k platbě:
                             </Text>{" "}
                             {fromCents(invoiceData.roundedTotalPrice)}{" "}
-                            {invoiceData?.currency}
+                            {invoiceData.currency}
                         </Text>
                     </View>
                     <View wrap={false} style={styles.endInfo}>
@@ -441,7 +439,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                 </View>
 
                 <View fixed style={styles.footer}>
-                    {invoiceData?.reverseCharge && (
+                    {invoiceData.reverseCharge && (
                         <>
                             <View style={styles.line} />
                             <View style={styles.space} />
@@ -490,16 +488,16 @@ const BillingView = ({
     return (
         <>
             <View style={styles.space} />
-            <Text style={{ fontWeight: 500 }}>{billing?.fullname}</Text>
-            <Text style={styles.textSecondary}>{billing?.line1}</Text>
+            <Text style={{ fontWeight: 500 }}>{billing.fullname}</Text>
+            <Text style={styles.textSecondary}>{billing.line1}</Text>
             <Text style={styles.textSecondary}>
-                {billing?.postal} {billing?.city}
+                {billing.postal} {billing.city}
             </Text>
-            <Text style={styles.textSecondary}>{billing?.country}</Text>
+            <Text style={styles.textSecondary}>{billing.country}</Text>
             <View style={styles.space} />
-            {billing?.ine && (
+            {billing.ine && (
                 <Text>
-                    <Text style={styles.italic}>IČO:</Text> {billing?.ine}
+                    <Text style={styles.italic}>IČO:</Text> {billing.ine}
                 </Text>
             )}
             {supplier ? (
@@ -514,9 +512,9 @@ const BillingView = ({
                     )}
                 </Text>
             ) : (
-                billing?.vat && (
+                billing.vat && (
                     <Text>
-                        <Text style={styles.italic}>DIČ:</Text> {billing?.vat}
+                        <Text style={styles.italic}>DIČ:</Text> {billing.vat}
                     </Text>
                 )
             )}

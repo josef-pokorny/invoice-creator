@@ -1,20 +1,17 @@
 <script lang="ts">
-    import { goto, invalidateAll } from "$app/navigation";
+    import { CZ, GB } from "country-flag-icons/string/1x1";
+
+    import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import Dialog from "$lib/components/Dialog.svelte";
     import { m } from "$lib/paraglide/messages";
     import {
         getLocale,
+        type Locale,
         locales,
         localizeHref,
         setLocale,
-        type Locale,
     } from "$lib/paraglide/runtime";
-    import { GB, CZ } from "country-flag-icons/string/1x1";
-
-    function a() {
-        let a = "a"
-    }
 
     function onSetLocale(locale: Locale) {
         setLocale(locale, { reload: false });
@@ -30,9 +27,8 @@
     <Dialog>
         {#snippet button({ showModal, closeModal, isOpen })}
             <button
-                type="button"
                 class="lang-change-trigger"
-                title={m["actions.change-language"]()}
+                aria-checked={isOpen}
                 aria-label={m["actions.change-language"]()}
                 onclick={() => {
                     isOpen
@@ -40,7 +36,8 @@
                         : showModal && showModal();
                 }}
                 role="switch"
-                aria-checked={isOpen}
+                title={m["actions.change-language"]()}
+                type="button"
             >
                 {#if getLocale() === "cs"}
                     {@html CZ}

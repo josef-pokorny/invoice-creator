@@ -1,6 +1,8 @@
 import type { AxiosError } from "axios";
-import type { IGovEkonomickeSubjektyReturn, IGovError } from "./ares-types";
+
 import AxiosClient from "$lib/requests/client";
+
+import type { IGovEkonomickeSubjektyReturn, IGovError } from "./ares-types";
 
 export async function findAresByINE({ ine }: { ine: string }) {
     try {
@@ -11,7 +13,7 @@ export async function findAresByINE({ ine }: { ine: string }) {
 
         return data;
     } catch (err) {
-        let e = err as AxiosError<IGovError>;
+        const e = err as AxiosError<IGovError>;
 
         if (
             e.response?.data.subKod === "VYSTUP_SUBJEKT_NENALEZEN" ||

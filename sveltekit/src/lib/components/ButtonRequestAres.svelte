@@ -1,11 +1,12 @@
 <script lang="ts">
-    import type { IBilling } from "$lib/pdf/invoice-types";
+    import { isAxiosError } from "axios";
+
+    import { addToast } from "$lib/components/Toaster.svelte";
     import { m } from "$lib/paraglide/messages";
+    import type { IBilling } from "$lib/pdf/invoice-types";
     import { findAresByINE } from "$lib/requests/ares/ares-ine";
     import type { IGovEkonomickeSubjektyReturn } from "$lib/requests/ares/ares-types";
     import { isINEValid } from "$lib/validations/ine";
-    import { isAxiosError, type AxiosError } from "axios";
-    import { addToast } from "$lib/components/Toaster.svelte";
 
     let {
         aresINEData = $bindable(),
@@ -64,8 +65,8 @@
 
 <button
     class="btn preset-filled-primary-500 font-medium"
-    type="button"
     onclick={aresRequest}
+    type="button"
 >
     {m["actions.fill-in-by-ine"]()}
 </button>

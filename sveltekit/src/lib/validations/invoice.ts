@@ -1,8 +1,10 @@
-import type { IBilling } from "$lib/pdf/invoice-types";
-import { m } from "$lib/paraglide/messages";
-import type { YupShape } from "$lib/types/types";
-import { yupInvoiceIneValidation } from "./ine";
 import * as yup from "yup";
+
+import { m } from "$lib/paraglide/messages";
+import type { IBilling } from "$lib/pdf/invoice-types";
+import type { YupShape } from "$lib/types/types";
+
+import { yupInvoiceIneValidation } from "./ine";
 
 export function yupItsRecommended() {
     return yup.string().required(m["errors.this-field-is-recommended"]());

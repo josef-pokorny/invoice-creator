@@ -1,22 +1,24 @@
 <script lang="ts">
-    import { DefaultItem } from "$lib/pdf/invoice-types";
+    import Trash from "@lucide/svelte/icons/trash";
+    import { cloneDeep, difference, get, isUndefined, set } from "lodash-es";
+    import * as yup from "yup";
+
     import { m } from "$lib/paraglide/messages";
     import type { IItem } from "$lib/pdf/invoice-types";
+    import { DefaultItem } from "$lib/pdf/invoice-types";
+    import { fromCents, toCents } from "$lib/pdf/utils";
     import {
         useFormItemErrors,
         useFormKeyStore,
         useFormStore,
     } from "$lib/stores/form.svelte";
-    import Trash from "@lucide/svelte/icons/trash";
-    import Input from "./Input.svelte";
-    import { cloneDeep, difference, get, isUndefined, set } from "lodash-es";
-    import * as yup from "yup";
     import type { YupShape } from "$lib/types/types";
-    import { yupHasNumberMaxTwoDecimalValidation } from "$lib/validations/ine";
-    import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
     import { createId } from "$lib/utils";
+    import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
+    import { yupHasNumberMaxTwoDecimalValidation } from "$lib/validations/ine";
+
     import Error from "./Error.svelte";
-    import { fromCents, toCents } from "$lib/pdf/utils";
+    import Input from "./Input.svelte";
 
     let {
         ...props
@@ -91,39 +93,39 @@
     <div class="flex justify-end">
         <button
             aria-label={m["actions.remove-item"]()}
-            title={m["actions.remove-item"]()}
-            type="button"
             onclick={() => {
                 invoiceValues.items = invoiceValues.items.filter(
                     (i) => i.id !== item.id,
                 );
             }}
+            title={m["actions.remove-item"]()}
+            type="button"
         >
             <Trash class="stroke-error-500" />
         </button>
     </div>
-    <Input bind:value={item.name} label={m["form.name"]()} />
+    <Input label={m["form.name"]()} bind:value={item.name} />
     <Input
-        bind:value={item.count}
-        label={m["form.count"]()}
-        type="number"
-        min={0}
         error={itemErrors.value["count"]}
+        label={m["form.count"]()}
+        min={0}
+        type="number"
+        bind:value={item.count}
     />
     <div class="grid grid-cols-[2fr_1fr] items-end gap-1">
         <Input
-            bind:value={item.singlePrice}
-            label={m["form.single-price"]()}
-            type="number"
-            step="0.01"
-            bind:id={InputSinglePriceId}
             error={itemErrors.value["singlePrice"]}
             isErrorVisible={false}
+            label={m["form.single-price"]()}
+            step="0.01"
+            type="number"
+            bind:value={item.singlePrice}
+            bind:id={InputSinglePriceId}
         />
         <Input
-            bind:value={item.measurementUnit}
-            label={m["form.measurement-unit"]()}
             error={itemErrors.value["measurementUnit"]}
+            label={m["form.measurement-unit"]()}
+            bind:value={item.measurementUnit}
         />
         <Error
             id={InputSinglePriceId}
@@ -132,13 +134,13 @@
     </div>
     {#if !isUndefined(item.vatPercentage)}
         <Input
-            bind:value={item.vatPercentage}
-            label={m["form.vat-percentage"]()}
-            type="number"
-            min={0}
-            max={100}
-            step={0.01}
             error={itemErrors.value["vatPercentage"]}
+            label={m["form.vat-percentage"]()}
+            max={100}
+            min={0}
+            step={0.01}
+            type="number"
+            bind:value={item.vatPercentage}
         />
     {/if}
 </div>

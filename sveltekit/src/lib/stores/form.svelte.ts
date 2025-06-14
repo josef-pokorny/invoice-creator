@@ -1,5 +1,7 @@
+import { untrack } from "svelte";
+import * as yup from "yup";
+
 import {
-    ECzechReverseChargeParagraph,
     EInvoiceType,
     type IInvoiceValues,
     type IItem,
@@ -7,10 +9,9 @@ import {
 import type { YupErrorsList } from "$lib/types/types";
 import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
 import { invoiceFormSchema } from "$lib/validations/schemas/invoice-form.svelte";
-import { untrack } from "svelte";
-import { useLocalStorageStore, useStore } from "./sharedStore.svelte";
-import * as yup from "yup";
+
 import { useLocaleStore } from "./locale.svelte";
+import { useLocalStorageStore, useStore } from "./sharedStore.svelte";
 
 // Define default values
 export const defaultForm: IInvoiceValues = {
@@ -62,7 +63,7 @@ export function useFormStore({
     initialValue?: typeof defaultForm;
     key?: string;
 } = {}) {
-    let store = useLocalStorageStore({
+    const store = useLocalStorageStore({
         key: InvoiceFormKeyPrefix + key,
         defaultValue: defaultForm,
         initialValue,
@@ -76,7 +77,7 @@ export function useFormKeyStore({
 }: {
     initialValue?: typeof defaultFormKey;
 } = {}) {
-    let store = useLocalStorageStore({
+    const store = useLocalStorageStore({
         key: "invoice-formkey",
         defaultValue: defaultFormKey,
         initialValue: initialValue,
@@ -90,10 +91,10 @@ const defaultFormErrors: YupErrorsList<IInvoiceValues> = {};
 export function useFormErrorsStore() {
     const store = useStore("invoice-form-errors-", defaultFormErrors);
 
-    let locale = useLocaleStore();
+    const locale = useLocaleStore();
 
     const invoiceValuesKey = useFormKeyStore();
-    let invoiceValues = $derived(
+    const invoiceValues = $derived(
         useFormStore({
             get key() {
                 return invoiceValuesKey.value.profileName;

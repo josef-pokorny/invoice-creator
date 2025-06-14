@@ -1,4 +1,5 @@
 import { createToaster } from "@skeletonlabs/skeleton-svelte";
+
 import { useStore } from "./sharedStore.svelte";
 
 const defaultToaster: ReturnType<typeof createToaster> = createToaster({

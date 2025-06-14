@@ -22,7 +22,6 @@
 
 <script lang="ts">
     import { isFunction, isString } from "lodash-es";
-
     import { Toaster } from "melt/builders";
     import { Progress } from "melt/components";
     import type { Snippet } from "svelte";
@@ -31,13 +30,14 @@
 
 <div
     {...toaster.root}
-    class="fixed !right-0 !bottom-4 flex w-[100%] max-w-[400px] flex-col"
     style:--toasts={toaster.toasts.length}
+    class="fixed !right-0 !bottom-4 flex w-[100%] max-w-[400px] flex-col"
 >
     {#each toaster.toasts as toast, i (toast.id)}
         {@const variant = toast.data.variant || "error"};
 
         <div
+            style:--n={toaster.toasts.length - i}
             class="{variant === 'success'
                 ? 'preset-filled-success-500'
                 : variant === 'warning'
@@ -46,7 +46,6 @@
                     ? 'bg-error-500 text-error-contrast-500'
                     : ''} relative flex h-[--toast-height] w-full flex-col justify-center rounded-xl px-4 text-left transition"
             {...toast.content}
-            style:--n={toaster.toasts.length - i}
             in:fly={{ y: 60, opacity: 0.9 }}
             out:fly={{ y: 20 }}
         >
@@ -61,7 +60,7 @@
             {#if toast.data.description}
                 <div
                     {...toast.description}
-                    class={variant === "error" ? "font-medium" : ""}
+                    class:font-medium={variant === "error"}
                 >
                     {#if isFunction(toast.data.description)}
                         {@render toast.data.description()}
@@ -71,7 +70,7 @@
                 </div>
             {/if}
 
-            <button {...toast.close} aria-label="dismiss toast" class="cross">
+            <button {...toast.close} class="cross" aria-label="dismiss toast">
                 X
             </button>
 

@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { createId } from "$lib/utils";
     import type { Snippet } from "svelte";
     import type { HTMLSelectAttributes } from "svelte/elements";
+
+    import { createId } from "$lib/utils";
 
     interface IProps extends HTMLSelectAttributes {
         label?: string;
@@ -19,7 +20,7 @@
 
 <fieldset class="label">
     {#if label}
-        <label for={id} class="label-text text-surface-100 text-[0.9rem]">
+        <label class="label-text text-surface-100 text-[0.9rem]" for={id}>
             {label}
         </label>
     {/if}

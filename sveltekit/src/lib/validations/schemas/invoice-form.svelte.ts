@@ -1,7 +1,9 @@
+import * as yup from "yup";
+
 import { m } from "$lib/paraglide/messages";
 import type { IInvoiceValues } from "$lib/pdf/invoice-types";
 import type { NestedKeyOf, YupShape } from "$lib/types/types";
-import * as yup from "yup";
+
 import { yupBillingValidation } from "../invoice";
 
 export function invoiceFormSchema() {

@@ -1,8 +1,9 @@
 <script lang="ts">
-    import type { ComponentProps } from "svelte";
     import Toggle from "flowbite-svelte/Toggle.svelte";
-    import { createId } from "$lib/utils";
+    import type { ComponentProps } from "svelte";
     import type { ClassValue } from "svelte/elements";
+
+    import { createId } from "$lib/utils";
 
     interface IProps extends ComponentProps<typeof Toggle> {
         label?: string;

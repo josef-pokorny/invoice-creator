@@ -1,6 +1,7 @@
+import { cloneDeep, difference, get, set } from "lodash-es";
+
 import { browser } from "$app/environment";
 import { getNestedKeys } from "$lib/utils";
-import { cloneDeep, difference, get, set } from "lodash-es";
 
 export const AppStoragePrefix = "invoice-app-";
 

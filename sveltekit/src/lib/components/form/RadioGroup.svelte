@@ -1,14 +1,14 @@
 <script lang="ts">
     import type { ClassValue, HTMLInputAttributes } from "svelte/elements";
-    import Error from "./Error.svelte";
+
+    import { m } from "$lib/paraglide/messages";
     import type { IYupError } from "$lib/types/types";
     import { createId } from "$lib/utils";
+
+    import Error from "./Error.svelte";
     import Label from "./Label.svelte";
-    import { m } from "$lib/paraglide/messages";
 
-    type TExdended = HTMLInputAttributes;
-
-    interface IRadio extends TExdended {
+    interface IRadio extends HTMLInputAttributes {
         label?: string;
     }
 
@@ -40,31 +40,31 @@
 
 <div
     class="radiogroup grid grid-cols-[auto_1fr] gap-x-2 gap-y-2 {containerClass}"
-    role="radiogroup"
     aria-errormessage="{id}-error"
     aria-invalid={!!error}
     aria-label={groupLabel}
+    role="radiogroup"
 >
     {#if uncheckable}
         <input
-            type="radio"
             id="{id}-none-radio"
-            bind:group
-            checked={group === ""}
-            value=""
             class="radio"
+            checked={group === ""}
+            type="radio"
+            value=""
+            bind:group
         />
         <Label for="{id}-none-radio" label={m["form.none"]()} />
     {/if}
     {#if radios}
-        {#each radios as { label, ...rest }}
+        {#each radios as { label, ...rest } (label)}
             {@const radioId = createId("radio")}
 
             <input
-                type="radio"
                 id={radioId}
-                bind:group
                 checked={group === rest.value}
+                type="radio"
+                bind:group
                 {...rest}
                 class={"radio " + rest.class}
             />

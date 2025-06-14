@@ -6,7 +6,16 @@
 </script>
 
 <script lang="ts">
+    import FileDown from "@lucide/svelte/icons/file-down";
+    import FileUp from "@lucide/svelte/icons/file-up";
+    import Plus from "@lucide/svelte/icons/plus";
+    import Settings from "@lucide/svelte/icons/settings";
+    import Trash from "@lucide/svelte/icons/trash";
+    import { cloneDeep } from "lodash-es";
+
     import { browser } from "$app/environment";
+    import Dialog from "$lib/components/Dialog.svelte";
+    import moment from "$lib/moment";
     import { m } from "$lib/paraglide/messages";
     import {
         defaultFormKey,
@@ -15,17 +24,10 @@
         useFormStore,
     } from "$lib/stores/form.svelte";
     import { AppStoragePrefix } from "$lib/stores/sharedStore.svelte";
+
     import Input from "./form/Input.svelte";
     import Label from "./form/Label.svelte";
     import Select from "./form/Select.svelte";
-    import FileDown from "@lucide/svelte/icons/file-down";
-    import FileUp from "@lucide/svelte/icons/file-up";
-    import Plus from "@lucide/svelte/icons/plus";
-    import Settings from "@lucide/svelte/icons/settings";
-    import Trash from "@lucide/svelte/icons/trash";
-    import moment from "$lib/moment";
-    import Dialog from "$lib/components/Dialog.svelte";
-    import { cloneDeep } from "lodash-es";
 
     const Prefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
@@ -122,12 +124,12 @@
     {#snippet button({ toggleOpen, isOpen })}
         <button
             class="w-full !p-0 hover:brightness-75"
-            type="button"
-            title={m["labels.settings"]()}
+            aria-checked={isOpen}
             aria-label={m["labels.settings"]()}
             onclick={toggleOpen}
             role="switch"
-            aria-checked={isOpen}
+            title={m["labels.settings"]()}
+            type="button"
         >
             <Settings class="w-full" />
         </button>
@@ -136,8 +138,8 @@
         <h3 class="h4">{m["labels.settings"]()}</h3>
         <section class="flex flex-col gap-2">
             <Select
-                bind:value={invoiceValuesKey.value.profileName}
                 label={m["labels.used-profile"]()}
+                bind:value={invoiceValuesKey.value.profileName}
             >
                 {#snippet options()}
                     {#each invoiceValuesKeys as profileName}
@@ -187,16 +189,16 @@
             >
                 <div class="grid grid-cols-[1fr_auto] items-end gap-0.5">
                     <Label
-                        label={m["labels.new-profile"]()}
                         for="input-new-profile"
+                        label={m["labels.new-profile"]()}
                     />
                     <div></div>
 
-                    <Input bind:value={newKey} id="input-new-profile" />
+                    <Input id="input-new-profile" bind:value={newKey} />
                     <button
-                        type="submit"
-                        title={m["actions.save"]()}
                         class="btn-icon preset-filled-success-500 h-auto self-stretch px-2 py-0"
+                        title={m["actions.save"]()}
+                        type="submit"
                     >
                         <Plus class="stroke-success-contrast-500" />
                     </button>
@@ -217,7 +219,7 @@
                 <button
                     class="btn preset-filled-primary-500 flex w-full items-center font-medium"
                     onclick={() => {
-                        let dataStr =
+                        const dataStr =
                             "data:text/json;charset=utf-8," +
                             encodeURIComponent(
                                 JSON.stringify([
@@ -226,7 +228,7 @@
                                         .map(([k, v]) => [k, JSON.parse(v)]),
                                 ] as ISavedProfiles),
                             );
-                        let downloadAnchorNode = document.createElement("a");
+                        const downloadAnchorNode = document.createElement("a");
                         downloadAnchorNode.setAttribute("href", dataStr);
                         downloadAnchorNode.setAttribute(
                             "download",
@@ -253,11 +255,11 @@
 
             {#key importProfileFileValue}
                 <input
-                    bind:files={importProfileFileValue}
                     bind:this={importProfileFileInputEl}
-                    type="file"
                     accept="application/JSON"
                     hidden
+                    type="file"
+                    bind:files={importProfileFileValue}
                 />
             {/key}
         </section>
