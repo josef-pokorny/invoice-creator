@@ -1,8 +1,8 @@
 export interface IInvoiceValues {
     companyName?: string;
     items: IItem[];
-    supplierBilling: IBilling;
-    billing: IBilling;
+    supplierBilling: ISupplierBilling;
+    receiverBilling: IReceiverBilling;
     refId: string;
     totalPrice: number | string;
     currency: string;
@@ -13,7 +13,6 @@ export interface IInvoiceValues {
     paymentDueDate?: string;
     paymentType?: string;
     paymentInfo?: string;
-    isSupplierSelfEmployed?: boolean;
     customTextUnderSupplier?: string;
     customFooterText?: string;
     countVat?: boolean;
@@ -40,6 +39,12 @@ export interface IBilling {
     ine?: string;
     vat?: string;
 }
+
+export interface ISupplierBilling extends IBilling {
+    isSelfEmployed: boolean;
+}
+
+export type IReceiverBilling = IBilling;
 
 export interface IInvoiceData extends IInvoiceValues {
     totalPrice: number;

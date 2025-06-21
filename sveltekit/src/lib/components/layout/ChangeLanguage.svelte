@@ -13,6 +13,8 @@
         setLocale,
     } from "$lib/paraglide/runtime";
 
+    import Button from "../form/Button.svelte";
+
     function onSetLocale(locale: Locale) {
         setLocale(locale, { reload: false });
 
@@ -26,7 +28,7 @@
 <div class="wrapper">
     <Dialog>
         {#snippet button({ showModal, closeModal, isOpen })}
-            <button
+            <Button
                 class="lang-change-trigger"
                 aria-checked={isOpen}
                 aria-label={m["actions.change-language"]()}
@@ -44,14 +46,14 @@
                 {:else if getLocale() === "en"}
                     {@html GB}
                 {/if}
-            </button>
+            </Button>
         {/snippet}
         {#snippet content()}
             <div class="lang-change-content">
                 <h4 class="h4">{m["actions.change-language"]()}</h4>
                 <section class="languages">
                     {#each locales as locale}
-                        <button
+                        <Button
                             disabled={locale === getLocale()}
                             onclick={() => onSetLocale(locale)}
                             title={locale === "cs"
@@ -65,7 +67,7 @@
                             {:else if locale === "en"}
                                 {@html GB}
                             {/if}
-                        </button>
+                        </Button>
                     {/each}
                 </section>
             </div>
@@ -83,7 +85,7 @@
         }
     }
 
-    .lang-change-trigger {
+    :global(.lang-change-trigger) {
         transition: border 150ms;
 
         border-radius: 50%;
@@ -113,7 +115,7 @@
             align-items: center;
             justify-content: center;
 
-            button {
+            :global(button) {
                 transition: border 150ms;
 
                 border-radius: 50%;

@@ -3,14 +3,15 @@
     import X from "@lucide/svelte/icons/x";
     import _ from "lodash";
     import { onMount } from "svelte";
-    import { fade } from "svelte/transition";
 
     import ButtonRequestAres from "$lib/components/ButtonRequestAres.svelte";
+    import Button from "$lib/components/form/Button.svelte";
     import Datepicker from "$lib/components/form/Datepicker.svelte";
     import Input from "$lib/components/form/Input.svelte";
     import Item from "$lib/components/form/Item.svelte";
     import Select from "$lib/components/form/Select.svelte";
     import Switch from "$lib/components/form/Switch.svelte";
+    import SupplierFormPart from "$lib/components/invoice/SupplierFormPart.svelte";
     import Message from "$lib/components/Message.svelte";
     import { m } from "$lib/paraglide/messages";
     import { getLocale } from "$lib/paraglide/runtime";
@@ -26,39 +27,37 @@
     import SvgShare from "$lib/svgs/svg-share.svelte";
     import { createId } from "$lib/utils";
 
-    const invoiceValuesErrors = useFormErrorsStore();
-
     let url: string | null = $state(null);
 
-    const invoiceValuesKey = useFormKeyStore();
-    let invoiceValues = $derived(
+    const formKey = useFormKeyStore();
+    const formStore = $derived(
         useFormStore({
             get key() {
-                return invoiceValuesKey.value.profileName;
+                return formKey.value.invoiceName;
             },
         }).value,
     );
+    const invoiceValuesErrors = useFormErrorsStore();
+
     let issuedAtDate = $derived(
-        invoiceValues.issuedAt ? new Date(invoiceValues.issuedAt) : undefined,
+        formStore.issuedAt ? new Date(formStore.issuedAt) : undefined,
     );
     let paidAtDate = $derived(
-        invoiceValues.paidAt ? new Date(invoiceValues.paidAt) : undefined,
+        formStore.paidAt ? new Date(formStore.paidAt) : undefined,
     );
     let pickedUpAtDate = $derived(
-        invoiceValues.pickedUpAt
-            ? new Date(invoiceValues.pickedUpAt)
-            : undefined,
+        formStore.pickedUpAt ? new Date(formStore.pickedUpAt) : undefined,
     );
     let paymentDueDate = $derived(
-        invoiceValues.paymentDueDate
-            ? new Date(invoiceValues.paymentDueDate)
+        formStore.paymentDueDate
+            ? new Date(formStore.paymentDueDate)
             : undefined,
     );
 
     const renderInvoiceFunc = (download?: boolean) =>
         renderInvoiceBlobUrl({
             invoiceProps: {
-                invoiceData: createInvoiceData(invoiceValues),
+                invoiceData: createInvoiceData(formStore),
             },
             download,
             prefixFileName: `${m["labels.invoice"]()}`,
@@ -67,7 +66,7 @@
     const renderInvoiceShare = () =>
         renderInvoiceFile({
             invoiceProps: {
-                invoiceData: createInvoiceData(invoiceValues),
+                invoiceData: createInvoiceData(formStore),
             },
             prefixFileName: `${m["labels.invoice"]()}`,
         });
@@ -90,10 +89,10 @@
     let isMounted = false;
     $effect(() => {
         ({
-            ...invoiceValues,
-            ...invoiceValues.items,
-            ...invoiceValues.billing,
-            ...invoiceValues.supplierBilling,
+            ...formStore,
+            ...formStore.items,
+            ...formStore.receiverBilling,
+            ...formStore.supplierBilling,
         });
 
         if (isMounted) {
@@ -110,30 +109,34 @@
         };
     });
 
-    let isFullPreview = $state(false);
+    let dialogEl: HTMLDialogElement | null = $state(null);
+    let isDialogOpened = $state(false);
 
-    $effect(() => {
-        document.body.style.overflow = isFullPreview ? "hidden" : "";
-    });
+    function closeDialog() {
+        dialogEl?.close();
+        isDialogOpened = false;
+    }
+
+    function openDialog() {
+        dialogEl?.showModal();
+        isDialogOpened = true;
+    }
 
     let currentPageNum = $state(1);
 </script>
 
-{#if isFullPreview}
-    <div class="pdf-full-preview" transition:fade={{ duration: 120 }}>
-        <button
-            class="btn absolute top-0 right-0 z-50"
-            onclick={() => {
-                isFullPreview = false;
-            }}
-            type="button"
-        >
-            <X class="stroke-error-600 h-[48px] w-[48px]" />
-        </button>
+<dialog bind:this={dialogEl} class="h-full max-h-full w-full max-w-full">
+    <div class="pdf-full-preview">
+        <form method="dialog" onsubmit={closeDialog}>
+            <Button class="btn absolute top-0 right-0 z-50" type="submit">
+                <X class="stroke-error-600 h-[48px] w-[48px]" />
+            </Button>
+        </form>
+
         <div class="pdf-viewer-wrap">
             {#await import('@josef-pokorny/svelte-pdf') then { default: PdfViewer }}
                 {#await import(`../messages/${getLocale()}.json`) then { default: translations }}
-                    {#if url}
+                    {#if url && isDialogOpened}
                         {#key url}
                             <PdfViewer
                                 pdfjsWorkerSrc={new URL(
@@ -153,9 +156,9 @@
             {/await}
         </div>
     </div>
-{/if}
+</dialog>
 
-<div class="page-wrap" aria-hidden={isFullPreview}>
+<div class="page-wrap">
     <div class="w-full max-w-[380px] shrink-0">
         <form
             class="relative mb-15 gap-2 px-1"
@@ -164,126 +167,71 @@
                 renderPDF(true);
             }}
         >
-            <div class="flex w-full flex-col gap-2 px-1 mb-15">
+            <div class="mb-15 flex w-full flex-col gap-2 px-1">
                 <h2 class="h3 text-center">{m["labels.invoice"]()}</h2>
 
                 <h3 class="h5 font-bold uppercase">{m["form.general"]()}</h3>
-                <Select bind:value={invoiceValues.invoiceType}>
-                    {#snippet options()}
-                        {#each Object.values(EInvoiceType) as invoiceType (invoiceType)}
-                            <option value={invoiceType}>
-                                {m[`form.${invoiceType}`]()}
-                            </option>
-                        {/each}
-                    {/snippet}
-                </Select>
+                <Select
+                    label={m["labels.invoice-type"]()}
+                    bind:value={formStore.invoiceType}
+                    options={Object.values(EInvoiceType).map((invoiceType) => ({
+                        label: m[`form.${invoiceType}`](),
+                        value: invoiceType,
+                    }))}
+                />
+
                 <Input
                     label={m["form.company"]()}
-                    bind:value={invoiceValues.companyName}
+                    bind:value={formStore.companyName}
                 />
-                <Input
-                    label={m["form.refid"]()}
-                    bind:value={invoiceValues.refId}
-                />
+                <Input label={m["form.refid"]()} bind:value={formStore.refId} />
                 <Input
                     label={m["form.currency"]()}
-                    bind:value={invoiceValues.currency}
+                    bind:value={formStore.currency}
                 />
                 <Datepicker
                     error={invoiceValuesErrors.value["issuedAt"]}
                     label={m["form.issued-at"]()}
                     type="date"
                     bind:value={issuedAtDate}
-                    bind:isoDate={invoiceValues.issuedAt}
+                    bind:isoDate={formStore.issuedAt}
                 />
                 <Datepicker
                     error={invoiceValuesErrors.value["paidAt"]}
                     label={m["form.paid-at"]()}
                     type="date"
                     bind:value={paidAtDate}
-                    bind:isoDate={invoiceValues.paidAt}
+                    bind:isoDate={formStore.paidAt}
                 />
                 <Datepicker
                     error={invoiceValuesErrors.value["pickedUpAt"]}
                     label={m["form.pickup-at"]()}
                     type="date"
                     bind:value={pickedUpAtDate}
-                    bind:isoDate={invoiceValues.pickedUpAt}
+                    bind:isoDate={formStore.pickedUpAt}
                 />
                 <Datepicker
                     error={invoiceValuesErrors.value["paymentDueDate"]}
                     label={m["form.payment-due"]()}
                     type="date"
                     bind:value={paymentDueDate}
-                    bind:isoDate={invoiceValues.paymentDueDate}
+                    bind:isoDate={formStore.paymentDueDate}
                 />
                 <Switch
                     classContainer="mt-4"
                     label={m["form.reverse-charge"]()}
-                    bind:checked={invoiceValues.reverseCharge}
+                    bind:checked={formStore.reverseCharge}
                 />
 
                 <hr class="hr mx-7 my-5 w-[auto]" />
 
-                <h3 class="h5 font-bold uppercase">{m["form.supplier"]()}</h3>
-                <Message id="supplier-ine-fill" clossable>
-                    {m["text.you-can-fill-by-ine"]()}
-                </Message>
-                <Input
-                    error={invoiceValuesErrors.value[
-                        "supplierBilling.fullname"
-                    ]}
-                    label={m["form.fullname"]()}
-                    bind:value={invoiceValues.supplierBilling.fullname}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["supplierBilling.line1"]}
-                    label={m["form.address"]()}
-                    bind:value={invoiceValues.supplierBilling.line1}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["supplierBilling.postal"]}
-                    label={m["form.postal"]()}
-                    bind:value={invoiceValues.supplierBilling.postal}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["supplierBilling.city"]}
-                    label={m["form.city"]()}
-                    bind:value={invoiceValues.supplierBilling.city}
-                />
-                <Input
-                    label={m["form.country"]()}
-                    bind:value={invoiceValues.supplierBilling.country}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["supplierBilling.ine"]}
-                    label={m["form.ine"]()}
-                    bind:value={invoiceValues.supplierBilling.ine}
-                />
-                {#if !invoiceValuesErrors.value["supplierBilling.ine"]}
-                    <ButtonRequestAres
-                        ine={invoiceValues.supplierBilling.ine}
-                        bind:billing={invoiceValues.supplierBilling}
-                    />
-                {/if}
+                <SupplierFormPart />
 
                 <Input
-                    label={m["form.vat"]()}
-                    bind:value={invoiceValues.supplierBilling.vat}
+                    label={m["form.custom-text-under-supplier"]()}
+                    type="textarea"
+                    bind:value={formStore.customTextUnderSupplier}
                 />
-
-                <Switch
-                    label={m["form.is-selfemployed"]()}
-                    bind:checked={invoiceValues.isSupplierSelfEmployed}
-                />
-
-                {#if !invoiceValues.isSupplierSelfEmployed}
-                    <Input
-                        label={m["form.custom-text-under-supplier"]()}
-                        type="textarea"
-                        bind:value={invoiceValues.customTextUnderSupplier}
-                    />
-                {/if}
 
                 <hr class="hr mx-7 my-5 w-[auto]" />
 
@@ -292,43 +240,45 @@
                     {m["text.you-can-fill-by-ine"]()}
                 </Message>
                 <Input
-                    error={invoiceValuesErrors.value["billing.fullname"]}
+                    error={invoiceValuesErrors.value[
+                        "receiverBilling.fullname"
+                    ]}
                     label={m["form.fullname"]()}
-                    bind:value={invoiceValues.billing.fullname}
+                    bind:value={formStore.receiverBilling.fullname}
                 />
                 <Input
-                    error={invoiceValuesErrors.value["billing.line1"]}
+                    error={invoiceValuesErrors.value["receiverBilling.line1"]}
                     label={m["form.address"]()}
-                    bind:value={invoiceValues.billing.line1}
+                    bind:value={formStore.receiverBilling.line1}
                 />
                 <Input
-                    error={invoiceValuesErrors.value["billing.postal"]}
+                    error={invoiceValuesErrors.value["receiverBilling.postal"]}
                     label={m["form.postal"]()}
-                    bind:value={invoiceValues.billing.postal}
+                    bind:value={formStore.receiverBilling.postal}
                 />
                 <Input
-                    error={invoiceValuesErrors.value["billing.city"]}
+                    error={invoiceValuesErrors.value["receiverBilling.city"]}
                     label={m["form.city"]()}
-                    bind:value={invoiceValues.billing.city}
+                    bind:value={formStore.receiverBilling.city}
                 />
                 <Input
                     label={m["form.country"]()}
-                    bind:value={invoiceValues.billing.country}
+                    bind:value={formStore.receiverBilling.country}
                 />
                 <Input
-                    error={invoiceValuesErrors.value["billing.ine"]}
+                    error={invoiceValuesErrors.value["receiverBilling.ine"]}
                     label={m["form.ine"]()}
-                    bind:value={invoiceValues.billing.ine}
+                    bind:value={formStore.receiverBilling.ine}
                 />
-                {#if !invoiceValuesErrors.value["billing.ine"]}
+                {#if !invoiceValuesErrors.value["receiverBilling.ine"]}
                     <ButtonRequestAres
-                        ine={invoiceValues.billing.ine}
-                        bind:billing={invoiceValues.billing}
+                        ine={formStore.receiverBilling.ine}
+                        bind:billing={formStore.receiverBilling}
                     />
                 {/if}
                 <Input
                     label={m["form.vat"]()}
-                    bind:value={invoiceValues.billing.vat}
+                    bind:value={formStore.receiverBilling.vat}
                 />
 
                 <hr class="hr mx-7 my-5 w-[auto]" />
@@ -336,46 +286,44 @@
                 <h3 class="h5 font-bold uppercase">{m["form.items"]()}</h3>
                 <Switch
                     label={m["form.count-vat"]()}
-                    bind:checked={invoiceValues.countVat}
+                    bind:checked={formStore.countVat}
                 />
                 <Switch
                     label={m["form.round-total"]()}
-                    bind:checked={invoiceValues.roundTotal}
+                    bind:checked={formStore.roundTotal}
                 />
 
-                {#each invoiceValues.items as item (item.id)}
+                {#each formStore.items as item (item.id)}
                     <Item {item} />
                 {/each}
 
-                <div>
-                    <button
-                        class="btn btn-group preset-filled-success-100-900"
-                        onclick={() => {
-                            invoiceValues.items.push(
-                                _.cloneDeep({
-                                    ...DefaultItem,
-                                    id: createId(),
-                                }),
-                            );
-                        }}
-                        type="button"
-                    >
-                        <SvgPlusCircle class="fill-success-600 w-10" />
-                        {m["actions.add-item"]()}
-                    </button>
-                </div>
+                <Button
+                    class="btn btn-group preset-filled-success-100-900"
+                    onclick={() => {
+                        formStore.items.push(
+                            _.cloneDeep({
+                                ...DefaultItem,
+                                id: createId("item"),
+                            }),
+                        );
+                    }}
+                    type="button"
+                >
+                    <SvgPlusCircle class="fill-success-600 w-10" />
+                    {m["actions.add-item"]()}
+                </Button>
 
                 <hr class="hr mx-7 my-5 w-[auto]" />
 
                 <Input
                     label={m["form.payment-type"]()}
-                    bind:value={invoiceValues.paymentType}
+                    bind:value={formStore.paymentType}
                 />
                 <Input
                     class="min-h-[8rem]"
                     label={m["form.payment-info"]()}
                     type="textarea"
-                    bind:value={invoiceValues.paymentInfo}
+                    bind:value={formStore.paymentInfo}
                 />
 
                 <hr class="hr mx-7 my-5 w-[auto]" />
@@ -384,31 +332,29 @@
                     class="min-h-[8rem]"
                     label={m["form.custom-footer-text"]()}
                     type="textarea"
-                    bind:value={invoiceValues.customFooterText}
+                    bind:value={formStore.customFooterText}
                 />
             </div>
 
             <div
                 class="sticky bottom-0 flex min-h-15 gap-1 bg-[var(--body-background-color-dark)]"
             >
-                <button
+                <Button
                     class="btn preset-filled-success-100-900 flex-1 font-medium"
                     type="submit"
                 >
                     {m["actions.save"]()}
-                </button>
-                <button
+                </Button>
+                <Button
                     class="btn preset-filled-primary-400-600"
-                    onclick={() => {
-                        isFullPreview = !isFullPreview;
-                    }}
+                    onclick={openDialog}
                     type="button"
                 >
                     {m["actions.full-preview"]()}
-                </button>
+                </Button>
             </div>
             <div class="mt-2 flex h-1 min-h-15 gap-1">
-                <button
+                <Button
                     class="btn preset-filled-primary-400-600 h-full"
                     onclick={async () => {
                         await navigator.share({
@@ -421,15 +367,15 @@
                     type="button"
                 >
                     <SvgShare class="w-10 fill-white" />
-                </button>
-                <button
+                </Button>
+                <Button
                     class="btn preset-filled-success-100-900 h-full flex-1"
                     onclick={() => renderInvoiceFunc(true)}
                     type="button"
                 >
                     <SaveIcon class="fill-success-600 w-10" />
                     {m["actions.download"]()}
-                </button>
+                </Button>
             </div>
         </form>
     </div>
@@ -531,21 +477,25 @@
     }
 
     .pdf-full-preview {
-        @apply fixed top-1/2 left-1/2 z-10 h-[100vh] w-[100vw] -translate-1/2;
         background-color: var(--color-surface-900);
         display: grid;
         align-items: center;
 
         .pdf-viewer-wrap {
             overflow: auto;
-            height: 100%;
-            width: 100%;
+            height: 100vh;
+            height: 100dvh;
 
-            :global(.viewer) {
-                :global(canvas) {
-                    margin: 0 auto;
-                    height: 100%;
-                    max-height: 1500px;
+            :global(.control) {
+                :global(.viewer) {
+                    width: 100%;
+                    overlay: auto;
+
+                    :global(canvas) {
+                        margin: 0 auto;
+                        width: 100%;
+                        max-width: 900px;
+                    }
                 }
             }
         }

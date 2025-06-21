@@ -4,10 +4,12 @@ import tailwindcss from "@tailwindcss/vite";
 import { SvelteKitPWA } from "@vite-pwa/sveltekit";
 import { defineConfig } from "vite";
 import circleDependency from "vite-plugin-circular-dependency";
+import devtoolsJson from "vite-plugin-devtools-json";
 import mkcert from "vite-plugin-mkcert";
 
 export default defineConfig({
     plugins: [
+        devtoolsJson({ uuid: "invoice-creator" }),
         mkcert(),
         tailwindcss(),
         sveltekit(),
@@ -53,7 +55,8 @@ export default defineConfig({
             scss: {
                 api: "modern-compiler",
                 additionalData: `
-                    @use "$lib/styles/_mixins" as *;
+                    @use "$lib/styles/mixins/_mixins.scss" as *;
+                    @use "$lib/styles/mixins/shadows.scss" as *;
                     @reference "$lib/app.css";
                 `,
             },

@@ -2,21 +2,19 @@ import _ from "lodash";
 
 import { browser } from "$app/environment";
 import { AppStoragePrefix } from "$lib/constants";
-import { saveToLocalStorage, UndefinedReplacement } from "$lib/stores/utils";
+import {
+    deleteStore,
+    getStoreValueFromLocalStorage,
+    saveToLocalStorage,
+    setKey,
+    stores,
+    type TSharedStorageState,
+} from "$lib/stores/utils/utils.svelte";
 import { getNestedKeys } from "$lib/utils";
 
-export const stores = $state({
-    value: new Map<string, TSharedStorageState<unknown>>(),
-});
 const storesWithEffectForSetToLocalStorage: Record<string, boolean> = $state(
     {},
 );
-
-export interface TSharedStorageState<T> {
-    value: T;
-    reset: () => void;
-    deleteStore: () => void;
-}
 
 function createLocalStorageStore<T>({
     key,
@@ -26,49 +24,14 @@ function createLocalStorageStore<T>({
     key: string;
     defaultValue: T;
     initialValue?: T;
-}) {
+}): TSharedStorageState<T> {
     let value = $state(initialValue || defaultValue);
 
-    if (browser) {
-        const storedValue = localStorage.getItem(key);
-
-        if (storedValue !== null) {
-            try {
-                let parsedData = JSON.parse(storedValue, (k, v) =>
-                    v === UndefinedReplacement ? undefined : v,
-                ) as T;
-
-                const differentKeys =
-                    defaultValue && parsedData
-                        ? _.difference(
-                              getNestedKeys(defaultValue),
-                              getNestedKeys(parsedData),
-                          )
-                        : [];
-
-                if (!parsedData && defaultValue) {
-                    value = _.cloneDeep(defaultValue);
-                } else if (parsedData && differentKeys.length > 0) {
-                    differentKeys.forEach((key) => {
-                        parsedData = _.set(
-                            parsedData as NonNullable<T>,
-                            key,
-                            _.get(defaultValue, key),
-                        );
-                    });
-
-                    value = parsedData;
-                } else {
-                    value = parsedData;
-                }
-            } catch (error) {
-                console.error(
-                    `Failed to parse localStorage key "${key}":`,
-                    error,
-                );
-            }
-        }
-    }
+    const valueFromStore = getStoreValueFromLocalStorage({
+        key,
+        defaultValue,
+    });
+    if (valueFromStore) value = valueFromStore;
 
     function reset() {
         if (defaultValue) {
@@ -80,11 +43,12 @@ function createLocalStorageStore<T>({
         }
     }
 
-    function deleteStore() {
-        if (browser) {
-            localStorage.removeItem(key);
-            stores.value.delete(key);
-        }
+    function deleteStoreInner() {
+        deleteStore(key);
+    }
+
+    function setKeyInner(newKey: string) {
+        setKey(key, newKey);
     }
 
     return {
@@ -98,8 +62,8 @@ function createLocalStorageStore<T>({
                 const differentKeys =
                     defaultValue && newValue
                         ? _.difference(
-                              Object.keys(defaultValue),
-                              Object.keys(newValue),
+                              getNestedKeys(defaultValue),
+                              getNestedKeys(newValue),
                           )
                         : [];
 
@@ -117,7 +81,9 @@ function createLocalStorageStore<T>({
             }, 0);
         },
         reset,
-        deleteStore,
+        deleteStore: deleteStoreInner,
+        setKey: setKeyInner,
+        key,
     };
 }
 
@@ -135,7 +101,7 @@ export function useLocalStorageStore<T>({
     let store: TSharedStorageState<T>;
 
     if (stores.value.has(localStorageKey)) {
-        store = stores.value.get(localStorageKey) as any;
+        store = stores.value.get(localStorageKey) as TSharedStorageState<T>;
     } else {
         stores.value.set(
             localStorageKey,
@@ -145,7 +111,7 @@ export function useLocalStorageStore<T>({
                 initialValue,
             }),
         );
-        store = stores.value.get(localStorageKey) as any;
+        store = stores.value.get(localStorageKey) as TSharedStorageState<T>;
     }
 
     $effect.root(() => {
@@ -155,7 +121,9 @@ export function useLocalStorageStore<T>({
         storesWithEffectForSetToLocalStorage[localStorageKey] = true;
 
         $effect(() => {
-            saveToLocalStorage(localStorageKey, store.value);
+            if (store.value) {
+                saveToLocalStorage(localStorageKey, store.value);
+            }
         });
 
         return () => {
@@ -204,7 +172,7 @@ export function useStore<T>(
     const storeKey = AppStoragePrefix + key;
 
     if (stores.value.has(storeKey)) {
-        return stores.value.get(storeKey) as any;
+        return stores.value.get(storeKey) as TSharedStorageState<T>;
     } else {
         stores.value.set(
             storeKey,
@@ -213,12 +181,6 @@ export function useStore<T>(
                 initialValue,
             }) as any,
         );
-        return stores.value.get(storeKey) as any;
-    }
-}
-
-export function deleteStore(key: string) {
-    if (!stores.value.get(key)?.deleteStore()) {
-        localStorage.removeItem(key);
+        return stores.value.get(storeKey) as TSharedStorageState<T>;
     }
 }

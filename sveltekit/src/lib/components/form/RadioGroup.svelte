@@ -1,6 +1,8 @@
 <script lang="ts" generics="T">
     import type { Snippet } from "svelte";
-    import type { ClassValue, HTMLInputAttributes } from "svelte/elements";
+    import type { HTMLInputAttributes } from "svelte/elements";
+    import { slide, type SlideParams } from "svelte/transition";
+    import { type ClassNameValue, twMerge } from "tailwind-merge";
 
     import { m } from "$lib/paraglide/messages";
     import type { IYupError } from "$lib/types/types";
@@ -20,11 +22,12 @@
         type?: HTMLInputAttributes["type"] | "textarea";
         error?: IYupError;
         isErrorVisible?: boolean;
-        containerClass?: ClassValue;
+        containerClass?: ClassNameValue;
         id?: string;
         uncheckable?: boolean;
         groupLabel?: string;
         snippetRadio?: Snippet<[{ label?: string; value?: T }]>;
+        transitionSettings?: SlideParams;
     }
 
     let {
@@ -37,11 +40,12 @@
         uncheckable,
         groupLabel,
         snippetRadio,
+        transitionSettings,
     }: IProps = $props();
 </script>
 
 <div
-    class="radiogroup flex flex-col gap-2 {containerClass}"
+    class="radiogroup flex flex-col {containerClass}"
     aria-errormessage="{id}-error"
     aria-invalid={!!error}
     aria-label={groupLabel}
@@ -62,25 +66,32 @@
         {#each radios as { label, ...rest } (label)}
             {@const radioId = createId("radio")}
 
-            <fieldset class="flex items-center gap-2">
-                <input
-                    id={radioId}
-                    checked={group === rest.value}
-                    type="radio"
-                    bind:group
-                    aria-label={label}
-                    {...rest}
-                    class={"radio " + rest.class}
-                />
+            <div
+                class="w-full py-1"
+                transition:slide={{ duration: 200, ...transitionSettings }}
+            >
+                <fieldset class="flex items-center">
+                    <div class="flex w-8">
+                        <input
+                            id={radioId}
+                            checked={group === rest.value}
+                            type="radio"
+                            bind:group
+                            aria-label={label}
+                            {...rest}
+                            class={twMerge("radio")}
+                        />
+                    </div>
 
-                {#if label}
-                    {#if snippetRadio}
-                        {@render snippetRadio({ label, value: rest.value })}
-                    {:else}
-                        <Label for={radioId} {label} />
+                    {#if label}
+                        {#if snippetRadio}
+                            {@render snippetRadio({ label, value: rest.value })}
+                        {:else}
+                            <Label for={radioId} {label} />
+                        {/if}
                     {/if}
-                {/if}
-            </fieldset>
+                </fieldset>
+            </div>
         {/each}
     {/if}
 

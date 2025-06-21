@@ -11,6 +11,6 @@
     let { children, ...props }: ButtonProps = $props();
 </script>
 
-<button {...props}>
+<button {...props} type={props.type || "button"}>
     {@render children()}
 </button>

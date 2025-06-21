@@ -12,9 +12,7 @@
         "strictNullChecks": true,
         "moduleResolution": "Bundler",
         "jsx": "react",
-        "types": [
-            "vite-plugin-pwa/client"
-        ]
+        "types": ["vite-plugin-pwa/client"]
     },
     "svelte": {
         "typescript": true

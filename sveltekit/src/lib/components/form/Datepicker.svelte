@@ -26,7 +26,7 @@
         ...rest
     }: IProps = $props();
 
-    const id = createId();
+    const id = createId("datepicker");
 
     function onchange(e: Parameters<NonNullable<IProps["onchange"]>>[0]) {
         if (onchangeProp) onchangeProp(e as any);
@@ -82,36 +82,38 @@
             {...rest}
         />
     </div>
-    <Error id={id || ""} {error} />
+    <Error {id} {error} />
 </fieldset>
 
 <style lang="scss">
     .date-picker {
-        :global(input[type="text"]) {
-            @apply input placeholder-transparent;
-        }
-
-        :global(input[type="text"][aria-invalid="true"]) {
-            @include errorInput;
-        }
-
-        :global(#datepicker-dropdown) {
-            width: 100%;
-            max-width: 350px;
-
-            :global([role="grid"]) {
-                width: 100%;
+        :global {
+            input[type="text"] {
+                @apply input placeholder-transparent;
             }
 
-            :global(.mt-4.flex.justify-between) {
-                :global(button:nth-of-type(1)) {
-                    @apply btn bg-primary-500 text-white;
+            input[type="text"][aria-invalid="true"] {
+                @include errorInput;
+            }
+
+            #datepicker-dropdown {
+                width: 100%;
+                max-width: 350px;
+
+                [role="grid"] {
+                    width: 100%;
                 }
-                :global(button:nth-of-type(2)) {
-                    @apply btn;
-                }
-                :global(button:nth-of-type(3)) {
-                    @apply btn bg-success-600 text-white;
+
+                .mt-4.flex.justify-between {
+                    button:nth-of-type(1) {
+                        @apply btn bg-primary-500 text-white;
+                    }
+                    button:nth-of-type(2) {
+                        @apply btn;
+                    }
+                    button:nth-of-type(3) {
+                        @apply btn bg-success-600 text-white;
+                    }
                 }
             }
         }

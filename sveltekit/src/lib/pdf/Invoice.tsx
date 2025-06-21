@@ -223,12 +223,14 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
 
                             <View style={styles.space} />
 
-                            {invoiceData.isSupplierSelfEmployed ? (
+                            {invoiceData.supplierBilling.isSelfEmployed && (
                                 <Text style={styles.textSecondary}>
                                     Fyzická osoba zapsaná v živnostenském
                                     rejstříku
                                 </Text>
-                            ) : (
+                            )}
+
+                            {invoiceData.customTextUnderSupplier && (
                                 <Text style={styles.textSecondary}>
                                     {invoiceData.customTextUnderSupplier}
                                 </Text>
@@ -255,7 +257,9 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                         </View>
                         <View style={styles.address}>
                             <Text style={styles.h2}>Odběratel</Text>
-                            <BillingView billing={invoiceData.billing} />
+                            <BillingView
+                                billing={invoiceData.receiverBilling}
+                            />
 
                             {(invoiceData.issuedAt ||
                                 invoiceData.paidAt ||

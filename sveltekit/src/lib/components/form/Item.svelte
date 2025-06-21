@@ -17,6 +17,7 @@
     import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
     import { yupHasNumberMaxTwoDecimalValidation } from "$lib/validations/ine";
 
+    import Button from "./Button.svelte";
     import Error from "./Error.svelte";
     import Input from "./Input.svelte";
 
@@ -30,7 +31,7 @@
     let invoiceValues = $derived(
         useFormStore({
             get key() {
-                return invoiceValuesKey.value.profileName;
+                return invoiceValuesKey.value.invoiceName;
             },
         }).value,
     );
@@ -91,7 +92,7 @@
 
 <div class="border-surface-500 flex flex-col gap-2 rounded-[10px] border-1 p-3">
     <div class="flex justify-end">
-        <button
+        <Button
             aria-label={m["actions.remove-item"]()}
             onclick={() => {
                 invoiceValues.items = invoiceValues.items.filter(
@@ -102,7 +103,7 @@
             type="button"
         >
             <Trash class="stroke-error-500" />
-        </button>
+        </Button>
     </div>
     <Input label={m["form.name"]()} bind:value={item.name} />
     <Input
@@ -144,5 +145,3 @@
         />
     {/if}
 </div>
-
-<style lang="scss"></style>

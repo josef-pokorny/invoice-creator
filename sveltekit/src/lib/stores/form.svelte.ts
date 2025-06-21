@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { untrack } from "svelte";
 import * as yup from "yup";
 
@@ -13,6 +14,7 @@ import { invoiceFormSchema } from "$lib/validations/schemas/invoice-form.svelte"
 
 import { useLocaleStore } from "./locale.svelte";
 import { useLocalStorageStore, useStore } from "./sharedStore.svelte";
+import { useSupplierKeyStore, useSupplierStore } from "./supplier.svelte";
 
 // Define default values
 export const defaultForm: IInvoiceValues = {
@@ -25,8 +27,9 @@ export const defaultForm: IInvoiceValues = {
         country: "",
         ine: "",
         vat: "",
+        isSelfEmployed: true,
     },
-    billing: {
+    receiverBilling: {
         fullname: "",
         line1: "",
         postal: "",
@@ -46,14 +49,12 @@ export const defaultForm: IInvoiceValues = {
     pickedUpAt: "",
     paymentType: "",
     paymentInfo: "",
-    isSupplierSelfEmployed: true,
     customTextUnderSupplier: "",
     customFooterText: "",
     countVat: false,
     roundTotal: false,
     reverseCharge: false,
 };
-export const defaultFormKey = { profileName: "default" };
 
 export function useFormStore({
     initialValue,
@@ -70,6 +71,8 @@ export function useFormStore({
 
     return store;
 }
+
+export const defaultFormKey = { invoiceName: "default" };
 
 export function useFormKeyStore({
     initialValue,
@@ -90,34 +93,6 @@ const defaultFormErrors: YupErrorsList<IInvoiceValues> = {};
 export function useFormErrorsStore() {
     const store = useStore("invoice-form-errors-", defaultFormErrors);
 
-    const locale = useLocaleStore();
-
-    const invoiceValuesKey = useFormKeyStore();
-    const invoiceValues = $derived(
-        useFormStore({
-            get key() {
-                return invoiceValuesKey.value.profileName;
-            },
-        }),
-    );
-
-    $effect(() => {
-        locale.locale;
-
-        invoiceFormSchema()
-            .validate(invoiceValues.value, { abortEarly: false })
-            .then(() => {
-                store.reset();
-            })
-            .catch((e: yup.ValidationError) => {
-                store.reset();
-
-                untrack(() => {
-                    extractYupErrors(e, store.value);
-                });
-            });
-    });
-
     return store;
 }
 
@@ -136,3 +111,57 @@ export function useFormItemErrors({
         initialValue,
     );
 }
+
+const rootCleanUp = $effect.root(() => {
+    const formKey = useFormKeyStore();
+    const formStore = $derived(
+        useFormStore({
+            get key() {
+                return formKey.value.invoiceName;
+            },
+        }),
+    );
+    const formErrorsStore = useFormErrorsStore();
+
+    const supplierKeyStore = useSupplierKeyStore();
+    const supplierStore = $derived(
+        useSupplierStore({
+            get key() {
+                return supplierKeyStore.value.supplierName;
+            },
+        }),
+    );
+
+    $effect(() => {
+        ({ ...supplierStore.value, ...formStore.value.supplierBilling });
+
+        if (!_.isEmpty(supplierStore.key)) {
+            formStore.value.supplierBilling = supplierStore.value;
+        } else {
+            supplierStore.value = formStore.value.supplierBilling;
+        }
+    });
+
+    const locale = useLocaleStore();
+
+    $effect(() => {
+        locale.locale;
+
+        invoiceFormSchema()
+            .validate(formStore.value, { abortEarly: false })
+            .then(() => {
+                formErrorsStore.reset();
+            })
+            .catch((e: yup.ValidationError) => {
+                formErrorsStore.reset();
+
+                untrack(() => {
+                    extractYupErrors(e, formErrorsStore.value);
+                });
+            });
+    });
+
+    return () => {
+        rootCleanUp();
+    };
+});

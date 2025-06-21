@@ -1,0 +1,5 @@
+@reference "../app.css";
+
+.input[aria-invalid="true"] {
+    @include errorInput;
+}

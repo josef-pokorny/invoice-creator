@@ -2,6 +2,7 @@
     import type { Snippet } from "svelte";
     import type { ClassValue, HTMLAttributes } from "svelte/elements";
 
+    import Button from "$lib/components/form/Button.svelte";
     import { m } from "$lib/paraglide/messages";
 
     let {
@@ -27,7 +28,7 @@
         >;
         classContentContainer?: ClassValue;
         classForm?: ClassValue;
-        /** use type="submit" on <button> when you want to close the modal */
+        /** use `type="submit"` on \<button> when you want to close the modal */
         footerButtons?: Snippet;
     } & HTMLAttributes<HTMLDialogElement> = $props();
 
@@ -47,7 +48,7 @@
 
     $effect(() => {
         if (isOpen) {
-            document.body.style.overflow = "hidden";
+            document.body.classList.add("body-overflow");
 
             elemModal?.showModal();
 
@@ -60,7 +61,7 @@
                 document.removeEventListener("click", closeModal);
             };
         } else {
-            document.body.style.overflow = "auto";
+            document.body.classList.remove("body-overflow");
 
             elemModal?.close();
         }
@@ -85,14 +86,14 @@
             {@render content()}
         </div>
 
-        <form class={classForm} method="dialog" onsubmit={closeModal}>
-            <button
+        <form class={classForm + " !p-6"} method="dialog" onsubmit={closeModal}>
+            <Button
                 class="btn preset-tonal hover:preset-filled"
                 onclick={closeModal}
                 type="submit"
             >
                 {m["actions.close"]()}
-            </button>
+            </Button>
         </form>
     </div>
 </dialog>

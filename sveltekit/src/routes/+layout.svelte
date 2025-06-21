@@ -3,11 +3,13 @@
     import "$lib/styles/app.scss";
     import "$lib/styles/toaster.scss";
     import "$lib/styles/skeletonlab.scss";
+    import "$lib/styles/shadows.scss";
+    import "$lib/styles/form.scss";
     import "@fontsource-variable/montserrat";
 
-    import { onMount } from "svelte";
-
     import Layout from "$lib/components/layout/Layout.svelte";
+    import LocaleSync from "$lib/components/layout/LocaleSync.svelte";
+    import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
     import Toaster from "$lib/components/Toaster.svelte";
     import { m } from "$lib/paraglide/messages";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
@@ -15,24 +17,6 @@
     let { children } = $props();
 
     const locale = useLocaleStore();
-
-    onMount(() => {
-        const timeoutId = setTimeout(() => {
-            const container = document.querySelector(
-                "#svelte-app-container",
-            ) as HTMLDivElement;
-
-            document.body.style.overflow = "auto";
-
-            if (container) {
-                container.style.opacity = "1";
-            }
-        }, 0);
-
-        return () => {
-            clearTimeout(timeoutId);
-        };
-    });
 </script>
 
 <!-- <Crawl /> -->
@@ -62,8 +46,12 @@
     {/key}
 </svelte:head>
 
-<Toaster />
 {#key locale.locale}
+    <LocaleSync />
+    <PWAMeta />
+
+    <Toaster />
+
     <Layout>
         {@render children()}
     </Layout>

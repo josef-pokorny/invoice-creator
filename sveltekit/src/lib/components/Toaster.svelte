@@ -1,7 +1,7 @@
 <script lang="ts" module>
     type ToastData = {
         title?: Snippet | string;
-        description: Snippet | string;
+        description?: Snippet | string;
         variant?: "success" | "warning" | "error";
     };
 
@@ -10,7 +10,7 @@
     export const addToast = (args: Parameters<typeof toaster.addToast>[0]) => {
         if (_.isString(args.data.description) && args.closeDelay) {
             args.closeDelay =
-                args.closeDelay + args.data.description.length * 30;
+                args.closeDelay + args.data.description?.length * 30;
         }
         if (_.isString(args.data.title) && args.closeDelay) {
             args.closeDelay = args.closeDelay + args.data.title.length * 30;
@@ -26,6 +26,8 @@
     import { Progress } from "melt/components";
     import type { Snippet } from "svelte";
     import { fly } from "svelte/transition";
+
+    import Button from "./form/Button.svelte";
 </script>
 
 <div
@@ -70,9 +72,9 @@
                 </div>
             {/if}
 
-            <button {...toast.close} class="cross" aria-label="dismiss toast">
+            <Button {...toast.close} class="cross" aria-label="dismiss toast">
                 X
-            </button>
+            </Button>
 
             {#if toast.closeDelay !== 0}
                 <div

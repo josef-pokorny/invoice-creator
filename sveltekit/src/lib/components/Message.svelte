@@ -6,6 +6,8 @@
     import { m } from "$lib/paraglide/messages";
     import { useMessageStore } from "$lib/stores/message";
 
+    import Button from "./form/Button.svelte";
+
     let {
         children,
         type = "primary",
@@ -51,12 +53,12 @@
         </div>
         {#if clossable}
             <div class="flex gap-1">
-                <button
+                <Button
                     class="btn preset-tonal hover:preset-filled"
                     onclick={onClose}
                 >
                     {m["actions.close"]()}
-                </button>
+                </Button>
             </div>
         {/if}
     </div>

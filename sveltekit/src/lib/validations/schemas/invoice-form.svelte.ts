@@ -30,7 +30,7 @@ export function invoiceFormSchema() {
                     }
                 },
             ),
-        billing: yupBillingValidation(),
+        receiverBilling: yupBillingValidation(),
         supplierBilling: yupBillingValidation(),
     });
 }

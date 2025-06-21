@@ -2,6 +2,7 @@
     import _ from "lodash";
     import type { Snippet } from "svelte";
     import type {
+        HTMLAttributes,
         HTMLInputAttributes,
         HTMLTextareaAttributes,
     } from "svelte/elements";
@@ -13,7 +14,7 @@
     import Label from "./Label.svelte";
 
     type TExdended = HTMLInputAttributes & HTMLTextareaAttributes;
-    interface IProps extends TExdended {
+    interface IProps extends Omit<TExdended, "prefix"> {
         label?: string;
         value?: string | number;
         type?: HTMLInputAttributes["type"] | "textarea";
@@ -21,6 +22,9 @@
         error?: IYupError;
         isErrorVisible?: boolean;
         suffix?: Snippet;
+        prefix?: Snippet;
+        containerProps?: HTMLAttributes<HTMLDivElement>;
+        fieldsetProps?: HTMLAttributes<HTMLFieldSetElement>;
     }
 
     let {
@@ -32,6 +36,9 @@
         error,
         isErrorVisible = true,
         suffix,
+        prefix,
+        containerProps,
+        fieldsetProps,
         ...rest
     }: IProps = $props();
 
@@ -61,17 +68,22 @@
     }
 
     let hasSuffix = _.isFunction(suffix);
+    let hasPrefix = _.isFunction(prefix);
 </script>
 
-<fieldset class="w-full">
+<fieldset class="w-full {fieldsetProps?.class}">
     {#if label}
         <Label for={id} {label} />
     {/if}
 
     <div
-        class:contents={!hasSuffix}
-        class="input-group flex w-full items-stretch"
+        class:contents={!hasSuffix && !hasPrefix}
+        class="input-group flex w-full items-stretch {containerProps?.class}"
     >
+        {#if prefix}
+            {@render prefix()}
+        {/if}
+
         {#if rest.type === "textarea"}
             <textarea
                 {id}
@@ -81,7 +93,7 @@
                 bind:value
                 {...rest}
                 class={"min-h-[2rem] flex-1 " +
-                    (hasSuffix ? "ig-input" : "input") +
+                    (hasSuffix || hasPrefix ? "ig-input" : "input") +
                     " " +
                     rest.class}
             ></textarea>
@@ -94,13 +106,13 @@
                 bind:value
                 {...rest}
                 class={"flex-1 " +
-                    (hasSuffix ? "ig-input" : "input") +
+                    (hasSuffix || hasPrefix ? "ig-input" : "input") +
                     " " +
                     rest.class}
             />
         {/if}
 
-        {#if hasSuffix && suffix}
+        {#if suffix}
             {@render suffix()}
         {/if}
     </div>

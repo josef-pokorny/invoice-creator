@@ -8,6 +8,8 @@
     import type { IGovEkonomickeSubjektyReturn } from "$lib/requests/ares/ares-types";
     import { isINEValid } from "$lib/validations/ine";
 
+    import Button from "./form/Button.svelte";
+
     let {
         aresINEData = $bindable(),
         billing = $bindable(),
@@ -63,10 +65,10 @@
     }
 </script>
 
-<button
+<Button
     class="btn preset-filled-primary-500 font-medium"
     onclick={aresRequest}
     type="button"
 >
     {m["actions.fill-in-by-ine"]()}
-</button>
+</Button>

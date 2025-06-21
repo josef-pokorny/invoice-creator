@@ -1,14 +1,22 @@
-:root {
-    --anchor-color: var(--color-primary-200);
+body {
+    overflow: hidden;
 }
 
-.input[aria-invalid="true"] {
-    @include errorInput;
+.body-overflow {
+    overflow: hidden;
+}
+
+:root {
+    --anchor-color: var(--color-primary-200);
 }
 
 .anchor {
     color: var(--anchor-color);
     font-weight: 500;
+}
+
+::placeholder {
+    color: var(--color-surface-300);
 }
 
 button {

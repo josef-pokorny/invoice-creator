@@ -9,7 +9,12 @@
         "share": "Share",
         "saved-invoices": "Saved invoices",
         "new-invoice": "New invoice",
-        "used-invoice": "Used invoice"
+        "used-invoice": "Used invoice",
+        "search": "Search",
+        "invoice-type": "Invoice type",
+        "suppliers": "Suppliers",
+        "new-supplier": "New supplier",
+        "supplier-preset": "Supplier preset"
     },
     "actions": {
         "add-item": "Add item",
@@ -22,7 +27,10 @@
         "change-language": "Change language",
         "import": "Import",
         "export": "Export",
-        "delete-invoice": "Delete invoice"
+        "delete-invoice": "Delete invoice",
+        "delete": "Delete",
+        "edit-supplier": "Edit supplier",
+        "delete-supplier": "Delete supplier"
     },
     "form": {
         "receiver": "Receiver",
@@ -72,7 +80,8 @@
     },
     "text": {
         "you-can-fill-by-ine": "You can automatically fill in all the data after filling in only the INE.",
-        "export-all": "Export all invoices"
+        "export-all": "Export all invoices",
+        "no-results": "No results found"
     },
     "meta": {
         "title": "Create Invoice for Free",

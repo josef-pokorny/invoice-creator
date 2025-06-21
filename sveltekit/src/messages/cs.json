@@ -9,7 +9,12 @@
         "share": "Sdílet",
         "saved-invoices": "Uložené faktury",
         "new-invoice": "Nová faktura",
-        "used-invoice": "Použitá faktura"
+        "used-invoice": "Použitá faktura",
+        "search": "Vyhledat",
+        "invoice-type": "Typ faktury",
+        "suppliers": "Dodavatelé",
+        "new-supplier": "Nový dodavatel",
+        "supplier-preset": "Dodavatel - přednastavení"
     },
     "actions": {
         "add-item": "Přidat položku",
@@ -22,7 +27,10 @@
         "change-language": "Změnit jazyk",
         "import": "Import",
         "export": "Export",
-        "delete-invoice": "Smazat fakturu"
+        "delete-invoice": "Smazat fakturu",
+        "delete": "Vymazat",
+        "edit-supplier": "Upravit dodavatele",
+        "delete-supplier": "Vymazat dodavatele"
     },
     "form": {
         "receiver": "Odběratel",
@@ -71,7 +79,8 @@
     },
     "text": {
         "you-can-fill-by-ine": "Všechny údaje můžete automaticky doplnit pouhým vyplněním IČa.",
-        "export-all": "Exportujte všechny faktury"
+        "export-all": "Exportujte všechny faktury",
+        "no-results": "Nenalezeny žádné výsledky"
     },
     "meta": {
         "title": "Vytvoření Faktury Zdarma",

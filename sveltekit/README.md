@@ -33,5 +33,13 @@ You can preview the production build with `pnpm run preview`.
 - [ ] Checking VAT ID with VIES (https://ec.europa.eu/taxation_customs/vies/#/technical-information) - npm: https://www.npmjs.com/package/viesapi-client
 - [x] Rename "Profiles" to "Invoices"
 - [ ] Storing suppliers and receivers (button -> dialog for storing with name), autocomplete in form
-- [ ] Move invoices list from dialog
-- [ ] Searching for invoices in the list
+    - [x] Suppliers
+    - [ ] Receivers
+- [ ] Message in suppliers/receivers that it will store to that object
+- [ ] Exporting suppliers/receivers along with invoices
+- [x] Move invoices list from dialog
+- [x] Searching for invoices in the list
+- [ ] Move PDF preview to Resizable group
+
+## FIX
+- [ ] !!! Not possible scrolling and touching on touch devices (even on browser simulated) when scrolling/touching is done on the lower side of display. Idk why, possibly something with paneforge

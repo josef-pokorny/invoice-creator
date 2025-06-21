@@ -1,0 +1,11 @@
+.shadow-all {
+    @include shadow-all;
+}
+
+.shadow-top {
+    @include shadow-top;
+}
+
+.shadow-bottom {
+    @include shadow-bottom;
+}

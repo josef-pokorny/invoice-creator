@@ -1,9 +1,8 @@
 import _ from "lodash";
+import { v4 as uuid } from "uuid";
 
 export function createId(prefix: string = "input_") {
-    return (
-        _.uniqueId(prefix) + String(Math.round(Math.random() * 999999999999))
-    );
+    return _.uniqueId(prefix) + uuid();
 }
 
 export function countDecimals(value: number) {
@@ -24,8 +23,6 @@ export function getNestedKeys(obj: Record<string, any>, prefix = ""): string[] {
     const keys: string[] = [];
 
     for (const key in obj) {
-        if (!obj[key]) continue;
-
         const value = obj[key];
         const path = prefix ? `${prefix}.${key}` : key;
 
@@ -38,4 +35,10 @@ export function getNestedKeys(obj: Record<string, any>, prefix = ""): string[] {
     }
 
     return keys;
+}
+
+export function normalizeStringForSearch(str: string) {
+    return _.toLower(str.replace(/\s/g, ""))
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 }
