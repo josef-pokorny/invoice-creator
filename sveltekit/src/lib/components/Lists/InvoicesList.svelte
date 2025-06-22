@@ -17,12 +17,12 @@
         setKey,
         stores,
     } from "$lib/stores/utils/utils.svelte";
+    import { type IExport } from "$lib/types/import-export";
     import { normalizeStringForSearch } from "$lib/utils";
 
     import Button from "../form/Button.svelte";
     import Input from "../form/Input.svelte";
     import RadioGroup from "../form/RadioGroup.svelte";
-    import type { ISavedInvoices } from "../InvoiceSelect.svelte";
 
     const ImportKeyPrefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
@@ -133,7 +133,7 @@
         if (importInvoicesFileValue && importInvoicesFileValue.length > 0) {
             importInvoicesFileValue[0].text().then((text) => {
                 try {
-                    const { invoices }: ISavedInvoices = JSON.parse(text);
+                    const { invoices }: IExport = JSON.parse(text);
 
                     stores.value.clear();
 
@@ -280,7 +280,7 @@
                                         k.startsWith(ImportKeyPrefix),
                                     )
                                     .map(([k, v]) => [k, JSON.parse(v)]),
-                            } as ISavedInvoices),
+                            } as IExport),
                         );
                     const downloadAnchorNode = document.createElement("a");
                     downloadAnchorNode.setAttribute("href", dataStr);

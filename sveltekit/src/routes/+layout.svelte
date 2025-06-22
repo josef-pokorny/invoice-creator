@@ -12,6 +12,7 @@
     import PWAMeta from "$lib/components/layout/PWAMeta.svelte";
     import Toaster from "$lib/components/Toaster.svelte";
     import { m } from "$lib/paraglide/messages";
+    import TanstackQueryWrapper from "$lib/query/wrapper/TanstackQueryWrapper.svelte";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
 
     let { children } = $props();
@@ -47,12 +48,14 @@
 </svelte:head>
 
 {#key locale.locale}
-    <LocaleSync />
-    <PWAMeta />
+    <TanstackQueryWrapper>
+        <LocaleSync />
+        <PWAMeta />
 
-    <Toaster />
+        <Toaster />
 
-    <Layout>
-        {@render children()}
-    </Layout>
+        <Layout>
+            {@render children()}
+        </Layout>
+    </TanstackQueryWrapper>
 {/key}

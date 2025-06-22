@@ -1,117 +1,125 @@
-<script lang="ts" module>
-    type ToastData = {
-        title?: Snippet | string;
-        description?: Snippet | string;
-        variant?: "success" | "warning" | "error";
-    };
-
-    const toaster = new Toaster<ToastData>();
-
-    export const addToast = (args: Parameters<typeof toaster.addToast>[0]) => {
-        if (_.isString(args.data.description) && args.closeDelay) {
-            args.closeDelay =
-                args.closeDelay + args.data.description?.length * 30;
-        }
-        if (_.isString(args.data.title) && args.closeDelay) {
-            args.closeDelay = args.closeDelay + args.data.title.length * 30;
-        }
-
-        toaster.addToast(args);
-    };
-</script>
-
 <script lang="ts">
     import _ from "lodash";
     import { Toaster } from "melt/builders";
     import { Progress } from "melt/components";
-    import type { Snippet } from "svelte";
     import { fly } from "svelte/transition";
+    import { twMerge } from "tailwind-merge";
+
+    import {
+        type ToastData,
+        useToasterStore,
+    } from "$lib/stores/toaster.svelte";
 
     import Button from "./form/Button.svelte";
+
+    const toaster = useToasterStore({
+        initialValue: new Toaster<ToastData>(),
+    });
+
+    let toasts = $derived(toaster.value?.toasts);
 </script>
 
-<div
-    {...toaster.root}
-    style:--toasts={toaster.toasts.length}
-    class="fixed !right-0 !bottom-4 flex w-[100%] max-w-[400px] flex-col"
->
-    {#each toaster.toasts as toast, i (toast.id)}
-        {@const variant = toast.data.variant || "error"};
+{#if toaster.value && toasts}
+    <div
+        {...toaster.value.root}
+        style:--toasts={toasts.length}
+        class="toaster-container fixed !right-0 !bottom-4 flex w-[100%] max-w-[400px] flex-col"
+    >
+        {#each toasts as toast, i (toast.id)}
+            {@const variant = toast.data.variant || "error"};
 
-        <div
-            style:--n={toaster.toasts.length - i}
-            class="{variant === 'success'
-                ? 'preset-filled-success-500'
-                : variant === 'warning'
-                  ? 'bg-warning-400 text-warning-contrast-500'
-                  : variant === 'error'
-                    ? 'bg-error-500 text-error-contrast-500'
-                    : ''} relative flex h-[--toast-height] w-full flex-col justify-center rounded-xl px-4 text-left transition"
-            {...toast.content}
-            in:fly={{ y: 60, opacity: 0.9 }}
-            out:fly={{ y: 20 }}
-        >
-            {#if _.isFunction(toast.data.title)}
-                {@render toast.data.title()}
-            {:else if toast.data.title}
-                <h3 {...toast.title} class="text-[1.1rem] font-medium">
-                    {toast.data.title}
-                </h3>
-            {/if}
+            <div
+                style:--n={toasts.length - i}
+                class={twMerge(
+                    variant === "success"
+                        ? "preset-filled-success-500"
+                        : variant === "warning"
+                          ? "bg-warning-400 text-warning-contrast-500"
+                          : variant === "error"
+                            ? "bg-error-500 text-error-contrast-500"
+                            : "",
+                    "relative flex h-[--toast-height] w-full flex-col justify-center rounded-xl px-4 text-left transition",
+                )}
+                {...toast.content}
+                in:fly={{ y: 60, opacity: 0.9 }}
+                out:fly={{ y: 20 }}
+            >
+                {#if _.isFunction(toast.data.title)}
+                    {@render toast.data.title()}
+                {:else if toast.data.title}
+                    <h3 {...toast.title} class="text-[1.1rem] font-medium">
+                        {toast.data.title}
+                    </h3>
+                {/if}
 
-            {#if toast.data.description}
-                <div
-                    {...toast.description}
-                    class:font-medium={variant === "error"}
+                {#if toast.data.description}
+                    <div
+                        {...toast.description}
+                        class:font-medium={variant === "error"}
+                    >
+                        {#if _.isFunction(toast.data.description)}
+                            {@render toast.data.description()}
+                        {:else}
+                            {toast.data.description}
+                        {/if}
+                    </div>
+                {/if}
+
+                <Button
+                    {...toast.close}
+                    class="cross"
+                    aria-label="dismiss toast"
                 >
-                    {#if _.isFunction(toast.data.description)}
-                        {@render toast.data.description()}
-                    {:else}
-                        {toast.data.description}
-                    {/if}
-                </div>
-            {/if}
+                    X
+                </Button>
 
-            <Button {...toast.close} class="cross" aria-label="dismiss toast">
-                X
-            </Button>
-
-            {#if toast.closeDelay !== 0}
-                <div
-                    class="absolute top-2 right-8 h-[4px] w-[30px] overflow-hidden rounded-full"
-                >
-                    <Progress value={toast.percentage}>
-                        {#snippet children(progress)}
-                            <div
-                                {...progress.root}
-                                class="relative h-full w-full overflow-hidden bg-gray-200 dark:bg-gray-950"
-                            >
+                {#if toast.closeDelay !== 0}
+                    <div
+                        class="absolute top-2 right-8 h-[4px] w-[30px] overflow-hidden rounded-full"
+                    >
+                        <Progress value={toast.percentage}>
+                            {#snippet children(progress)}
                                 <div
-                                    {...progress.progress}
-                                    class="h-full w-full -translate-x-[var(--progress)] bg-white"
-                                ></div>
-                            </div>
-                        {/snippet}
-                    </Progress>
-                </div>
-            {/if}
-        </div>
-    {/each}
-</div>
+                                    {...progress.root}
+                                    class="relative h-full w-full overflow-hidden bg-gray-200 dark:bg-gray-950"
+                                >
+                                    <div
+                                        {...progress.progress}
+                                        class="h-full w-full -translate-x-[var(--progress)] bg-white"
+                                    ></div>
+                                </div>
+                            {/snippet}
+                        </Progress>
+                    </div>
+                {/if}
+            </div>
+        {/each}
+    </div>
+{/if}
 
 <style lang="scss">
-    :global([popover]) {
-        inset: unset;
+    :global {
+        [popover] {
+            inset: unset;
+        }
     }
 
-    .cross {
-        @apply absolute top-[50%] right-2 translate-y-[-50%] bg-transparent font-semibold;
+    .toaster-container {
+        :global {
+            .cross {
+                position: absolute;
+                top: 50%;
+                right: calc(var(--spacing) * 2);
+                translate: 0 -50%;
+                background-color: transparent;
+                font-weight: 600;
+                color: var(--color-surface-150);
 
-        color: var(--color-surface-150);
-
-        &:hover {
-            color: var(--color-surface-50);
-            text-shadow: 0 0 10px var(--color-surface-50);
+                &:hover {
+                    color: var(--color-surface-50);
+                    text-shadow: 0 0 10px var(--color-surface-50);
+                }
+            }
         }
     }
 
@@ -157,8 +165,10 @@
         transition: all 350ms ease;
     }
 
-    :global([data-theme="dark"] [data-melt-toaster-toast-content]) {
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+    :global {
+        [data-theme="dark"] [data-melt-toaster-toast-content] {
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+        }
     }
 
     [data-melt-toaster-toast-content]:nth-last-child(n + 4) {

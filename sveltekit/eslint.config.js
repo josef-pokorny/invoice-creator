@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import { includeIgnoreFile } from "@eslint/compat";
 import js from "@eslint/js";
+import pluginQuery from "@tanstack/eslint-plugin-query";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import svelte from "eslint-plugin-svelte";
 import unusedImports from "eslint-plugin-unused-imports";
@@ -15,6 +16,7 @@ const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url));
 export default ts.config(
     includeIgnoreFile(gitignorePath),
     js.configs.recommended,
+    ...pluginQuery.configs["flat/recommended"],
     ...ts.configs.recommended,
     ...svelte.configs["flat/recommended"],
     {

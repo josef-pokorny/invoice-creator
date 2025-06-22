@@ -75,7 +75,8 @@
         "this-field-is-recommended": "Je doporučeno vyplnit toto pole",
         "price-must-have-only-two-decimals": "Číslo musí mít maximálně dvě desetinná místa",
         "offline-title": "Offline",
-        "offline-description": "Nemáte přístup k internetu."
+        "offline-description": "Nemáte přístup k internetu.",
+        "error": "Chyba"
     },
     "text": {
         "you-can-fill-by-ine": "Všechny údaje můžete automaticky doplnit pouhým vyplněním IČa.",

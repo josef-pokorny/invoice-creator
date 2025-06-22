@@ -5,16 +5,17 @@
 
     import { m } from "$lib/paraglide/messages";
 
-    const intervalMS = 5 * 60 * 1000;
+    const intervalMS = 30 * 60 * 1000;
 
-    const { needRefresh, updateServiceWorker } = useRegisterSW({
+    const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW({
         onRegistered(r: any) {
             // uncomment following code if you want check for updates
 
             r &&
-                setInterval(() => {
+                setInterval(async () => {
                     console.log("Checking for sw update");
-                    r.update();
+                    await r.update();
+                    updateServiceWorker(false);
                 }, intervalMS);
             console.log(`SW Registered: `, r);
         },
@@ -24,9 +25,8 @@
     });
     const close = () => {
         needRefresh.set(false);
+        offlineReady.set(false);
     };
-
-    $: console.log({ $needRefresh });
 </script>
 
 {#if $needRefresh}

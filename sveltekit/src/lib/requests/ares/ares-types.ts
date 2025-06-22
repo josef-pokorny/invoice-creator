@@ -119,7 +119,7 @@ export interface IGovEkonomickeSubjektyReturn {
     dicSkDph: string;
 }
 
-export interface IGovError {
+export interface IAresError {
     kod: string;
     popis: string;
     subKod: string;

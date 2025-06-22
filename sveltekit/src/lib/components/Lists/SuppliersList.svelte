@@ -38,9 +38,13 @@
         suppliers = getSuppliersFromStorage(normalizeStringForSearch(search));
     }
 
-    function onCreateSupplier(e: SubmitEvent) {
-        e.preventDefault();
-        e.stopPropagation();
+    function onCreateSupplier(e?: SubmitEvent) {
+        console.log({ newKey });
+
+        e?.preventDefault();
+        e?.stopPropagation();
+
+        console.log({ newKey });
 
         if (!newKey.length) return;
 
@@ -64,6 +68,8 @@
             }
         }
         findSameKey(newKey);
+
+        console.log({ newKey });
 
         createSupplierInLocalStorage(newKey);
 

@@ -270,12 +270,12 @@
                     label={m["form.ine"]()}
                     bind:value={formStore.receiverBilling.ine}
                 />
-                {#if !invoiceValuesErrors.value["receiverBilling.ine"]}
-                    <ButtonRequestAres
-                        ine={formStore.receiverBilling.ine}
-                        bind:billing={formStore.receiverBilling}
-                    />
-                {/if}
+                <ButtonRequestAres
+                    ine={formStore.receiverBilling.ine}
+                    bind:billing={formStore.receiverBilling}
+                    type="receiver"
+                />
+
                 <Input
                     label={m["form.vat"]()}
                     bind:value={formStore.receiverBilling.vat}

@@ -7,13 +7,11 @@
     import { slide } from "svelte/transition";
     import { twMerge } from "tailwind-merge";
 
-    import { SupplierKeyPrefix } from "$lib/constants";
     import { m } from "$lib/paraglide/messages";
     import type { ISupplierBilling } from "$lib/pdf/invoice-types";
     import { ImportSupplierKeyPrefix } from "$lib/stores/supplier.svelte";
     import { deleteStore, setKey } from "$lib/stores/utils/utils.svelte";
     import { createId } from "$lib/utils";
-    import { getSuppliersFromStorage } from "$lib/utils/suppliers";
 
     import Accordion, {
         type IAccordionSnippetArguments,
@@ -55,9 +53,14 @@
     }) {
         if (!newName.length) throw "";
 
+        console.log({ newName });
+
         try {
-            setKey(SupplierKeyPrefix + prevName, SupplierKeyPrefix + newName);
-            getSuppliersFromStorage();
+            setKey(
+                ImportSupplierKeyPrefix + prevName,
+                ImportSupplierKeyPrefix + newName,
+            );
+            getSuppliers();
         } catch (e) {
             console.log(e);
             throw e;
@@ -86,7 +89,7 @@
         onchange={(event) => {
             try {
                 onUpdateSupplierName({
-                    prevName: key,
+                    prevName: key.substring(ImportSupplierKeyPrefix.length),
                     newName: event.currentTarget.value,
                 });
             } catch (e) {

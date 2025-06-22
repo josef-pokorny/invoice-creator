@@ -76,12 +76,11 @@
     label={m["form.ine"]()}
     bind:value={supplierStore.value.ine}
 />
-{#if !invoiceValuesErrors.value["supplierBilling.ine"]}
-    <ButtonRequestAres
-        ine={supplierStore.value.ine}
-        bind:billing={supplierStore.value}
-    />
-{/if}
+<ButtonRequestAres
+    ine={supplierStore.value.ine}
+    bind:billing={supplierStore.value}
+    type="supplier"
+/>
 
 <Input label={m["form.vat"]()} bind:value={supplierStore.value.vat} />
 

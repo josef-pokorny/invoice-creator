@@ -14,7 +14,10 @@
         "invoice-type": "Invoice type",
         "suppliers": "Suppliers",
         "new-supplier": "New supplier",
-        "supplier-preset": "Supplier preset"
+        "supplier-preset": "Supplier preset",
+        "saved-profiles": "Saved profiles",
+        "new-profile": "New profile",
+        "used-profile": "Profile used"
     },
     "actions": {
         "add-item": "Add item",
@@ -76,7 +79,8 @@
         "this-field-is-recommended": "It's recommended to fill this field",
         "price-must-have-only-two-decimals": "The number must have a maximum of two decimal places.",
         "offline-title": "Offline",
-        "offline-description": "You do not have access to the internet."
+        "offline-description": "You do not have access to the internet.",
+        "error": "Error"
     },
     "text": {
         "you-can-fill-by-ine": "You can automatically fill in all the data after filling in only the INE.",
