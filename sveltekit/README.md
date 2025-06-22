@@ -44,4 +44,4 @@ You can preview the production build with `pnpm run preview`.
 ## FIX
 
 - [x] !!!! Cant update supplier name
-- [ ] !!! Cant scroll and touch on touch devices (even on browser simulated) when scrolling/touching is done on the lower side of display. Idk why, possibly something with paneforge
+- [x] !!! Cant scroll and touch on touch devices (even on browser simulated) when scrolling/touching is done on the lower side of display. Idk why, possibly something with paneforge

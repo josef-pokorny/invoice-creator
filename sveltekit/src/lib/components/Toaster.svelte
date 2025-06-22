@@ -23,7 +23,7 @@
     <div
         {...toaster.value.root}
         style:--toasts={toasts.length}
-        class="toaster-container fixed !right-0 !bottom-4 flex w-[100%] max-w-[400px] flex-col"
+        class="toaster-container fixed !right-0 !bottom-4 flex w-[100%] max-w-[400px] flex-col pointer-events-none"
     >
         {#each toasts as toast, i (toast.id)}
             {@const variant = toast.data.variant || "error"};
@@ -36,7 +36,7 @@
                         : variant === "warning"
                           ? "bg-warning-400 text-warning-contrast-500"
                           : variant === "error"
-                            ? "bg-error-500 text-error-contrast-500"
+                            ? "bg-error-900 text-surface-contrast-950"
                             : "",
                     "relative flex h-[--toast-height] w-full flex-col justify-center rounded-xl px-4 text-left transition",
                 )}
