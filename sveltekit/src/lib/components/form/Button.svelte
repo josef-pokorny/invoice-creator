@@ -19,7 +19,6 @@
     let {
         children,
         isLoading,
-        class: className,
         buttonClass: buttonClass,
         ...props
     }: ButtonProps = $props();
@@ -30,10 +29,10 @@
 <button
     {...props}
     type={props.type || "button"}
-    aria-busy={isLoading ? "true" : "false"}
-    disabled={isLoading}
+    aria-busy={props["aria-busy"] || isLoading ? "true" : "false"}
+    disabled={props.disabled || isLoading}
+    class={twMerge("relative", props.class)}
     aria-describedby={isLoading ? ariaId : undefined}
-    class={twMerge("relative", className)}
 >
     {#if isLoading}
         <Spinner isAbosuluteCenter width="25px" thickness="4px" {ariaId} />
