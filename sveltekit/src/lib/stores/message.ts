@@ -1,4 +1,4 @@
-import { useLocalStorageContext } from "./sharedStore.svelte";
+import { useLocalStorageStore } from "./sharedStore.svelte";
 
 const defaultMessage = {
     closed: false,
@@ -11,9 +11,9 @@ export function useMessageStore({
     initialValue?: typeof defaultMessage;
     key?: string;
 } = {}) {
-    return useLocalStorageContext(
-        "messages-" + (key || ""),
-        defaultMessage,
+    return useLocalStorageStore({
+        key: "messages-" + (key || ""),
+        defaultValue: defaultMessage,
         initialValue,
-    );
+    });
 }

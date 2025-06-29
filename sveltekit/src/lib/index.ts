@@ -1,11 +1,10 @@
-import { PDFInvoice } from "$lib/pdf/Invoice";
-import { type IInvoiceProps } from "$lib/pdf/invoice-types";
-import moment from "$lib/moment";
-import { pdf } from "@react-pdf/renderer";
-import countries from "./i18n";
 import _ from "lodash";
-import { getLocale, type Locale } from "./paraglide/runtime";
+
+import moment from "$lib/moment";
+
+import countries from "./i18n";
 import { m } from "./paraglide/messages";
+import { getLocale, type Locale } from "./paraglide/runtime";
 
 export function countriesList(locale?: Locale) {
     return [
@@ -21,4 +20,3 @@ export function countriesList(locale?: Locale) {
         ),
     ];
 }
-

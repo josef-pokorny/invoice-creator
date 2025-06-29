@@ -1,17 +1,21 @@
+<!-- SVELTE 4 - DON'T CHANGE IT! -->
 <script lang="ts">
-    import { m } from "$lib/paraglide/messages";
     import { fade } from "svelte/transition";
     import { useRegisterSW } from "virtual:pwa-register/svelte";
 
-    const intervalMS = 5 * 60 * 1000;
+    import { m } from "$lib/paraglide/messages";
 
-    const { needRefresh, updateServiceWorker } = useRegisterSW({
+    const intervalMS = 30 * 60 * 1000;
+
+    const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW({
         onRegistered(r: any) {
             // uncomment following code if you want check for updates
+
             r &&
-                setInterval(() => {
+                setInterval(async () => {
                     console.log("Checking for sw update");
-                    r.update();
+                    await r.update();
+                    updateServiceWorker(false);
                 }, intervalMS);
             console.log(`SW Registered: `, r);
         },
@@ -21,6 +25,7 @@
     });
     const close = () => {
         needRefresh.set(false);
+        offlineReady.set(false);
     };
 </script>
 
@@ -38,11 +43,16 @@
 
         <button
             class="btn preset-filled-success-500"
+            type="button"
             on:click={() => updateServiceWorker(true)}
         >
             {m["pwa.reload"]()}
         </button>
-        <button class="btn preset-tonal hover:preset-filled" on:click={close}>
+        <button
+            class="btn preset-tonal hover:preset-filled"
+            type="button"
+            on:click={close}
+        >
             {m["actions.close"]()}
         </button>
     </div>

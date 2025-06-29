@@ -1,65 +1,90 @@
 <script lang="ts">
-    import type { IBilling } from "$lib/pdf/invoice-types";
+    import { createQuery } from "@tanstack/svelte-query";
+    import { twMerge } from "tailwind-merge";
+
     import { m } from "$lib/paraglide/messages";
+    import type { IBilling } from "$lib/pdf/invoice-types";
+    import queryKeys from "$lib/query/queryKeys";
     import { findAresByINE } from "$lib/requests/ares/ares-ine";
     import type { IGovEkonomickeSubjektyReturn } from "$lib/requests/ares/ares-types";
-    import { useToasterStore } from "$lib/stores/toaster";
+    import { useFormErrorsStore } from "$lib/stores/form.svelte";
+    import { addFormError } from "$lib/stores/utils/form-errors.svelte";
     import { isINEValid } from "$lib/validations/ine";
 
-    const toaster = useToasterStore().value;
+    import Button from "./form/Button.svelte";
+
+    const invoiceValuesErrors = useFormErrorsStore();
 
     let {
         aresINEData = $bindable(),
         billing = $bindable(),
+        type,
         ine,
     }: {
         aresINEData?: IGovEkonomickeSubjektyReturn;
         ine?: string;
         billing?: IBilling;
+        type?: "supplier" | "receiver";
     } = $props();
 
-    async function aresRequest() {
-        if (ine && isINEValid(ine)) {
-            try {
-                const data = await findAresByINE({ ine });
+    const query = createQuery(() => ({
+        queryKey: queryKeys.ares.ine(ine!),
+        queryFn: () => findAresByINE({ ine: ine! }),
+        enabled: Boolean(ine) && isINEValid(ine),
+        staleTime: 14 * 24 * 60 * 60 * 1000,
+        retry: false,
+        retryOnMount: false,
+        refetchOnMount: false,
+    }));
 
-                aresINEData = data;
+    async function aresAutocomplete() {
+        const data = query.data || (await query.refetch()).data;
 
-                const {
-                    obchodniJmeno,
-                    sidlo: {
-                        nazevUlice,
-                        cisloDomovni,
-                        cisloOrientacni,
-                        psc,
-                        nazevObce,
-                        nazevStatu,
-                    },
-                    icoId,
-                } = aresINEData;
+        if (data) {
+            const {
+                obchodniJmeno,
+                sidlo: {
+                    nazevUlice,
+                    cisloDomovni,
+                    cisloOrientacni,
+                    psc,
+                    nazevObce,
+                    nazevStatu,
+                },
+                icoId,
+            } = data;
 
-                billing = {
-                    fullname: obchodniJmeno,
-                    line1: `${nazevUlice} ${cisloDomovni}/${cisloOrientacni}`,
-                    postal: String(psc),
-                    city: nazevObce,
-                    country: nazevStatu,
-                    ine,
-                    vat: icoId,
-                };
-            } catch (e) {
-                toaster.error({
-                    description: m["errors.something-went-wrong-500"](),
-                });
-            }
+            billing = {
+                ...billing,
+                fullname: obchodniJmeno,
+                line1: `${nazevUlice} ${cisloDomovni}/${cisloOrientacni}`,
+                postal: String(psc),
+                city: nazevObce,
+                country: nazevStatu,
+                ine,
+                vat: icoId,
+            };
         }
     }
+
+    $effect(() => {
+        if (query.isError) {
+            if (type === "supplier") {
+                addFormError("supplierBilling.ine", m["errors.invalid-ine"]());
+            } else if (type === "receiver") {
+                addFormError("receiverBilling.ine", m["errors.invalid-ine"]());
+            }
+        }
+    });
 </script>
 
-<button
-    class="btn preset-filled-primary-500 font-medium"
-    type="button"
-    onclick={aresRequest}
->
-    {m["actions.fill-in-by-ine"]()}
-</button>
+{#if !invoiceValuesErrors.value["supplierBilling.ine"]}
+    <Button
+        isLoading={query.isLoading}
+        class={twMerge("btn preset-filled-primary-500 font-medium")}
+        onclick={aresAutocomplete}
+        type="button"
+    >
+        {m["actions.fill-in-by-ine"]()}
+    </Button>
+{/if}

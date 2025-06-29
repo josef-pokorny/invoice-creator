@@ -1,16 +1,19 @@
 <script lang="ts">
-    import { goto, invalidateAll } from "$app/navigation";
+    import { CZ, GB } from "country-flag-icons/string/1x1";
+
+    import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import Dialog from "$lib/components/Dialog.svelte";
     import { m } from "$lib/paraglide/messages";
     import {
         getLocale,
+        type Locale,
         locales,
         localizeHref,
         setLocale,
-        type Locale,
     } from "$lib/paraglide/runtime";
-    import { GB, CZ } from "country-flag-icons/string/1x1";
+
+    import Button from "../form/Button.svelte";
 
     function onSetLocale(locale: Locale) {
         setLocale(locale, { reload: false });
@@ -22,77 +25,67 @@
     }
 </script>
 
-<Dialog>
-    {#snippet button({ showModal, closeModal, isOpen })}
-        <button
-            type="button"
-            class="lang-change-trigger"
-            title={m["actions.change-language"]()}
-            onclick={() => {
-                isOpen ? closeModal && closeModal() : showModal && showModal();
-            }}
-            role="switch"
-            aria-checked={isOpen}
-        >
-            {#if getLocale() === "cs"}
-                {@html CZ}
-            {:else if getLocale() === "en"}
-                {@html GB}
-            {/if}
-        </button>
-    {/snippet}
-    {#snippet content()}
-        <div class="lang-change-content">
-            <h4 class="h4">{m["actions.change-language"]()}</h4>
-            <section class="languages">
-                {#each locales as locale}
-                    <button
-                        disabled={locale === getLocale()}
-                        onclick={() => onSetLocale(locale)}
-                        title={locale === "cs"
-                            ? "Čeština"
-                            : locale === "en"
-                              ? "English"
-                              : ""}
-                    >
-                        {#if locale === "cs"}
-                            {@html CZ}
-                        {:else if locale === "en"}
-                            {@html GB}
-                        {/if}
-                    </button>
-                    <!-- <a
-                        class="anchor"
-                        href={localizeHref(page.url.pathname, {
-                            locale,
-                        })}
-                        aria-disabled={locale === getLocale()}
-                        onclick={() => setLocale(locale)}
-                        title={locale === "cs"
-                            ? "Čeština"
-                            : locale === "en"
-                              ? "English"
-                              : ""}
-                    >
-                        {#if locale === "cs"}
-                            {@html CZ}
-                        {:else if locale === "en"}
-                            {@html GB}
-                        {/if}
-                    </a> -->
-                {/each}
-            </section>
-        </div>
-    {/snippet}
-</Dialog>
+<div class="wrapper">
+    <Dialog>
+        {#snippet button({ showModal, closeModal, isOpen })}
+            <Button
+                class="lang-change-trigger"
+                aria-checked={isOpen}
+                aria-label={m["actions.change-language"]()}
+                onclick={() => {
+                    isOpen
+                        ? closeModal && closeModal()
+                        : showModal && showModal();
+                }}
+                role="switch"
+                title={m["actions.change-language"]()}
+                type="button"
+            >
+                {#if getLocale() === "cs"}
+                    {@html CZ}
+                {:else if getLocale() === "en"}
+                    {@html GB}
+                {/if}
+            </Button>
+        {/snippet}
+        {#snippet content()}
+            <div class="lang-change-content">
+                <h4 class="h4">{m["actions.change-language"]()}</h4>
+                <section class="languages">
+                    {#each locales as locale}
+                        <Button
+                            disabled={locale === getLocale()}
+                            onclick={() => onSetLocale(locale)}
+                            title={locale === "cs"
+                                ? "Čeština"
+                                : locale === "en"
+                                  ? "English"
+                                  : ""}
+                        >
+                            {#if locale === "cs"}
+                                {@html CZ}
+                            {:else if locale === "en"}
+                                {@html GB}
+                            {/if}
+                        </Button>
+                    {/each}
+                </section>
+            </div>
+        {/snippet}
+    </Dialog>
+</div>
 
 <style lang="scss">
-    :global(dialog) {
-        width: 100%;
-        max-width: 400px;
+    .wrapper {
+        display: contents;
+
+        :global(dialog) {
+            width: 100%;
+            max-width: 400px;
+        }
     }
 
-    .lang-change-trigger {
+    :global(.lang-change-trigger) {
         transition: border 150ms;
 
         border-radius: 50%;
@@ -122,8 +115,7 @@
             align-items: center;
             justify-content: center;
 
-            a,
-            button {
+            :global(button) {
                 transition: border 150ms;
 
                 border-radius: 50%;
@@ -139,9 +131,8 @@
                     border-color: var(--color-primary-300);
                 }
 
-                &[aria-disabled="true"] {
+                &:disabled {
                     opacity: 0.5;
-                    pointer-events: none;
                 }
             }
         }

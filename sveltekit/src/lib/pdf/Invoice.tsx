@@ -1,25 +1,23 @@
-import React from "react";
 import {
     Document,
+    Font,
     Page,
+    StyleSheet,
     Text,
     View,
-    StyleSheet,
-    Font,
 } from "@react-pdf/renderer";
-import { EInvoiceType, type IInvoiceProps } from "./invoice-types";
+import React from "react";
+
 import moment from "$lib/moment";
 
-import { type IBilling } from "./invoice-types";
-
 import Roboto400 from "./fonts/roboto-400.ttf";
-import Roboto500 from "./fonts/roboto-500.ttf";
-import Roboto600 from "./fonts/roboto-600.ttf";
-
 import Roboto400Italic from "./fonts/roboto-400-italic.ttf";
+import Roboto500 from "./fonts/roboto-500.ttf";
 import Roboto500Italic from "./fonts/roboto-500-italic.ttf";
+import Roboto600 from "./fonts/roboto-600.ttf";
 import Roboto600Italic from "./fonts/roboto-600-italic.ttf";
-
+import { type IBilling } from "./invoice-types";
+import { EInvoiceType, type IInvoiceProps } from "./invoice-types";
 import { fromCents } from "./utils";
 
 Font.register({
@@ -63,25 +61,26 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto",
         fontSize: 11,
     },
+    page: {
+        display: "flex",
+        paddingBottom: 100,
+        justifyContent: "space-between",
+    },
     header: {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
         gap: 4,
-        padding: "30 18 0",
+        padding: "30 18 10",
     },
     footer: {
-        display: "flex",
+        marginBottom: -80,
+        padding: "0 18",
+    },
+    endInfo: {
         flexDirection: "column",
-        flex: 1,
         justifyContent: "flex-end",
         padding: "30 18",
-    },
-    page: {
-        display: "flex",
-    },
-    main: {
-        padding: "5 18 30",
     },
     companyName: {
         fontWeight: 600,
@@ -106,18 +105,15 @@ const styles = StyleSheet.create({
         width: "50%",
     },
     itemsTable: {
-        display: "flex",
-        flexDirection: "column",
-        marginBottom: 25,
+        padding: "0 10 30",
     },
     item: {
-        display: "flex",
         flexDirection: "row",
         borderColor: "gray",
-        borderBottomWidth: 2,
+        borderBottomWidth: 1,
         borderStyle: "solid",
         padding: "2 5",
-        fontSize: "10px",
+        fontSize: 10,
     },
     itemCount: {
         width: "6%",
@@ -140,7 +136,7 @@ const styles = StyleSheet.create({
         padding: "0 3",
     },
     itemVatPercentage: {
-        width: "10%",
+        width: "7%",
         padding: "0 3",
     },
     itemTotalWithVat: {
@@ -151,14 +147,16 @@ const styles = StyleSheet.create({
         padding: "0 3",
         flex: 1,
         minWidth: 1,
-        width: "100%",
     },
     line: {
         backgroundColor: "gray",
-        height: 2,
+        height: 1,
     },
     space: {
         height: 5,
+    },
+    totalContainer: {
+        padding: "15 10",
     },
     totalPrice: {
         fontSize: 18,
@@ -176,7 +174,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         padding: "2 5",
-        fontSize: "10px",
+        fontSize: 10,
         marginTop: 10,
     },
 });
@@ -184,24 +182,37 @@ const styles = StyleSheet.create({
 export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
     const withoutVatText = "bez DPH";
 
+    // const breakAtIndexes: number[] = [];
+
+    // {
+    //     let totalCharacters =
+    //         (invoiceData.customFooterText?.length || 0) +
+    //         (invoiceData.customTextUnderSupplier?.length || 0) +
+    //         (invoiceData.reverseCharge ? 50 : 0);
+
+    //     invoiceData.items.forEach((v, i) => {
+    //         totalCharacters += v.name.length;
+
+    //         if (totalCharacters > 100) {
+    //         }
+    //     });
+    // }
+
     return (
         <Document>
             <Page size="A4" style={{ ...styles.font, ...styles.page }}>
-                <View style={styles.header}>
-                    <Text style={styles.companyName}>
-                        <Text>{invoiceData?.companyName}</Text>
-                    </Text>
-                    <Text style={styles.refId}>
-                        {invoiceData.invoiceType === EInvoiceType.PRE_INVOICE
-                            ? "Proforma faktura"
-                            : invoiceData.invoiceType ===
-                                EInvoiceType.INVOICE_TAX_DOC
-                              ? "Faktura - daňový doklad"
-                              : "Faktura"}{" "}
-                        {invoiceData?.refId}
-                    </Text>
-                </View>
-                <View style={styles.main}>
+                <View style={{ flex: 1 }}>
+                    <View fixed style={styles.header}>
+                        <Text style={styles.companyName}>
+                            <Text>{invoiceData.companyName}</Text>
+                        </Text>
+                        <Text style={styles.refId}>
+                            <InvoiceName
+                                invoiceType={invoiceData.invoiceType}
+                                refId={invoiceData.refId}
+                            />
+                        </Text>
+                    </View>
                     <View style={styles.addresses}>
                         <View style={styles.address}>
                             <Text style={styles.h2}>Dodavatel</Text>
@@ -212,12 +223,14 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
 
                             <View style={styles.space} />
 
-                            {invoiceData.isSupplierSelfEmployed ? (
+                            {invoiceData.supplierBilling.isSelfEmployed && (
                                 <Text style={styles.textSecondary}>
                                     Fyzická osoba zapsaná v živnostenském
                                     rejstříku
                                 </Text>
-                            ) : (
+                            )}
+
+                            {invoiceData.customTextUnderSupplier && (
                                 <Text style={styles.textSecondary}>
                                     {invoiceData.customTextUnderSupplier}
                                 </Text>
@@ -244,12 +257,14 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                         </View>
                         <View style={styles.address}>
                             <Text style={styles.h2}>Odběratel</Text>
-                            <BillingView billing={invoiceData.billing} />
+                            <BillingView
+                                billing={invoiceData.receiverBilling}
+                            />
 
-                            {(invoiceData?.issuedAt ||
-                                invoiceData?.paidAt ||
-                                invoiceData?.pickedUpAt ||
-                                invoiceData?.paymentDueDate) && (
+                            {(invoiceData.issuedAt ||
+                                invoiceData.paidAt ||
+                                invoiceData.pickedUpAt ||
+                                invoiceData.paymentDueDate) && (
                                 <>
                                     <View style={styles.space} />
                                     <View style={styles.line} />
@@ -258,42 +273,42 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                             )}
 
                             <View style={{ fontSize: 10 }}>
-                                {invoiceData?.issuedAt && (
+                                {invoiceData.issuedAt && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum vystavení:{" "}
                                         </Text>
-                                        {moment(invoiceData?.issuedAt)
+                                        {moment(invoiceData.issuedAt)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
                                 )}
-                                {invoiceData?.paidAt && (
+                                {invoiceData.paidAt && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum uskut. zdaň. plnění:{" "}
                                         </Text>
-                                        {moment(invoiceData?.paidAt)
+                                        {moment(invoiceData.paidAt)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
                                 )}
-                                {invoiceData?.pickedUpAt && (
+                                {invoiceData.pickedUpAt && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum převzetí:{" "}
                                         </Text>
-                                        {moment(invoiceData?.pickedUpAt)
+                                        {moment(invoiceData.pickedUpAt)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
                                 )}
-                                {invoiceData?.paymentDueDate && (
+                                {invoiceData.paymentDueDate && (
                                     <Text>
                                         <Text style={styles.italic}>
                                             Datum splatnosti:{" "}
                                         </Text>
-                                        {moment(invoiceData?.paymentDueDate)
+                                        {moment(invoiceData.paymentDueDate)
                                             .locale("cs")
                                             .format("l")}
                                     </Text>
@@ -301,17 +316,18 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                             </View>
                         </View>
                     </View>
-                    <View style={styles.itemsTable}>
+                    <View wrap style={styles.itemsTable}>
                         <View
+                            fixed
                             style={{
                                 ...styles.item,
                                 ...styles.italic,
                                 fontWeight: 500,
                             }}
                         >
+                            <Text style={styles.itemName}>Název položky</Text>
                             <Text style={styles.itemCount}>Počet</Text>
                             <Text style={styles.itemMeasurementUnit}>MJ</Text>
-                            <Text style={styles.itemName}>Název položky</Text>
                             <Text style={styles.itemPriceForMU}>
                                 Cena za MJ
                             </Text>
@@ -332,16 +348,19 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                         </View>
                         {invoiceData.items.map((item) => (
                             <View
+                                wrap={false}
                                 style={styles.item}
                                 key={item.name + item.count + item.id}
                             >
+                                <Text style={styles.itemName}>
+                                    {breakText(item.name)}
+                                </Text>
                                 <Text style={styles.itemCount}>
                                     {breakText(item.count)}
                                 </Text>
                                 <Text style={styles.itemMeasurementUnit}>
                                     {breakText(item.measurementUnit)}
                                 </Text>
-                                <Text style={styles.itemName}>{item.name}</Text>
                                 <Text style={styles.itemPriceForMU}>
                                     {breakText(
                                         fromCents(Number(item.singlePrice)),
@@ -369,7 +388,7 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                                 )}
                             </View>
                         ))}
-                        <View style={styles.totalRow}>
+                        <View wrap={false} style={styles.totalRow}>
                             <Text
                                 style={{
                                     ...styles.itemCount,
@@ -400,25 +419,63 @@ export const PDFInvoice = ({ invoiceData }: IInvoiceProps) => {
                             )}
                         </View>
                     </View>
-                    {invoiceData.roundTotal && (
-                        <Text style={styles.rounded}>
-                            <Text style={{ ...styles.italic }}>
-                                Zaokrouhlení:
+                    <View wrap={false} style={styles.totalContainer}>
+                        {invoiceData.roundTotal && (
+                            <Text style={styles.rounded}>
+                                <Text style={{ ...styles.italic }}>
+                                    Zaokrouhlení:
+                                </Text>{" "}
+                                {fromCents(invoiceData.roundedTotalPriceBy)}{" "}
+                                {invoiceData.currency}
+                            </Text>
+                        )}
+                        <Text style={styles.totalPrice}>
+                            <Text style={{ fontWeight: 500, ...styles.italic }}>
+                                Celkem k platbě:
                             </Text>{" "}
-                            {fromCents(invoiceData.roundedTotalPriceBy)}{" "}
-                            {invoiceData?.currency}
+                            {fromCents(invoiceData.roundedTotalPrice)}{" "}
+                            {invoiceData.currency}
                         </Text>
-                    )}
-                    <Text style={styles.totalPrice}>
-                        <Text style={{ fontWeight: 500, ...styles.italic }}>
-                            Celkem k platbě:
-                        </Text>{" "}
-                        {fromCents(invoiceData.roundedTotalPrice)}{" "}
-                        {invoiceData?.currency}
-                    </Text>
+                    </View>
+                    <View wrap={false} style={styles.endInfo}>
+                        <Text>{invoiceData.customFooterText}</Text>
+                    </View>
                 </View>
-                <View style={styles.footer}>
-                    <Text>{invoiceData.customFooterText}</Text>
+
+                <View fixed style={styles.footer}>
+                    {invoiceData.reverseCharge && (
+                        <>
+                            <View style={styles.line} />
+                            <View style={styles.space} />
+                            <Text style={{ paddingLeft: 5 }}>
+                                Reverse charge - daň odvede zákazník
+                            </Text>
+                            <View style={styles.space} />
+                            <View style={styles.line} />
+                            <View style={{ ...styles.space, height: 10 }} />
+                        </>
+                    )}
+                    <View
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <Text>
+                            <InvoiceName
+                                invoiceType={invoiceData.invoiceType}
+                                refId={invoiceData.refId}
+                            />
+                        </Text>
+                        <Text
+                            render={({ pageNumber, totalPages }) => (
+                                <>
+                                    Strana {pageNumber} z {totalPages}
+                                </>
+                            )}
+                        />
+                    </View>
                 </View>
             </Page>
         </Document>
@@ -435,16 +492,16 @@ const BillingView = ({
     return (
         <>
             <View style={styles.space} />
-            <Text style={{ fontWeight: 500 }}>{billing?.fullname}</Text>
-            <Text style={styles.textSecondary}>{billing?.line1}</Text>
+            <Text style={{ fontWeight: 500 }}>{billing.fullname}</Text>
+            <Text style={styles.textSecondary}>{billing.line1}</Text>
             <Text style={styles.textSecondary}>
-                {billing?.postal} {billing?.city}
+                {billing.postal} {billing.city}
             </Text>
-            <Text style={styles.textSecondary}>{billing?.country}</Text>
+            <Text style={styles.textSecondary}>{billing.country}</Text>
             <View style={styles.space} />
-            {billing?.ine && (
+            {billing.ine && (
                 <Text>
-                    <Text style={styles.italic}>IČO:</Text> {billing?.ine}
+                    <Text style={styles.italic}>IČO:</Text> {billing.ine}
                 </Text>
             )}
             {supplier ? (
@@ -459,15 +516,32 @@ const BillingView = ({
                     )}
                 </Text>
             ) : (
-                billing?.vat && (
+                billing.vat && (
                     <Text>
-                        <Text style={styles.italic}>DIČ:</Text> {billing?.vat}
+                        <Text style={styles.italic}>DIČ:</Text> {billing.vat}
                     </Text>
                 )
             )}
         </>
     );
 };
+
+const InvoiceName = ({
+    invoiceType,
+    refId,
+}: {
+    invoiceType: EInvoiceType;
+    refId: string;
+}) => (
+    <>
+        {invoiceType === EInvoiceType.PRE_INVOICE
+            ? "Proforma faktura"
+            : invoiceType === EInvoiceType.INVOICE_TAX_DOC
+              ? "Faktura - daňový doklad"
+              : "Faktura"}{" "}
+        {refId}
+    </>
+);
 
 function breakText(text: string | number | undefined) {
     return String(text)

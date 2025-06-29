@@ -1,8 +1,8 @@
 export interface IInvoiceValues {
     companyName?: string;
     items: IItem[];
-    supplierBilling: IBilling;
-    billing: IBilling;
+    supplierBilling: ISupplierBilling;
+    receiverBilling: IReceiverBilling;
     refId: string;
     totalPrice: number | string;
     currency: string;
@@ -13,11 +13,21 @@ export interface IInvoiceValues {
     paymentDueDate?: string;
     paymentType?: string;
     paymentInfo?: string;
-    isSupplierSelfEmployed?: boolean;
     customTextUnderSupplier?: string;
     customFooterText?: string;
     countVat?: boolean;
     roundTotal?: boolean;
+    reverseCharge?: boolean;
+}
+
+export enum ECzechReverseChargeParagraph {
+    "92a" = "92a",
+    "92b" = "92b",
+    "92c" = "92c",
+    "92d" = "92d",
+    "92e" = "92e",
+    "92f" = "92f",
+    "92g" = "92g",
 }
 
 export interface IBilling {
@@ -29,6 +39,12 @@ export interface IBilling {
     ine?: string;
     vat?: string;
 }
+
+export interface ISupplierBilling extends IBilling {
+    isSelfEmployed: boolean;
+}
+
+export type IReceiverBilling = IBilling;
 
 export interface IInvoiceData extends IInvoiceValues {
     totalPrice: number;

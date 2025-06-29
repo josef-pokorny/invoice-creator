@@ -32,13 +32,13 @@ export interface IGovEkonomickeSubjektyReturn {
         pscTxt: string;
         typCisloDomovni: number;
     };
-    pravniForma: "393";
-    financniUrad: "550";
+    pravniForma: string;
+    financniUrad: string;
     datumVzniku: string;
     datumZaniku: string;
     datumAktualizace: string;
     dic: string;
-    icoId: "ARES_69625608";
+    icoId: string;
     adresaDorucovaci: {
         radekAdresy1: string;
         radekAdresy2: string;
@@ -119,7 +119,7 @@ export interface IGovEkonomickeSubjektyReturn {
     dicSkDph: string;
 }
 
-export interface IGovError {
+export interface IAresError {
     kod: string;
     popis: string;
     subKod: string;

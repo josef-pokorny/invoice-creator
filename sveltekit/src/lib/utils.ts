@@ -1,15 +1,8 @@
-import { type ClassValue, clsx } from "clsx";
 import _ from "lodash";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+import { v4 as uuid } from "uuid";
 
 export function createId(prefix: string = "input_") {
-    return (
-        _.uniqueId(prefix) + String(Math.round(Math.random() * 999999999999))
-    );
+    return _.uniqueId(prefix) + uuid();
 }
 
 export function countDecimals(value: number) {
@@ -24,4 +17,28 @@ export function countDecimals(value: number) {
     }
 
     return parseInt(str.split("-")[1] || "0", 10);
+}
+
+export function getNestedKeys(obj: Record<string, any>, prefix = ""): string[] {
+    const keys: string[] = [];
+
+    for (const key in obj) {
+        const value = obj[key];
+        const path = prefix ? `${prefix}.${key}` : key;
+
+        if (_.isPlainObject(value)) {
+            keys.push(path);
+            keys.push(...getNestedKeys(value, path));
+        } else {
+            keys.push(path);
+        }
+    }
+
+    return keys;
+}
+
+export function normalizeStringForSearch(str: string) {
+    return _.toLower(str.replace(/\s/g, ""))
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 }

@@ -1,5 +1,6 @@
-import type { NestedKeyOf, YupErrorsList } from "$lib/types/types";
 import * as yup from "yup";
+
+import type { NestedKeyOf, YupErrorsList } from "$lib/types/types";
 
 export function extractYupErrors<T extends object>(
     e: yup.ValidationError,

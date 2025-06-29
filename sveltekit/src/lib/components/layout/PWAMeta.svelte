@@ -4,20 +4,12 @@
     // @ts-expect-error
     import { pwaInfo } from "virtual:pwa-info";
 
-    const intervalMS = 5 * 60 * 1000;
-
     onMount(async () => {
         if (pwaInfo) {
             const { registerSW } = await import("virtual:pwa-register");
             registerSW({
                 immediate: true,
                 onRegistered(r) {
-                    // uncomment following code if you want check for updates
-                    r &&
-                        setInterval(() => {
-                            console.log("Checking for sw update");
-                            r.update();
-                        }, intervalMS);
                     console.log(`SW Registered: `, r);
                 },
                 onRegisterError(error) {

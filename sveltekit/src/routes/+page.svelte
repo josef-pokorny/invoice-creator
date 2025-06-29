@@ -1,91 +1,79 @@
 <script lang="ts">
-    import PdfViewer from "svelte-pdf";
-    import Input from "$lib/components/form/Input.svelte";
-    import { onMount } from "svelte";
-    import { useFormErrorsStore, useFormStore } from "$lib/stores/form";
-    import { m } from "$lib/paraglide/messages";
-    import Item from "$lib/components/form/Item.svelte";
-    import SvgPlusCircle from "$lib/svgs/svg-plus-circle.svelte";
+    import SaveIcon from "@lucide/svelte/icons/save";
+    import X from "@lucide/svelte/icons/x";
     import _ from "lodash";
-    import Switch from "$lib/components/form/Switch.svelte";
-    import Datepicker from "$lib/components/form/Datepicker.svelte";
-    import {
-        DefaultItem,
-        EInvoiceType,
-        type IInvoiceValues,
-    } from "$lib/pdf/invoice-types";
-    import Select from "$lib/components/form/Select.svelte";
-    import { fade } from "svelte/transition";
-    import { SaveIcon, X } from "@lucide/svelte";
-    import * as yup from "yup";
-    import { yupBillingValidation } from "$lib/validations/invoice";
-    import { createInvoiceData, renderInvoiceBlobUrl } from "$lib/pdf/utils";
-    import type { NestedKeyOf, YupShape } from "$lib/types/types";
+    import { onMount } from "svelte";
+
     import ButtonRequestAres from "$lib/components/ButtonRequestAres.svelte";
-    import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
+    import Button from "$lib/components/form/Button.svelte";
+    import Datepicker from "$lib/components/form/Datepicker.svelte";
+    import Input from "$lib/components/form/Input.svelte";
+    import Item from "$lib/components/form/Item.svelte";
+    import Select from "$lib/components/form/Select.svelte";
+    import Switch from "$lib/components/form/Switch.svelte";
+    import SupplierFormPart from "$lib/components/invoice/SupplierFormPart.svelte";
     import Message from "$lib/components/Message.svelte";
-
-    // region:    --- Form validation
-
-    const schema = yup.object().shape<YupShape<Partial<IInvoiceValues>>>({
-        issuedAt: yup
-            .string()
-            .required(m["errors.this-field-is-recommended"]()),
-        paymentDueDate: yup
-            .string()
-            .when(
-                ["paymentInfo", "paymentType"] as NestedKeyOf<IInvoiceValues>[],
-                (values, schema) => {
-                    const [paymentInfo, paymentType]: [
-                        IInvoiceValues["paymentInfo"],
-                        IInvoiceValues["paymentType"],
-                    ] = values as any;
-
-                    if (paymentInfo?.length || paymentType?.length) {
-                        return yup
-                            .string()
-                            .required(m["errors.this-field-is-recommended"]());
-                    } else {
-                        return schema;
-                    }
-                },
-            ),
-        billing: yupBillingValidation,
-        supplierBilling: yupBillingValidation,
-    });
-
-    // endregion: --- Form validation
+    import { m } from "$lib/paraglide/messages";
+    import { getLocale } from "$lib/paraglide/runtime";
+    import { DefaultItem, EInvoiceType } from "$lib/pdf/invoice-types";
+    import {
+        createInvoiceData,
+        renderInvoiceBlobUrl,
+        renderInvoiceFile,
+    } from "$lib/pdf/utils";
+    import { useFormKeyStore, useFormStore } from "$lib/stores/form.svelte";
+    import { useFormErrorsStore } from "$lib/stores/form.svelte";
+    import SvgPlusCircle from "$lib/svgs/svg-plus-circle.svelte";
+    import SvgShare from "$lib/svgs/svg-share.svelte";
+    import { createId } from "$lib/utils";
 
     let url: string | null = $state(null);
 
-    const invoiceValues = useFormStore().value;
-    let invoiceValuesErrors = useFormErrorsStore();
+    const formKey = useFormKeyStore();
+    const formStore = $derived(
+        useFormStore({
+            get key() {
+                return formKey.value.invoiceName;
+            },
+        }).value,
+    );
+    const invoiceValuesErrors = useFormErrorsStore();
+
+    let issuedAtDate = $derived(
+        formStore.issuedAt ? new Date(formStore.issuedAt) : undefined,
+    );
+    let paidAtDate = $derived(
+        formStore.paidAt ? new Date(formStore.paidAt) : undefined,
+    );
+    let pickedUpAtDate = $derived(
+        formStore.pickedUpAt ? new Date(formStore.pickedUpAt) : undefined,
+    );
+    let paymentDueDate = $derived(
+        formStore.paymentDueDate
+            ? new Date(formStore.paymentDueDate)
+            : undefined,
+    );
 
     const renderInvoiceFunc = (download?: boolean) =>
         renderInvoiceBlobUrl({
             invoiceProps: {
-                invoiceData: createInvoiceData(invoiceValues),
+                invoiceData: createInvoiceData(formStore),
             },
             download,
-            prefixFileName: `${m["labels.invoice"]()} - `,
+            prefixFileName: `${m["labels.invoice"]()}`,
+        });
+
+    const renderInvoiceShare = () =>
+        renderInvoiceFile({
+            invoiceProps: {
+                invoiceData: createInvoiceData(formStore),
+            },
+            prefixFileName: `${m["labels.invoice"]()}`,
         });
 
     let timeoutId: number;
     function renderPDF(skipTimeout?: boolean) {
         clearTimeout(timeoutId);
-
-        schema
-            .validate(invoiceValues, { abortEarly: false })
-            .then(() => {
-                invoiceValuesErrors.reset();
-            })
-            .catch((e: yup.ValidationError) => {
-                requestAnimationFrame(() => {
-                    invoiceValuesErrors.reset();
-
-                    extractYupErrors(e, invoiceValuesErrors.value);
-                });
-            });
 
         timeoutId = setTimeout(
             () => {
@@ -101,10 +89,10 @@
     let isMounted = false;
     $effect(() => {
         ({
-            ...invoiceValues,
-            ...invoiceValues.items,
-            ...invoiceValues.billing,
-            ...invoiceValues.supplierBilling,
+            ...formStore,
+            ...formStore.items,
+            ...formStore.receiverBilling,
+            ...formStore.supplierBilling,
         });
 
         if (isMounted) {
@@ -121,362 +109,394 @@
         };
     });
 
-    let issuedAtDate = $derived(
-        invoiceValues.issuedAt ? new Date(invoiceValues.issuedAt) : undefined,
-    );
-    let paidAtDate = $derived(
-        invoiceValues.paidAt ? new Date(invoiceValues.paidAt) : undefined,
-    );
-    let pickedUpAtDate = $derived(
-        invoiceValues.pickedUpAt
-            ? new Date(invoiceValues.pickedUpAt)
-            : undefined,
-    );
-    let paymentDueDate = $derived(
-        invoiceValues.paymentDueDate
-            ? new Date(invoiceValues.paymentDueDate)
-            : undefined,
-    );
+    let dialogEl: HTMLDialogElement | null = $state(null);
+    let isDialogOpened = $state(false);
 
-    let isFullPreview = $state(false);
+    function closeDialog() {
+        dialogEl?.close();
+        isDialogOpened = false;
+    }
 
-    $effect(() => {
-        document.body.style.overflow = isFullPreview ? "hidden" : "";
-    });
+    function openDialog() {
+        dialogEl?.showModal();
+        isDialogOpened = true;
+    }
+
+    let currentPageNum = $state(1);
 </script>
 
-{#if isFullPreview}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-        transition:fade={{ duration: 120 }}
-        class="pdf-full-preview fixed top-0 right-0 z-10 h-[100vh] w-[100vw]"
-    >
-        <div class="relative h-[100%]">
-            <button
-                onclick={() => {
-                    isFullPreview = false;
-                }}
-                type="button"
-                class="btn absolute top-0 left-0"
+<dialog bind:this={dialogEl} class="h-full max-h-full w-full max-w-full">
+    <div class="pdf-full-preview">
+        <form method="dialog" onsubmit={closeDialog}>
+            <Button class="btn absolute top-0 right-0 z-50" type="submit">
+                <X class="stroke-error-600 h-[48px] w-[48px]" />
+            </Button>
+        </form>
+
+        <div class="pdf-viewer-wrap">
+            {#await import('@josef-pokorny/svelte-pdf') then { default: PdfViewer }}
+                {#await import(`../messages/${getLocale()}.json`) then { default: translations }}
+                    {#if url && isDialogOpened}
+                        {#key url}
+                            <PdfViewer
+                                pdfjsWorkerSrc={new URL(
+                                    "pdfjs-dist/build/pdf.worker.mjs",
+                                    import.meta.url,
+                                ).toString()}
+                                scale={4}
+                                showButtons={["navigation", "pageInfo"]}
+                                showTopButton={false}
+                                translations={translations["svelte-pdf"]}
+                                {url}
+                                bind:currentPageNum
+                            />
+                        {/key}
+                    {/if}
+                {/await}
+            {/await}
+        </div>
+    </div>
+</dialog>
+
+<div class="page-wrap">
+    <div class="w-full max-w-[380px] shrink-0">
+        <form
+            class="relative mb-15 gap-2 px-1"
+            onsubmit={(e) => {
+                e.preventDefault();
+                renderPDF(true);
+            }}
+        >
+            <div class="mb-15 flex w-full flex-col gap-2 px-1">
+                <h2 class="h3 text-center">{m["labels.invoice"]()}</h2>
+
+                <h3 class="h5 font-bold uppercase">{m["form.general"]()}</h3>
+                <Select
+                    label={m["labels.invoice-type"]()}
+                    bind:value={formStore.invoiceType}
+                    options={Object.values(EInvoiceType).map((invoiceType) => ({
+                        label: m[`form.${invoiceType}`](),
+                        value: invoiceType,
+                    }))}
+                />
+
+                <Input
+                    label={m["form.company"]()}
+                    bind:value={formStore.companyName}
+                />
+                <Input label={m["form.refid"]()} bind:value={formStore.refId} />
+                <Input
+                    label={m["form.currency"]()}
+                    bind:value={formStore.currency}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["issuedAt"]}
+                    label={m["form.issued-at"]()}
+                    type="date"
+                    bind:value={issuedAtDate}
+                    bind:isoDate={formStore.issuedAt}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["paidAt"]}
+                    label={m["form.paid-at"]()}
+                    type="date"
+                    bind:value={paidAtDate}
+                    bind:isoDate={formStore.paidAt}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["pickedUpAt"]}
+                    label={m["form.pickup-at"]()}
+                    type="date"
+                    bind:value={pickedUpAtDate}
+                    bind:isoDate={formStore.pickedUpAt}
+                />
+                <Datepicker
+                    error={invoiceValuesErrors.value["paymentDueDate"]}
+                    label={m["form.payment-due"]()}
+                    type="date"
+                    bind:value={paymentDueDate}
+                    bind:isoDate={formStore.paymentDueDate}
+                />
+                <Switch
+                    classContainer="mt-4"
+                    label={m["form.reverse-charge"]()}
+                    bind:checked={formStore.reverseCharge}
+                />
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <SupplierFormPart />
+
+                <Input
+                    label={m["form.custom-text-under-supplier"]()}
+                    type="textarea"
+                    bind:value={formStore.customTextUnderSupplier}
+                />
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <h3 class="h5 font-bold uppercase">{m["form.receiver"]()}</h3>
+                <Message id="receiver-ine-fill" clossable>
+                    {m["text.you-can-fill-by-ine"]()}
+                </Message>
+                <Input
+                    error={invoiceValuesErrors.value[
+                        "receiverBilling.fullname"
+                    ]}
+                    label={m["form.fullname"]()}
+                    bind:value={formStore.receiverBilling.fullname}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["receiverBilling.line1"]}
+                    label={m["form.address"]()}
+                    bind:value={formStore.receiverBilling.line1}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["receiverBilling.postal"]}
+                    label={m["form.postal"]()}
+                    bind:value={formStore.receiverBilling.postal}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["receiverBilling.city"]}
+                    label={m["form.city"]()}
+                    bind:value={formStore.receiverBilling.city}
+                />
+                <Input
+                    label={m["form.country"]()}
+                    bind:value={formStore.receiverBilling.country}
+                />
+                <Input
+                    error={invoiceValuesErrors.value["receiverBilling.ine"]}
+                    label={m["form.ine"]()}
+                    bind:value={formStore.receiverBilling.ine}
+                />
+                <ButtonRequestAres
+                    ine={formStore.receiverBilling.ine}
+                    bind:billing={formStore.receiverBilling}
+                    type="receiver"
+                />
+
+                <Input
+                    label={m["form.vat"]()}
+                    bind:value={formStore.receiverBilling.vat}
+                />
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <h3 class="h5 font-bold uppercase">{m["form.items"]()}</h3>
+                <Switch
+                    label={m["form.count-vat"]()}
+                    bind:checked={formStore.countVat}
+                />
+                <Switch
+                    label={m["form.round-total"]()}
+                    bind:checked={formStore.roundTotal}
+                />
+
+                {#each formStore.items as item (item.id)}
+                    <Item {item} />
+                {/each}
+
+                <Button
+                    class="btn btn-group preset-filled-success-100-900"
+                    onclick={() => {
+                        formStore.items.push(
+                            _.cloneDeep({
+                                ...DefaultItem,
+                                id: createId("item"),
+                            }),
+                        );
+                    }}
+                    type="button"
+                >
+                    <SvgPlusCircle class="fill-success-600 w-10" />
+                    {m["actions.add-item"]()}
+                </Button>
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <Input
+                    label={m["form.payment-type"]()}
+                    bind:value={formStore.paymentType}
+                />
+                <Input
+                    class="min-h-[8rem]"
+                    label={m["form.payment-info"]()}
+                    type="textarea"
+                    bind:value={formStore.paymentInfo}
+                />
+
+                <hr class="hr mx-7 my-5 w-[auto]" />
+
+                <Input
+                    class="min-h-[8rem]"
+                    label={m["form.custom-footer-text"]()}
+                    type="textarea"
+                    bind:value={formStore.customFooterText}
+                />
+            </div>
+
+            <div
+                class="sticky bottom-0 flex min-h-15 gap-1 bg-[var(--body-background-color-dark)]"
             >
-                <X class="stroke-error-600 h-[64px] w-[64px]" />
-            </button>
-            <div class="pdf-viewer-wrap h-[100%] overflow-auto">
+                <Button
+                    class="btn preset-filled-success-100-900 flex-1 font-medium"
+                    type="submit"
+                >
+                    {m["actions.save"]()}
+                </Button>
+                <Button
+                    class="btn preset-filled-primary-400-600"
+                    onclick={openDialog}
+                    type="button"
+                >
+                    {m["actions.full-preview"]()}
+                </Button>
+            </div>
+            <div class="mt-2 flex h-1 min-h-15 gap-1">
+                <Button
+                    class="btn preset-filled-primary-400-600 h-full"
+                    onclick={async () => {
+                        await navigator.share({
+                            files: [await renderInvoiceShare()],
+                            title: "Images",
+                            text: "Beautiful images",
+                        });
+                    }}
+                    title={m["labels.share"]()}
+                    type="button"
+                >
+                    <SvgShare class="w-10 fill-white" />
+                </Button>
+                <Button
+                    class="btn preset-filled-success-100-900 h-full flex-1"
+                    onclick={() => renderInvoiceFunc(true)}
+                    type="button"
+                >
+                    <SaveIcon class="fill-success-600 w-10" />
+                    {m["actions.download"]()}
+                </Button>
+            </div>
+        </form>
+    </div>
+
+    <div class="pdf-viewer-wrap">
+        {#await import('@josef-pokorny/svelte-pdf') then { default: PdfViewer }}
+            {#await import(`../messages/${getLocale()}.json`) then { default: translations }}
                 {#if url}
                     {#key url}
                         <PdfViewer
-                            {url}
+                            pdfjsWorkerSrc={new URL(
+                                "pdfjs-dist/build/pdf.worker.mjs",
+                                import.meta.url,
+                            ).toString()}
+                            scale={2.5}
+                            showButtons={["navigation", "pageInfo"]}
                             showTopButton={false}
-                            showButtons={[]}
-                            scale={4}
+                            translations={translations["svelte-pdf"]}
+                            {url}
+                            bind:currentPageNum
                         />
                     {/key}
                 {/if}
-            </div>
-        </div>
-    </div>
-{/if}
-
-<div class="main-wrap relative mb-40 flex justify-center gap-x-3 px-2">
-    <form
-        class="relative m-0 mt-5 mb-15 flex w-full max-w-[420px] shrink-0 flex-col gap-2"
-        onsubmit={(e) => {
-            e.preventDefault();
-            renderPDF(true);
-        }}
-    >
-        <h2 class="h3 text-center">{m["labels.invoice"]()}</h2>
-
-        <h3 class="h5 font-bold uppercase">{m["form.general"]()}</h3>
-        <Select bind:value={invoiceValues.invoiceType}>
-            {#snippet options()}
-                {#each Object.values(EInvoiceType) as invoiceType (invoiceType)}
-                    <option value={invoiceType}>
-                        {m[`form.${invoiceType}`]()}
-                    </option>
-                {/each}
-            {/snippet}
-        </Select>
-        <Input
-            bind:value={invoiceValues.companyName}
-            label={m["form.company"]()}
-        />
-        <Input bind:value={invoiceValues.refId} label={m["form.refid"]()} />
-        <Input
-            bind:value={invoiceValues.currency}
-            label={m["form.currency"]()}
-        />
-        <Datepicker
-            label={m["form.issued-at"]()}
-            type="date"
-            bind:value={issuedAtDate}
-            bind:isoDate={invoiceValues.issuedAt}
-            error={invoiceValuesErrors.value["issuedAt"]}
-        />
-        <Datepicker
-            label={m["form.paid-at"]()}
-            type="date"
-            bind:value={paidAtDate}
-            bind:isoDate={invoiceValues.paidAt}
-            error={invoiceValuesErrors.value["paidAt"]}
-        />
-        <Datepicker
-            label={m["form.pickup-at"]()}
-            type="date"
-            bind:value={pickedUpAtDate}
-            bind:isoDate={invoiceValues.pickedUpAt}
-            error={invoiceValuesErrors.value["pickedUpAt"]}
-        />
-        <Datepicker
-            label={m["form.payment-due"]()}
-            type="date"
-            bind:value={paymentDueDate}
-            bind:isoDate={invoiceValues.paymentDueDate}
-            error={invoiceValuesErrors.value["paymentDueDate"]}
-        />
-
-        <hr class="hr mx-7 my-4 w-[auto]" />
-
-        <h3 class="h5 font-bold uppercase">{m["form.supplier"]()}</h3>
-        <Message clossable id="supplier-ine-fill">
-            {m["text.you-can-fill-by-ine"]()}
-        </Message>
-        <Input
-            bind:value={invoiceValues.supplierBilling.fullname}
-            label={m["form.fullname"]()}
-            error={invoiceValuesErrors.value["supplierBilling.fullname"]}
-        />
-        <Input
-            bind:value={invoiceValues.supplierBilling.line1}
-            label={m["form.address"]()}
-            error={invoiceValuesErrors.value["supplierBilling.line1"]}
-        />
-        <Input
-            bind:value={invoiceValues.supplierBilling.postal}
-            label={m["form.postal"]()}
-            error={invoiceValuesErrors.value["supplierBilling.postal"]}
-        />
-        <Input
-            bind:value={invoiceValues.supplierBilling.city}
-            label={m["form.city"]()}
-            error={invoiceValuesErrors.value["supplierBilling.city"]}
-        />
-        <Input
-            bind:value={invoiceValues.supplierBilling.country}
-            label={m["form.country"]()}
-        />
-        <Input
-            bind:value={invoiceValues.supplierBilling.ine}
-            label={m["form.ine"]()}
-            error={invoiceValuesErrors.value["supplierBilling.ine"]}
-        />
-        {#if !invoiceValuesErrors.value["supplierBilling.ine"]}
-            <ButtonRequestAres
-                ine={invoiceValues.supplierBilling.ine}
-                bind:billing={invoiceValues.supplierBilling}
-            />
-        {/if}
-
-        <Input
-            bind:value={invoiceValues.supplierBilling.vat}
-            label={m["form.vat"]()}
-        />
-
-        <Switch
-            bind:checked={invoiceValues.isSupplierSelfEmployed}
-            label={m["form.is-selfemployed"]()}
-        />
-
-        {#if !invoiceValues.isSupplierSelfEmployed}
-            <Input
-                bind:value={invoiceValues.customTextUnderSupplier}
-                label={m["form.custom-text-under-supplier"]()}
-                type="textarea"
-            />
-        {/if}
-
-        <hr class="hr mx-7 my-4 w-[auto]" />
-
-        <h3 class="h5 font-bold uppercase">{m["form.receiver"]()}</h3>
-        <Message clossable id="receiver-ine-fill">
-            {m["text.you-can-fill-by-ine"]()}
-        </Message>
-        <Input
-            bind:value={invoiceValues.billing.fullname}
-            label={m["form.fullname"]()}
-            error={invoiceValuesErrors.value["billing.fullname"]}
-        />
-        <Input
-            bind:value={invoiceValues.billing.line1}
-            label={m["form.address"]()}
-            error={invoiceValuesErrors.value["billing.line1"]}
-        />
-        <Input
-            bind:value={invoiceValues.billing.postal}
-            label={m["form.postal"]()}
-            error={invoiceValuesErrors.value["billing.postal"]}
-        />
-        <Input
-            bind:value={invoiceValues.billing.city}
-            label={m["form.city"]()}
-            error={invoiceValuesErrors.value["billing.city"]}
-        />
-        <Input
-            bind:value={invoiceValues.billing.country}
-            label={m["form.country"]()}
-        />
-        <Input
-            bind:value={invoiceValues.billing.ine}
-            label={m["form.ine"]()}
-            error={invoiceValuesErrors.value["billing.ine"]}
-        />
-        {#if !invoiceValuesErrors.value["billing.ine"]}
-            <ButtonRequestAres
-                ine={invoiceValues.billing.ine}
-                bind:billing={invoiceValues.billing}
-            />
-        {/if}
-        <Input bind:value={invoiceValues.billing.vat} label={m["form.vat"]()} />
-
-        <hr class="hr mx-7 my-4 w-[auto]" />
-
-        <h3 class="h5 font-bold uppercase">{m["form.items"]()}</h3>
-        <Switch
-            bind:checked={invoiceValues.countVat}
-            label={m["form.count-vat"]()}
-        />
-        <Switch
-            bind:checked={invoiceValues.roundTotal}
-            label={m["form.round-total"]()}
-        />
-
-        {#each invoiceValues.items as item (item.id)}
-            <Item {item} />
-        {/each}
-
-        <div>
-            <button
-                onclick={() => {
-                    invoiceValues.items.push(
-                        _.cloneDeep({
-                            ...DefaultItem,
-                            id:
-                                _.uniqueId("item_") +
-                                Math.random() +
-                                Math.random(),
-                        }),
-                    );
-                }}
-                type="button"
-                class="btn btn-group preset-filled-success-100-900"
-            >
-                <SvgPlusCircle class="fill-success-600 w-10" />
-                {m["actions.add-item"]()}
-            </button>
-        </div>
-
-        <hr class="hr mx-7 my-4 w-[auto]" />
-
-        <Input
-            bind:value={invoiceValues.paymentType}
-            label={m["form.payment-type"]()}
-        />
-        <Input
-            bind:value={invoiceValues.paymentInfo}
-            label={m["form.payment-info"]()}
-            type="textarea"
-            class="min-h-[8rem]"
-        />
-
-        <hr class="hr mx-7 my-4 w-[auto]" />
-
-        <Input
-            bind:value={invoiceValues.customFooterText}
-            label={m["form.custom-footer-text"]()}
-            type="textarea"
-        />
-
-        <hr class="hr mx-7 my-4 w-[auto]" />
-
-        <div class="sticky bottom-0 flex min-h-15 gap-1">
-            <button
-                type="submit"
-                class="btn preset-filled-success-100-900 flex-1 font-medium"
-            >
-                {m["actions.save"]()}
-            </button>
-            <button
-                onclick={() => {
-                    isFullPreview = !isFullPreview;
-                }}
-                type="button"
-                class="btn preset-filled-primary-400-600"
-            >
-                {m["actions.full-preview"]()}
-            </button>
-        </div>
-        <button
-            onclick={() => renderInvoiceFunc(true)}
-            type="button"
-            class="btn btn-group preset-filled-success-100-900 mt-2"
-        >
-            <SaveIcon class="fill-success-600 w-10" />
-            {m["actions.download"]()}
-        </button>
-    </form>
-    <div
-        class="pdf-viewer-wrap sticky top-0 z-1 m-0 h-[100svh] w-[100%] max-w-[750px] flex-1 overflow-auto"
-    >
-        {#if url}
-            {#key url}
-                <PdfViewer
-                    {url}
-                    showTopButton={false}
-                    showButtons={[]}
-                    scale={3}
-                />
-            {/key}
-        {/if}
+            {/await}
+        {/await}
     </div>
 </div>
 
 <style lang="scss">
-    .pdf-full-preview {
-        background-color: rgba(0, 0, 0, 0.555);
+    .pdf-viewer-wrap {
+        :global(.svelte-pdf) {
+            height: 100%;
 
-        :global(.parent) {
-            margin: auto !important;
+            --theme-color: var(--color-primary-300);
+        }
+
+        :global(.control) {
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            border: 0;
+
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+
+            :global(.line) {
+                background-color: var(--color-surface-900);
+                justify-content: start;
+                padding: 5px 10px;
+                gap: 15px;
+                margin: 0;
+
+                :global(.melt-tooltip-container .content),
+                :global(.melt-tooltip-container .melt-tooltip-arrow) {
+                    background-color: var(--color-surface-700) !important;
+                    color: var(--color-white);
+
+                    &::before {
+                        display: none;
+                    }
+                }
+
+                :global(.button-control) {
+                    border: 0;
+                }
+            }
+
+            :global(.viewer) {
+                flex: 1;
+                min-width: 1px;
+            }
         }
     }
 
-    .main-wrap {
-        @media (max-width: 900px) {
+    .page-wrap {
+        @apply mt-8 mb-40 flex justify-center gap-x-1;
+
+        .pdf-viewer-wrap {
+            @apply sticky top-0 z-1 m-0 h-[100svh] max-w-[750px] min-w-1 flex-1;
+
+            :global(.viewer) {
+                :global(canvas) {
+                    min-width: 650px;
+                    width: 115%;
+                }
+            }
+
+            @media (max-width: 850px) {
+                position: unset;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 850px) {
             flex-direction: column;
             align-items: center;
         }
     }
 
-    .pdf-viewer-wrap {
-        :global(.parent),
-        :global(.control) {
-            margin: 0;
-            padding: 0;
-            border-radius: 0;
-        }
+    .pdf-full-preview {
+        background-color: var(--color-surface-900);
+        display: grid;
+        align-items: center;
 
-        :global(.viewer) {
-            border: 0;
-        }
+        .pdf-viewer-wrap {
+            overflow: auto;
+            height: 100vh;
+            height: 100dvh;
 
-        :global(.parent) {
-            width: 100% !important;
-            overflow: hidden;
-            min-width: 650px;
-            max-width: 720px;
+            :global(.control) {
+                :global(.viewer) {
+                    width: 100%;
+                    overlay: auto;
 
-            :global(canvas) {
-                width: 100% !important;
+                    :global(canvas) {
+                        margin: 0 auto;
+                        width: 100%;
+                        max-width: 900px;
+                    }
+                }
             }
         }
     }

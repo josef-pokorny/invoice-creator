@@ -4,6 +4,7 @@
 @import "@skeletonlabs/skeleton/themes/cerberus";
 
 @plugin '@tailwindcss/forms';
+@plugin 'flowbite/plugin';
 
 [data-theme="dark"] {
     --text-scaling: 1.067;
@@ -209,7 +210,10 @@
     --color-surface-contrast-800: var(--color-surface-contrast-light);
     --color-surface-contrast-900: var(--color-surface-contrast-light);
     --color-surface-contrast-950: var(--color-surface-contrast-light);
+    --text-color: #fff;
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @source "../../node_modules/@skeletonlabs/skeleton-svelte/dist";
 

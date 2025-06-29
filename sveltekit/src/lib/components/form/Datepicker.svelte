@@ -1,15 +1,13 @@
 <script lang="ts">
+    import Datepicker from "flowbite-svelte/Datepicker.svelte";
+    import type { ComponentProps } from "svelte";
+    import type { HTMLInputAttributes } from "svelte/elements";
+
     import { getLocale } from "$lib/paraglide/runtime";
     import type { IYupError } from "$lib/types/types";
-    import { Datepicker } from "flowbite-svelte";
-    import _ from "lodash";
-    import type { ComponentProps } from "svelte";
-    import type {
-        HTMLInputAttributes,
-        HTMLTextareaAttributes,
-    } from "svelte/elements";
-    import Error from "./Error.svelte";
     import { createId } from "$lib/utils";
+
+    import Error from "./Error.svelte";
 
     interface IProps extends Partial<ComponentProps<typeof Datepicker>> {
         label?: string;
@@ -28,7 +26,7 @@
         ...rest
     }: IProps = $props();
 
-    const id = createId();
+    const id = createId("datepicker");
 
     function onchange(e: Parameters<NonNullable<IProps["onchange"]>>[0]) {
         if (onchangeProp) onchangeProp(e as any);
@@ -40,7 +38,7 @@
 
     let wrapperEl: HTMLElement | null;
     $effect(() => {
-        let input = wrapperEl?.querySelector(`.date-picker input`);
+        const input = wrapperEl?.querySelector(`.date-picker input`);
 
         if (input) {
             input.id = id;
@@ -56,64 +54,66 @@
     });
 </script>
 
-<fieldset class="label" bind:this={wrapperEl}>
+<fieldset bind:this={wrapperEl} class="label">
     {#if label}
-        <label for={id} class="label-text text-surface-100 text-[0.9rem]">
+        <label class="label-text text-surface-100 text-[0.9rem]" for={id}>
             {label}
         </label>
     {/if}
     <div class="date-picker">
         <Datepicker
-            bind:value
-            color="green"
-            title={String(label)}
-            placeholder={String(label)}
             {id}
+            aria-invalid={!!error}
             autohide
-            range={false}
-            locale={getLocale()}
-            disabled={rest.disabled || false}
-            firstDayOfWeek={1}
+            color="green"
             dateFormat={{}}
+            disabled={rest.disabled || false}
+            locale={getLocale()}
+            placeholder={String(label)}
+            title={String(label)}
+            bind:value
+            range={false}
+            firstDayOfWeek={1}
             required={rest.required || false}
             inputClass="input"
             inline={false}
             showActionButtons
-            aria-invalid={!!error}
             {onchange}
             {...rest}
         />
     </div>
-    <Error id={id || ""} {error} />
+    <Error {id} {error} />
 </fieldset>
 
 <style lang="scss">
     .date-picker {
-        :global(input[type="text"]) {
-            @apply input placeholder-transparent;
-        }
-
-        :global(input[type="text"][aria-invalid="true"]) {
-            @include errorInput;
-        }
-
-        :global(#datepicker-dropdown) {
-            width: 100%;
-            max-width: 350px;
-
-            :global([role="grid"]) {
-                width: 100%;
+        :global {
+            input[type="text"] {
+                @apply input placeholder-transparent;
             }
 
-            :global(.mt-4.flex.justify-between) {
-                :global(button:nth-of-type(1)) {
-                    @apply btn bg-primary-500 text-white;
+            input[type="text"][aria-invalid="true"] {
+                @include errorInput;
+            }
+
+            #datepicker-dropdown {
+                width: 100%;
+                max-width: 350px;
+
+                [role="grid"] {
+                    width: 100%;
                 }
-                :global(button:nth-of-type(2)) {
-                    @apply btn;
-                }
-                :global(button:nth-of-type(3)) {
-                    @apply btn bg-success-600 text-white;
+
+                .mt-4.flex.justify-between {
+                    button:nth-of-type(1) {
+                        @apply btn bg-primary-500 text-white;
+                    }
+                    button:nth-of-type(2) {
+                        @apply btn;
+                    }
+                    button:nth-of-type(3) {
+                        @apply btn bg-success-600 text-white;
+                    }
                 }
             }
         }

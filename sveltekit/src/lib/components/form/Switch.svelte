@@ -1,16 +1,20 @@
 <script lang="ts">
-    import _ from "lodash";
+    import Toggle from "flowbite-svelte/Toggle.svelte";
     import type { ComponentProps } from "svelte";
-    import { Toggle } from "flowbite-svelte";
+    import type { ClassValue } from "svelte/elements";
+
+    import { createId } from "$lib/utils";
 
     interface IProps extends ComponentProps<typeof Toggle> {
         label?: string;
+        classContainer?: ClassValue;
     }
 
     let {
         label,
         checked = $bindable(false),
-        id = _.uniqueId("switch_") + Math.random() + Math.random(),
+        id = createId(),
+        classContainer,
         ...rest
     }: IProps = $props();
 </script>

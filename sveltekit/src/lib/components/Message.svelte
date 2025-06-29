@@ -1,9 +1,12 @@
 <script lang="ts">
-    import { m } from "$lib/paraglide/messages";
-    import { useMessageStore } from "$lib/stores/message";
-    import { InfoIcon } from "@lucide/svelte";
+    import InfoIcon from "@lucide/svelte/icons/info";
     import type { Snippet } from "svelte";
     import { fade } from "svelte/transition";
+
+    import { m } from "$lib/paraglide/messages";
+    import { useMessageStore } from "$lib/stores/message";
+
+    import Button from "./form/Button.svelte";
 
     let {
         children,
@@ -30,13 +33,13 @@
 
 {#if !isClosed}
     <div
-        transition:fade={{ duration: 120 }}
+        {id}
         class="card {type === 'info'
             ? 'preset-outlined-surface-500'
             : type === 'error'
               ? 'preset-outlined-error-500'
               : 'preset-outlined-primary-500'} grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3"
-        {id}
+        transition:fade={{ duration: 120 }}
     >
         <div class="flex items-center gap-3">
             {#if type === "info"}
@@ -50,12 +53,12 @@
         </div>
         {#if clossable}
             <div class="flex gap-1">
-                <button
+                <Button
                     class="btn preset-tonal hover:preset-filled"
                     onclick={onClose}
                 >
                     {m["actions.close"]()}
-                </button>
+                </Button>
             </div>
         {/if}
     </div>

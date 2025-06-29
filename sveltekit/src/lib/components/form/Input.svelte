@@ -1,30 +1,30 @@
 <script lang="ts">
-    import { Datepicker } from "flowbite-svelte";
     import _ from "lodash";
-    import type { ComponentProps } from "svelte";
+    import type { Snippet } from "svelte";
     import type {
+        HTMLAttributes,
         HTMLInputAttributes,
         HTMLTextareaAttributes,
     } from "svelte/elements";
-    import Error from "./Error.svelte";
+
     import type { IYupError } from "$lib/types/types";
     import { createId } from "$lib/utils";
 
-    type TExdended = HTMLInputAttributes &
-        HTMLTextareaAttributes &
-        Partial<
-            Omit<
-                ComponentProps<typeof Datepicker>,
-                "date" | "value" | "onchange"
-            >
-        >;
-    interface IProps extends TExdended {
+    import Error from "./Error.svelte";
+    import Label from "./Label.svelte";
+
+    type TExdended = HTMLInputAttributes & HTMLTextareaAttributes;
+    interface IProps extends Omit<TExdended, "prefix"> {
         label?: string;
         value?: string | number;
         type?: HTMLInputAttributes["type"] | "textarea";
         date?: string | Date;
         error?: IYupError;
         isErrorVisible?: boolean;
+        suffix?: Snippet;
+        prefix?: Snippet;
+        containerProps?: HTMLAttributes<HTMLDivElement>;
+        fieldsetProps?: HTMLAttributes<HTMLFieldSetElement>;
     }
 
     let {
@@ -35,6 +35,10 @@
         id = $bindable(createId()),
         error,
         isErrorVisible = true,
+        suffix,
+        prefix,
+        containerProps,
+        fieldsetProps,
         ...rest
     }: IProps = $props();
 
@@ -62,70 +66,58 @@
             }
         }
     }
+
+    let hasSuffix = _.isFunction(suffix);
+    let hasPrefix = _.isFunction(prefix);
 </script>
 
-<fieldset class="label">
+<fieldset class="w-full {fieldsetProps?.class}">
     {#if label}
-        <label
-            aria-errormessage="{id}-error"
-            aria-invalid={!!error}
-            for={id}
-            class="label-text text-surface-100 text-[0.9rem]"
-        >
-            {label}
-        </label>
+        <Label for={id} {label} />
     {/if}
-    {#if rest.type === "textarea"}
-        <textarea
-            aria-errormessage="{id}-error"
-            aria-invalid={!!error}
-            {id}
-            bind:value
-            {...rest}
-            class={"input min-h-[2rem] " + rest.class}
-            {onchange}
-        ></textarea>
-    {:else}
-        <input
-            aria-errormessage="{id}-error"
-            aria-invalid={!!error}
-            {id}
-            bind:value
-            {...rest}
-            class={"input " + rest.class}
-            {onchange}
-        />
-    {/if}
+
+    <div
+        class:contents={!hasSuffix && !hasPrefix}
+        class="input-group flex w-full items-stretch {containerProps?.class}"
+    >
+        {#if prefix}
+            {@render prefix()}
+        {/if}
+
+        {#if rest.type === "textarea"}
+            <textarea
+                {id}
+                aria-errormessage="{id}-error"
+                aria-invalid={!!error}
+                {onchange}
+                bind:value
+                {...rest}
+                class={"min-h-[2rem] flex-1 " +
+                    (hasSuffix || hasPrefix ? "ig-input" : "input") +
+                    " " +
+                    rest.class}
+            ></textarea>
+        {:else}
+            <input
+                {id}
+                aria-errormessage="{id}-error"
+                aria-invalid={!!error}
+                {onchange}
+                bind:value
+                {...rest}
+                class={"flex-1 " +
+                    (hasSuffix || hasPrefix ? "ig-input" : "input") +
+                    " " +
+                    rest.class}
+            />
+        {/if}
+
+        {#if suffix}
+            {@render suffix()}
+        {/if}
+    </div>
+
     {#if isErrorVisible}
         <Error id={id || ""} {error} />
     {/if}
 </fieldset>
-
-<style lang="scss">
-    .date-picker {
-        :global(input[type="text"]) {
-            @apply input;
-        }
-
-        :global(#datepicker-dropdown) {
-            width: 100%;
-            max-width: 350px;
-
-            :global([role="grid"]) {
-                width: 100%;
-            }
-
-            :global(.mt-4.flex.justify-between) {
-                :global(button:nth-of-type(1)) {
-                    @apply btn bg-primary-500 text-white;
-                }
-                :global(button:nth-of-type(2)) {
-                    @apply btn;
-                }
-                :global(button:nth-of-type(3)) {
-                    @apply btn bg-success-600 text-white;
-                }
-            }
-        }
-    }
-</style>
