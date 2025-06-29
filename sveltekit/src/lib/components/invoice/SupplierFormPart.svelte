@@ -8,21 +8,18 @@
     import _ from "lodash";
 
     import { m } from "$lib/paraglide/messages";
-    import { useFormErrorsStore } from "$lib/stores/form.svelte";
     import {
         useSupplierKeyStore,
         useSupplierStore,
     } from "$lib/stores/supplier.svelte";
+    import { IBillingType } from "$lib/types/form";
 
-    import ButtonRequestAres from "../ButtonRequestAres.svelte";
-    import Input from "../form/Input.svelte";
     import Switch from "../form/Switch.svelte";
     import Message from "../Message.svelte";
+    import BillingForm from "./BillingForm.svelte";
     import SupplierSelect from "./SupplierSelect.svelte";
 
     let { supplierNameKey }: ISupplierFormPartProps = $props();
-
-    const invoiceValuesErrors = useFormErrorsStore();
 
     const supplierKeyStore = supplierNameKey ?? useSupplierKeyStore();
     const supplierStore = $derived(
@@ -47,42 +44,12 @@
 </Message>
 
 {#if !supplierNameKey}
-    <SupplierSelect />
+    <div class="mb-5">
+        <SupplierSelect />
+    </div>
 {/if}
 
-<Input
-    error={invoiceValuesErrors.value["supplierBilling.fullname"]}
-    label={m["form.fullname"]()}
-    bind:value={supplierStore.value.fullname}
-/>
-<Input
-    error={invoiceValuesErrors.value["supplierBilling.line1"]}
-    label={m["form.address"]()}
-    bind:value={supplierStore.value.line1}
-/>
-<Input
-    error={invoiceValuesErrors.value["supplierBilling.postal"]}
-    label={m["form.postal"]()}
-    bind:value={supplierStore.value.postal}
-/>
-<Input
-    error={invoiceValuesErrors.value["supplierBilling.city"]}
-    label={m["form.city"]()}
-    bind:value={supplierStore.value.city}
-/>
-<Input label={m["form.country"]()} bind:value={supplierStore.value.country} />
-<Input
-    error={invoiceValuesErrors.value["supplierBilling.ine"]}
-    label={m["form.ine"]()}
-    bind:value={supplierStore.value.ine}
-/>
-<ButtonRequestAres
-    ine={supplierStore.value.ine}
-    bind:billing={supplierStore.value}
-    type="supplier"
-/>
-
-<Input label={m["form.vat"]()} bind:value={supplierStore.value.vat} />
+<BillingForm store={supplierStore} type={IBillingType.SUPPLIER} />
 
 <Switch
     label={m["form.is-selfemployed"]()}

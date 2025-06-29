@@ -4,15 +4,14 @@
     import _ from "lodash";
     import { onMount } from "svelte";
 
-    import ButtonRequestAres from "$lib/components/ButtonRequestAres.svelte";
     import Button from "$lib/components/form/Button.svelte";
     import Datepicker from "$lib/components/form/Datepicker.svelte";
     import Input from "$lib/components/form/Input.svelte";
-    import Item from "$lib/components/form/Item.svelte";
     import Select from "$lib/components/form/Select.svelte";
     import Switch from "$lib/components/form/Switch.svelte";
+    import Item from "$lib/components/invoice/Item.svelte";
+    import ReceiverFormPart from "$lib/components/invoice/ReceiverFormPart.svelte";
     import SupplierFormPart from "$lib/components/invoice/SupplierFormPart.svelte";
-    import Message from "$lib/components/Message.svelte";
     import { m } from "$lib/paraglide/messages";
     import { getLocale } from "$lib/paraglide/runtime";
     import { DefaultItem, EInvoiceType } from "$lib/pdf/invoice-types";
@@ -235,51 +234,7 @@
 
                 <hr class="hr mx-7 my-5 w-[auto]" />
 
-                <h3 class="h5 font-bold uppercase">{m["form.receiver"]()}</h3>
-                <Message id="receiver-ine-fill" clossable>
-                    {m["text.you-can-fill-by-ine"]()}
-                </Message>
-                <Input
-                    error={invoiceValuesErrors.value[
-                        "receiverBilling.fullname"
-                    ]}
-                    label={m["form.fullname"]()}
-                    bind:value={formStore.receiverBilling.fullname}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["receiverBilling.line1"]}
-                    label={m["form.address"]()}
-                    bind:value={formStore.receiverBilling.line1}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["receiverBilling.postal"]}
-                    label={m["form.postal"]()}
-                    bind:value={formStore.receiverBilling.postal}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["receiverBilling.city"]}
-                    label={m["form.city"]()}
-                    bind:value={formStore.receiverBilling.city}
-                />
-                <Input
-                    label={m["form.country"]()}
-                    bind:value={formStore.receiverBilling.country}
-                />
-                <Input
-                    error={invoiceValuesErrors.value["receiverBilling.ine"]}
-                    label={m["form.ine"]()}
-                    bind:value={formStore.receiverBilling.ine}
-                />
-                <ButtonRequestAres
-                    ine={formStore.receiverBilling.ine}
-                    bind:billing={formStore.receiverBilling}
-                    type="receiver"
-                />
-
-                <Input
-                    label={m["form.vat"]()}
-                    bind:value={formStore.receiverBilling.vat}
-                />
+                <ReceiverFormPart />
 
                 <hr class="hr mx-7 my-5 w-[auto]" />
 

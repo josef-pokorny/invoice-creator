@@ -7,10 +7,13 @@
     import Trash from "@lucide/svelte/icons/trash";
     import { twMerge } from "tailwind-merge";
 
-    import { AppStoragePrefix, InvoiceFormKeyPrefix } from "$lib/constants";
     import moment from "$lib/moment";
     import { m } from "$lib/paraglide/messages";
-    import { useFormKeyStore } from "$lib/stores/form.svelte";
+    import {
+        ImportInvoiceKeyPrefix,
+        useFormKeyStore,
+    } from "$lib/stores/form.svelte";
+    import { getFormKeysFromStorage } from "$lib/stores/utils/form.svelte";
     import {
         deleteStore,
         saveToLocalStorage,
@@ -18,13 +21,10 @@
         stores,
     } from "$lib/stores/utils/utils.svelte";
     import { type IExport } from "$lib/types/import-export";
-    import { normalizeStringForSearch } from "$lib/utils";
 
     import Button from "../form/Button.svelte";
     import Input from "../form/Input.svelte";
     import RadioGroup from "../form/RadioGroup.svelte";
-
-    const ImportKeyPrefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
     const invoiceValuesKey = useFormKeyStore();
 
@@ -45,7 +45,7 @@
                 invoiceValuesKey.reset();
             }
 
-            deleteStore(ImportKeyPrefix + invoiceName);
+            deleteStore(ImportInvoiceKeyPrefix + invoiceName);
             getInvoiceValuesKeys();
 
             if (invoiceName === invoiceValuesKey.value.invoiceName) {
@@ -55,22 +55,7 @@
     }
 
     function getInvoiceValuesKeys() {
-        const normalizedSearch = normalizeStringForSearch(search);
-
-        invoiceValuesKeys = Object.entries(localStorage)
-            .filter(
-                ([k]) =>
-                    k.startsWith(ImportKeyPrefix) &&
-                    (normalizedSearch.length
-                        ? normalizeStringForSearch(
-                              k.substring(ImportKeyPrefix.length),
-                          ).includes(normalizedSearch)
-                        : true),
-            )
-            .map(([k]) => k.substring(ImportKeyPrefix.length))
-            .sort((a, b) =>
-                a.localeCompare(b, undefined, { sensitivity: "base" }),
-            );
+        invoiceValuesKeys = getFormKeysFromStorage(search);
     }
 
     function onCreateInvocie(e: SubmitEvent) {
@@ -113,7 +98,10 @@
         if (!newName.length) throw "";
 
         try {
-            setKey(ImportKeyPrefix + prevName, ImportKeyPrefix + newName);
+            setKey(
+                ImportInvoiceKeyPrefix + prevName,
+                ImportInvoiceKeyPrefix + newName,
+            );
             getInvoiceValuesKeys();
             invoiceValuesKey.value.invoiceName = newName;
         } catch (e) {
@@ -277,7 +265,7 @@
                             JSON.stringify({
                                 invoices: Object.entries(localStorage)
                                     .filter(([k]) =>
-                                        k.startsWith(ImportKeyPrefix),
+                                        k.startsWith(ImportInvoiceKeyPrefix),
                                     )
                                     .map(([k, v]) => [k, JSON.parse(v)]),
                             } as IExport),

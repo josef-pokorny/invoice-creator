@@ -2,7 +2,7 @@ import _ from "lodash";
 import { untrack } from "svelte";
 import * as yup from "yup";
 
-import { InvoiceFormKeyPrefix } from "$lib/constants";
+import { AppStoragePrefix, InvoiceFormKeyPrefix } from "$lib/constants";
 import {
     EInvoiceType,
     type IInvoiceValues,
@@ -13,8 +13,19 @@ import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
 import { invoiceFormSchema } from "$lib/validations/schemas/invoice-form.svelte";
 
 import { useLocaleStore } from "./locale.svelte";
+import {
+    defaultReceiverKey,
+    useReceiverKeyStore,
+    useReceiverStore,
+} from "./receiver.svelte";
 import { useLocalStorageStore, useStore } from "./sharedStore.svelte";
-import { useSupplierKeyStore, useSupplierStore } from "./supplier.svelte";
+import {
+    defaultSupplierKey,
+    useSupplierKeyStore,
+    useSupplierStore,
+} from "./supplier.svelte";
+
+export const ImportInvoiceKeyPrefix = AppStoragePrefix + InvoiceFormKeyPrefix;
 
 // Define default values
 export const defaultForm: IInvoiceValues = {
@@ -91,7 +102,7 @@ export function useFormKeyStore({
 const defaultFormErrors: YupErrorsList<IInvoiceValues> = {};
 
 export function useFormErrorsStore() {
-    const store = useStore("invoice-form-errors-", defaultFormErrors);
+    const store = useStore("invoice-formerrors-", defaultFormErrors);
 
     return store;
 }
@@ -106,18 +117,20 @@ export function useFormItemErrors({
     key?: string;
 } = {}) {
     return useStore(
-        "invoice-form-item-errors-" + (key || ""),
+        "invoice-formitemerrors-" + (key || ""),
         defaultFormItemErrors,
         initialValue,
     );
 }
 
 const rootCleanUp = $effect.root(() => {
-    const formKey = useFormKeyStore();
+    const locale = useLocaleStore();
+
+    const formKeyStore = useFormKeyStore();
     const formStore = $derived(
         useFormStore({
             get key() {
-                return formKey.value.invoiceName;
+                return formKeyStore.value.invoiceName;
             },
         }),
     );
@@ -131,18 +144,48 @@ const rootCleanUp = $effect.root(() => {
             },
         }),
     );
-
-    $effect(() => {
-        ({ ...supplierStore.value, ...formStore.value.supplierBilling });
-
-        if (!_.isEmpty(supplierStore.key)) {
-            formStore.value.supplierBilling = supplierStore.value;
-        } else {
-            supplierStore.value = formStore.value.supplierBilling;
-        }
+    const supplierEmptyStore = useSupplierStore({
+        key: "",
     });
 
-    const locale = useLocaleStore();
+    const receiverKeyStore = useReceiverKeyStore();
+    const receiverStore = $derived(
+        useReceiverStore({
+            get key() {
+                return receiverKeyStore.value.receiverName;
+            },
+        }),
+    );
+    const receiverEmptyStore = useReceiverStore({
+        key: "",
+    });
+
+    $effect.pre(() => {
+        [formKeyStore.value.invoiceName];
+
+        untrack(() => {
+            // this will make sure that nothing will overwrite
+            // when changing invoices
+
+            supplierKeyStore.value = defaultSupplierKey;
+            receiverKeyStore.value = defaultReceiverKey;
+
+            supplierEmptyStore.value = formStore.value.supplierBilling;
+            receiverEmptyStore.value = formStore.value.receiverBilling;
+        });
+    });
+
+    $effect(() => {
+        ({ ...supplierStore.value });
+
+        formStore.value.supplierBilling = supplierStore.value;
+    });
+
+    $effect(() => {
+        ({ ...receiverStore.value });
+
+        formStore.value.receiverBilling = receiverStore.value;
+    });
 
     $effect(() => {
         locale.locale;

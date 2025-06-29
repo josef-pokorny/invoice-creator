@@ -1,11 +1,13 @@
+@reference "$lib/app.css";
+
 @mixin shadow-all {
-    box-shadow: rgba(0, 0, 0, 1) 0px 0px 15px;
+    box-shadow: rgba(0, 0, 0, 0.75) 0px 0px 25px 5px;
 }
 
 @mixin shadow-top {
-    box-shadow: rgba(0, 0, 0, 1) 0px -6px 15px;
+    box-shadow: rgba(0, 0, 0, 0.75) 0px -12px 25px 5px;
 }
 
 @mixin shadow-bottom {
-    box-shadow: rgba(0, 0, 0, 1) 0px 6px 15px;
+    box-shadow: rgba(0, 0, 0, 0.75) 0px 15px 25px 5px;
 }

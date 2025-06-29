@@ -9,7 +9,10 @@
 
     import { m } from "$lib/paraglide/messages";
     import type { ISupplierBilling } from "$lib/pdf/invoice-types";
-    import { ImportSupplierKeyPrefix } from "$lib/stores/supplier.svelte";
+    import {
+        ImportSupplierKeyPrefix,
+        useSupplierKeyStore,
+    } from "$lib/stores/supplier.svelte";
     import { deleteStore, setKey } from "$lib/stores/utils/utils.svelte";
     import { createId } from "$lib/utils";
 
@@ -22,13 +25,15 @@
     import SupplierFormPart from "../invoice/SupplierFormPart.svelte";
     import Tooltip from "../Tooltip.svelte";
 
-    interface ISupplierListItem {
+    interface ISupplierListItemProps {
         key: string;
         supplier: ISupplierBilling;
         getSuppliers: () => void;
     }
 
-    let { key, supplier, getSuppliers }: ISupplierListItem = $props();
+    let { key, supplier, getSuppliers }: ISupplierListItemProps = $props();
+
+    const supplierKeyStore = useSupplierKeyStore();
 
     let deleteConfirmation = $state(false);
 
@@ -53,13 +58,16 @@
     }) {
         if (!newName.length) throw "";
 
-        console.log({ newName });
-
         try {
             setKey(
                 ImportSupplierKeyPrefix + prevName,
                 ImportSupplierKeyPrefix + newName,
             );
+
+            if (supplierKeyStore.value.supplierName === prevName) {
+                supplierKeyStore.value.supplierName = newName;
+            }
+
             getSuppliers();
         } catch (e) {
             console.log(e);
@@ -71,7 +79,7 @@
         if (!deleteConfirmation) {
             deleteConfirmation = true;
         } else {
-            deleteStore(supplierName);
+            deleteStore(ImportSupplierKeyPrefix + supplierName);
             getSuppliers();
         }
     }
@@ -85,11 +93,11 @@
                 deleteConfirmation ? "bg-error-900" : "",
             ),
         }}
-        value={key.substring(ImportSupplierKeyPrefix.length)}
+        value={key}
         onchange={(event) => {
             try {
                 onUpdateSupplierName({
-                    prevName: key.substring(ImportSupplierKeyPrefix.length),
+                    prevName: key,
                     newName: event.currentTarget.value,
                 });
             } catch (e) {

@@ -40,8 +40,11 @@ You can preview the production build with `pnpm run preview`.
 - [x] Move invoices list from dialog
 - [x] Searching for invoices in the list
 - [ ] Move PDF preview to Resizable group
+- [x] Reset supplier and receiver to empty key when changing invoice so it loads from it and not from preset
+- [ ] Change layout in item form
 
 ## FIX
 
 - [x] !!!! Cant update supplier name
 - [x] !!! Cant scroll and touch on touch devices (even on browser simulated) when scrolling/touching is done on the lower side of display. Idk why, possibly something with paneforge
+- [ ] !!! for some reason when clicking on switch in paneforge in supplier form it will create void, then when the form is closed the void will dissapear (tf is this)

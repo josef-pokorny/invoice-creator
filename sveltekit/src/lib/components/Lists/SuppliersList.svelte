@@ -5,15 +5,14 @@
     import { m } from "$lib/paraglide/messages";
     import type { ISupplierBilling } from "$lib/pdf/invoice-types";
     import {
-        ImportSupplierKeyPrefix,
         useSupplierKeyStore,
         useSupplierStore,
     } from "$lib/stores/supplier.svelte";
-    import { normalizeStringForSearch } from "$lib/utils";
     import {
         createSupplierInLocalStorage,
         getSuppliersFromStorage,
-    } from "$lib/utils/suppliers";
+    } from "$lib/stores/utils/supplier.svelte";
+    import { normalizeStringForSearch } from "$lib/utils";
 
     import Button from "../form/Button.svelte";
     import Input from "../form/Input.svelte";
@@ -55,11 +54,7 @@
         }
 
         function findSameKey(keyToFind: string) {
-            if (
-                suppliers.find(
-                    ([k]) => k === ImportSupplierKeyPrefix + keyToFind,
-                )
-            ) {
+            if (suppliers.find(([k]) => k === keyToFind)) {
                 ++same;
                 console.log(createKeyName(newKey));
                 findSameKey(createKeyName(newKey));

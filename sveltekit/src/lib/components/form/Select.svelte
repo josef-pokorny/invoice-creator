@@ -13,7 +13,7 @@
     import { twMerge } from "tailwind-merge";
 
     import Label from "./Label.svelte";
-    import type { Option } from "./OptionsList.svelte";
+    import type { IOption } from "./OptionsList.svelte";
     import OptionsList from "./OptionsList.svelte";
 
     let {
@@ -24,7 +24,7 @@
         ...props
     }: ISelectProps<T> = $props();
 
-    const select = new Select<Option<T>["value"]>({
+    const select = new Select<IOption<T>["value"]>({
         ...props,
         value: () => value,
         onValueChange(v) {

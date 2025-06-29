@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { untrack } from "svelte";
 
 import { AppStoragePrefix, SupplierKeyPrefix } from "$lib/constants";
 import type { ISupplierBilling } from "$lib/pdf/invoice-types";
@@ -74,7 +75,12 @@ const rootCleanUp = $effect.root(() => {
         ({ ...supplierStore.value });
 
         if (!_.isEmpty(supplierStore.key)) {
-            supplierEmptyStore.value = _.cloneDeep(supplierStore.value);
+            untrack(
+                () =>
+                    (supplierEmptyStore.value = _.cloneDeep(
+                        supplierStore.value,
+                    )),
+            );
         }
     });
 

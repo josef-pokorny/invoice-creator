@@ -23,7 +23,7 @@
     let pane: PaneAPI;
 
     $effect(() => {
-        if (!isRisizing && pane.getSize() < 2) {
+        if (!isRisizing && pane?.getSize() < 2) {
             pane.resize(0);
         }
     });

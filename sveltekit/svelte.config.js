@@ -16,7 +16,6 @@ const config = {
     alias: {
         $routes: "./src/routes",
         $types: ".svelte-kit/types/src/routes/$types",
-        $static: "./static",
         $src: "./src",
     },
 };

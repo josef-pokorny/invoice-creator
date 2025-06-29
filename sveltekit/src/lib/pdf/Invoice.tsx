@@ -546,7 +546,7 @@ const InvoiceName = ({
 function breakText(text: string | number | undefined) {
     return String(text)
         .split("")
-        .map((s, idx) => {
-            return <Text key={String(text) + idx}>{s}</Text>;
+        .map((s, i) => {
+            return <Text key={String(text) + i}>{s}</Text>;
         });
 }
