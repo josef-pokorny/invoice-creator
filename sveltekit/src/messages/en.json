@@ -14,10 +14,7 @@
         "invoice-type": "Invoice type",
         "suppliers": "Suppliers",
         "new-supplier": "New supplier",
-        "supplier-preset": "Supplier preset",
-        "saved-profiles": "Saved profiles",
-        "new-profile": "New profile",
-        "used-profile": "Profile used"
+        "supplier-preset": "Supplier preset"
     },
     "actions": {
         "add-item": "Add item",
@@ -57,7 +54,6 @@
         "measurement-unit": "Measurement unit (MU)",
         "single-price": "Price for MU",
         "custom-text-under-supplier": "Custom text under Supplier",
-        "iam-selfemployed": "I'm self employed",
         "custom-footer-text": "Custom footer text",
         "INVOICE_TAX_DOC": "Tax Invoice",
         "INVOICE": "Invoice",

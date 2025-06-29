@@ -3,7 +3,7 @@ import _ from "lodash";
 import { browser } from "$app/environment";
 import { getNestedKeys } from "$lib/utils";
 
-export interface TSharedStorageState<T> {
+export interface TStoreState<T> {
     value: T;
     reset: () => void;
     setKey: (setNewKey: string) => void;
@@ -12,7 +12,7 @@ export interface TSharedStorageState<T> {
 }
 
 export const stores = $state({
-    value: new Map<string, TSharedStorageState<unknown>>(),
+    value: new Map<string, TStoreState<unknown>>(),
 });
 export const UndefinedReplacement = "undefinened#6Wundefinened";
 

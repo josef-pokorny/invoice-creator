@@ -14,6 +14,7 @@
     import { m } from "$lib/paraglide/messages";
     import TanstackQueryWrapper from "$lib/query/wrapper/TanstackQueryWrapper.svelte";
     import { useLocaleStore } from "$lib/stores/locale.svelte";
+    import { onMount } from "svelte";
 
     let { children } = $props();
 

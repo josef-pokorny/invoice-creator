@@ -9,6 +9,7 @@
     import type { IGovEkonomickeSubjektyReturn } from "$lib/requests/ares/ares-types";
     import { useFormErrorsStore } from "$lib/stores/form.svelte";
     import { addFormError } from "$lib/stores/utils/form-errors.svelte";
+    import { IBillingType } from "$lib/types/form";
     import { isINEValid } from "$lib/validations/ine";
 
     import Button from "./form/Button.svelte";
@@ -24,17 +25,15 @@
         aresINEData?: IGovEkonomickeSubjektyReturn;
         ine?: string;
         billing?: IBilling;
-        type?: "supplier" | "receiver";
+        type?: IBillingType;
     } = $props();
 
     const query = createQuery(() => ({
         queryKey: queryKeys.ares.ine(ine!),
         queryFn: () => findAresByINE({ ine: ine! }),
-        enabled: Boolean(ine) && isINEValid(ine),
-        staleTime: 14 * 24 * 60 * 60 * 1000,
+        enabled: isINEValid(ine),
+        staleTime: 20 * 24 * 60 * 60 * 1000,
         retry: false,
-        retryOnMount: false,
-        refetchOnMount: false,
     }));
 
     async function aresAutocomplete() {
@@ -69,16 +68,23 @@
 
     $effect(() => {
         if (query.isError) {
-            if (type === "supplier") {
+            if (type === IBillingType.SUPPLIER) {
                 addFormError("supplierBilling.ine", m["errors.invalid-ine"]());
-            } else if (type === "receiver") {
+            } else if (type === IBillingType.RECEIVER) {
                 addFormError("receiverBilling.ine", m["errors.invalid-ine"]());
             }
         }
     });
+
+    const isError = $derived(
+        (type === IBillingType.SUPPLIER &&
+            !invoiceValuesErrors.value["supplierBilling.ine"]) ||
+            (type === IBillingType.RECEIVER &&
+                !invoiceValuesErrors.value["receiverBilling.ine"]),
+    );
 </script>
 
-{#if !invoiceValuesErrors.value["supplierBilling.ine"]}
+{#if isError}
     <Button
         isLoading={query.isLoading}
         class={twMerge("btn preset-filled-primary-500 font-medium")}

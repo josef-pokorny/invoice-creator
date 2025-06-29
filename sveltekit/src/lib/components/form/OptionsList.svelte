@@ -5,13 +5,13 @@
 
     import { m } from "$lib/paraglide/messages";
 
-    export interface Option<T> {
+    export interface IOption<T> {
         value: T;
         label: string;
     }
 
     export interface IListProps<T> {
-        options: Option<T>[];
+        options: IOption<T>[];
         builder?: Select<T, boolean> | Combobox<T, boolean>;
     }
 </script>
@@ -43,9 +43,10 @@
 
 <style lang="scss">
     .list-container {
-        @include shadow-all;
+        @include shadow-bottom;
         border: 1px solid var(--color-surface-800);
         border-radius: var(--radius-base);
+        background-color: var(--color-surface-900);
     }
 
     .list-option {

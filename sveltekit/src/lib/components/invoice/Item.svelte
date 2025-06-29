@@ -17,9 +17,9 @@
     import { extractYupErrors } from "$lib/validations/extract-errors.svelte";
     import { yupHasNumberMaxTwoDecimalValidation } from "$lib/validations/ine";
 
-    import Button from "./Button.svelte";
-    import Error from "./Error.svelte";
-    import Input from "./Input.svelte";
+    import Button from "../form/Button.svelte";
+    import Error from "../form/Error.svelte";
+    import Input from "../form/Input.svelte";
 
     let {
         ...props

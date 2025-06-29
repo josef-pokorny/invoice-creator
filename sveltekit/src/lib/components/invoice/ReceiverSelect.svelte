@@ -2,19 +2,19 @@
     import _ from "lodash";
 
     import { m } from "$lib/paraglide/messages";
-    import { useSupplierKeyStore } from "$lib/stores/supplier.svelte";
-    import { getSupplierKeysFromStorage } from "$lib/stores/utils/supplier.svelte";
+    import { useReceiverKeyStore } from "$lib/stores/receiver.svelte";
+    import { getReceiverKeysFromStorage } from "$lib/stores/utils/receiver.svelte";
 
     import Combobox from "../form/Combobox.svelte";
     import type { IOption } from "../form/OptionsList.svelte";
 
-    const supplierKeyStore = useSupplierKeyStore();
+    const receiverKeyStore = useReceiverKeyStore();
 
-    let supplierKeysOptions: IOption<string>[] = $state([]);
+    let receiverKeysOptions: IOption<string>[] = $state([]);
     let open = $state(false);
 
-    function getSupplierKeys() {
-        supplierKeysOptions = getSupplierKeysFromStorage()
+    function getReceiverKeys() {
+        receiverKeysOptions = getReceiverKeysFromStorage()
             .filter((s) => !_.isEmpty(s))
             .map((s) => ({
                 value: s,
@@ -25,16 +25,16 @@
     $effect(() => {
         [open];
 
-        getSupplierKeys();
+        getReceiverKeys();
     });
 </script>
 
 <Combobox
     nullable
     bind:open
-    bind:value={supplierKeyStore.value.supplierName}
+    bind:value={receiverKeyStore.value.receiverName}
     nullValue=""
-    options={supplierKeysOptions}
+    options={receiverKeysOptions}
     label={m["labels.supplier-preset"]()}
     inputClass="ring-primary-700"
     labelClass="text-primary-50"

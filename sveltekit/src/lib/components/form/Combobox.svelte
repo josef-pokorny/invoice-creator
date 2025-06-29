@@ -1,7 +1,7 @@
 <script lang="ts" module>
     export interface IComboboxProps<T>
         extends Partial<ComboboxProps<T, false>> {
-        options: Option<T>[];
+        options: IOption<T>[];
         label?: string;
         class?: ClassNameValue;
         value?: T;
@@ -10,6 +10,8 @@
         nullable?: boolean;
         nullValue?: T;
         onNull?: () => void;
+        inputClass?: ClassNameValue;
+        labelClass?: ClassNameValue;
     }
 </script>
 
@@ -25,7 +27,7 @@
     import Tooltip from "../Tooltip.svelte";
     import Button from "./Button.svelte";
     import Label from "./Label.svelte";
-    import type { Option } from "./OptionsList.svelte";
+    import type { IOption } from "./OptionsList.svelte";
     import OptionsList from "./OptionsList.svelte";
 
     let {
@@ -36,10 +38,12 @@
         inputValue = $bindable(""),
         nullable,
         nullValue,
+        inputClass,
+        labelClass,
         ...props
     }: IComboboxProps<T> = $props();
 
-    const combobox = new Combobox<Option<T>["value"]>({
+    const combobox = new Combobox<IOption<T>["value"]>({
         ...props,
         value: () => value,
         onValueChange(v) {
@@ -95,11 +99,14 @@
 
 <div class={twMerge(props.class, "label")}>
     {#if label}
-        <Label for={combobox.ids.input} {label} />
+        <Label class={twMerge(labelClass)} for={combobox.ids.input} {label} />
     {/if}
 
     <div class="flex">
-        <input class="input w-full text-left" {...combobox.input} />
+        <input
+            class={twMerge("input w-full text-left", inputClass)}
+            {...combobox.input}
+        />
 
         {#if nullable && combobox.value}
             <Tooltip>

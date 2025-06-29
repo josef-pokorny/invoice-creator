@@ -8,7 +8,7 @@ import {
     saveToLocalStorage,
     setKey,
     stores,
-    type TSharedStorageState,
+    type TStoreState,
 } from "$lib/stores/utils/utils.svelte";
 import { getNestedKeys } from "$lib/utils";
 
@@ -24,7 +24,7 @@ function createLocalStorageStore<T>({
     key: string;
     defaultValue: T;
     initialValue?: T;
-}): TSharedStorageState<T> {
+}): TStoreState<T> {
     let value = $state(initialValue || defaultValue);
 
     const valueFromStore = getStoreValueFromLocalStorage({
@@ -95,13 +95,13 @@ export function useLocalStorageStore<T>({
     key: string;
     defaultValue: T;
     initialValue?: T;
-}): TSharedStorageState<T> {
+}): TStoreState<T> {
     const localStorageKey = AppStoragePrefix + key;
 
-    let store: TSharedStorageState<T>;
+    let store: TStoreState<T>;
 
     if (stores.value.has(localStorageKey)) {
-        store = stores.value.get(localStorageKey) as TSharedStorageState<T>;
+        store = stores.value.get(localStorageKey) as TStoreState<T>;
     } else {
         stores.value.set(
             localStorageKey,
@@ -111,7 +111,7 @@ export function useLocalStorageStore<T>({
                 initialValue,
             }),
         );
-        store = stores.value.get(localStorageKey) as TSharedStorageState<T>;
+        store = stores.value.get(localStorageKey) as TStoreState<T>;
     }
 
     $effect.root(() => {
@@ -168,11 +168,11 @@ export function useStore<T>(
     key: string,
     defaultValue: T,
     initialValue?: T,
-): TSharedStorageState<T> {
+): TStoreState<T> {
     const storeKey = AppStoragePrefix + key;
 
     if (stores.value.has(storeKey)) {
-        return stores.value.get(storeKey) as TSharedStorageState<T>;
+        return stores.value.get(storeKey) as TStoreState<T>;
     } else {
         stores.value.set(
             storeKey,
@@ -181,6 +181,6 @@ export function useStore<T>(
                 initialValue,
             }) as any,
         );
-        return stores.value.get(storeKey) as TSharedStorageState<T>;
+        return stores.value.get(storeKey) as TStoreState<T>;
     }
 }

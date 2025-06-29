@@ -1,4 +1,4 @@
-@reference "../app.css";
+@reference "$lib/app.css";
 
 .input[aria-invalid="true"] {
     @include errorInput;
